@@ -5,9 +5,9 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 ## 1. General & UI
 | Setting | Mobile | Android TV |
 | :--- | :--- | :--- |
-| **Theme** | Select between Light, Dark, or System. | Fixed dark theme (optimized for TVs). |
-| **Accent Color** | Fully customizable. | Limited to pre-set accent palettes. |
-| **Layout** | List or Grid views. | Poster-heavy "Rows" layout. |
+| **Theme** | Select between Light, Dark, or System. |
+| **Accent Color** | Choose from a pre-set accent palettes. |
+| **Layout** | List or Grid views. |
 
 ## 2. Playback
 - **Internal Player:** Highly recommended for most users. Supports hardware decoding.
