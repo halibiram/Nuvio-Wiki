@@ -10,11 +10,17 @@ Addons are the heart of the Nuvio experience. They provide the content and funct
 
 ## Finding Addons
 
-Nuvio maintains a community-driven ecosystem. Popular sources include:
-- Official Nuvio Addon Repository (built-in).
-- Community lists (e.g., Duckstreams).
+Nuvio maintains has a community-driven ecosystem. Popular sources include:
+- Aiostreams
+- Aiometadata
+- Torrentio
+- Comet
+- Mediafusion
+- Torz
+- Meteor
+- Debridio (Paid $10/year)
 
 ## Setup Links
 
 To add an addon, you typically need a manifest URL.
-- **Duckstreams Example:** `https://duckstreams.link/manifest.json` (Verify current links on their official site).
+- These will be generated when configuring the addon. The manifest generated will be pasted into the addons tab of Nuvio.
