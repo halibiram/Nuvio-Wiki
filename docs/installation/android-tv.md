@@ -27,6 +27,9 @@ Just like on Android Mobile, there are two ways to install Nuvio on Android Mobi
 
 3. Open Nuvio. You may be prompted to grant storage permissions and to allow nuvio to install unknown apps. This is to allow Nuvio to update itself.
 
+**Play Store**
+1. You can obtain the Offical Nuvio Play Store version by searching for it in the Play Store on the TV.
+
 ## Troubleshooting
 - **Play Protect Warning:** Since Nuvio is not on the Play Store, you might see a "Blocked by Play Protect" popup. Tap **More details** > **Install anyway**.
 - **App Not Installed:** Ensure you have enough storage space and that you aren't trying to install the Android TV version on a mobile device.
