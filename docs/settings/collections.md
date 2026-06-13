@@ -11,11 +11,11 @@ Nuvio collections can be confusing. At its core though, it is a file system with
 
 ```mermaid
 graph LR
-    MainCatalog[🎬 Action Catalog] --> Folder1[📁 2020s Action Movies]
-    MainCatalog --> Folder2[📁 2010s Action Movies]
+    MainCatalog[🎬 Action Catalog *on home screen*] --> Folder1[📁 2020s Action Movies *inside of Action Catalog*]
+    MainCatalog --> Folder2[📁 2010s Action Movies *inside of Action Catalog*]
 
-    Folder1 --> Movies2020[📄 List of 2020s Movies]
-    Folder2 --> Movies2010[📄 List of 2010s Movies]
+    Folder1 --> Movies2020[📄 List of 2020s Movies *catalog for list*]
+    Folder2 --> Movies2010[📄 List of 2010s Movies *catalog for list*]
     
     %% Styling
     classDef category fill:#2a2a2a,stroke:#333,stroke-width:2px,color:#fff
