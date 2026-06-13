@@ -7,7 +7,7 @@
 - **Website:** - [nuvio.tv](https://nuvio.tv)
 - **Discord:** - [Join the Community](https://discord.gg/nuvio)
 - 
-- **GitHub Nuvio Mobile:** - [Source Code / Issues][https://github.com/NuvioMedia/NuvioMobile)
+- **GitHub Nuvio Mobile:** - [Source Code / Issues](https://github.com/NuvioMedia/NuvioMobile)
 - **GitHub Nuvio TV:** - [Source Code / Issues](https://github.com/NuvioMedia/NuvioTV)
 - **GitHub Nuvio WebOS:** - [Source Code / Issues](https://github.com/NuvioMedia/NuvioTVWebOS)
 
