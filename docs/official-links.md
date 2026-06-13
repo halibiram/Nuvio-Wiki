@@ -4,7 +4,7 @@
 > Always verify links. Never provide your Debrid API key or Trakt password to unofficial sites.
 
 ## Official Channels
-- **Website:** [nuvio.tv(https://nuvio.tv)
+- **Website:** [nuvio.tv](https://nuvio.tv)
 - **Discord:** [Join the Community](https://discord.gg/nuvio)
 - 
 - **GitHub Nuvio Mobile:** [Source Code / Issues]([https://github.com/NuvioMedia/NuvioMobile])
