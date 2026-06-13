@@ -14,7 +14,7 @@ There are two ways to install Nuvio on Android Mobile. One, is getting it from t
 4.  **Initial Launch:** Open Nuvio. You may be prompted to grant storage permissions and to allow nuvio to install unknown apps. This is to allow Nuvio to update itself.
 
 **Play Store**
-1. You can obtaine the Offical Nuvio Play Store version from [here](https://play.google.com/store/apps/details?id=com.nuvio.app&utm_source=na_Med)
+1. You can obtain the Offical Nuvio Play Store version from [here](https://play.google.com/store/apps/details?id=com.nuvio.app&utm_source=na_Med)
 
 ## Troubleshooting
 - **Play Protect Warning:** Since Nuvio is not on the Play Store, you might see a "Blocked by Play Protect" popup. Tap **More details** > **Install anyway**.
