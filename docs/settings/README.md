@@ -1,6 +1,6 @@
 # Settings Breakdown
 
-Nuvio's settings allow for deep customization. Below is a detailed breakdown, noting differences between the **Mobile** and **Android TV** (Leanback) versions.
+Nuvio's settings allow for deep customization. Below is a detailed breakdown, noting differences between the **Mobile** and **Android TV** versions.
 
 ## 1. General & UI
 | Setting | Mobile | Android TV |
