@@ -8,10 +8,10 @@ Want to get Nuvio up and running in 10 minutes? Follow this sequence:
 
 ## 1. Install the App
 - **Android:** Download the APK and install. [Full Guide](addons/README.md)
-- **Android TV:** Use the "Downloader" app to get the TV APK. [Full Guide](docs/installation/android-tv.md)
+- **Android TV:** Use the "Downloader" app to get the TV APK. [Full Guide](installation/android-tv.md)
 
 ## 2. Add Your First Addon
-Nuvio is empty by default. You need an addon to see content. See [Addons](docs/addons/README.md).
+Nuvio is empty by default. You need an addon to see content. See [Addons](addons/README.md).
 - Open Nuvio > **Settings** > **Addons**.
 - Tap **Install from URL**.
 - Enter a manifest link.
@@ -20,7 +20,7 @@ Nuvio is empty by default. You need an addon to see content. See [Addons](docs/a
 For high-quality 4K streaming without buffering:
 - Go to **Settings** > **Integrations** > **Connected Services**.
 - Select your provider (Torbox or Premiumize).
-- Follow the on-screen instructions. [Integration Guide](docs/integrations/debrid.md)
+- Follow the on-screen instructions. [Integration Guide](integrations/debrid.md)
 
 ## 4. Setup Trakt (Optional)
 - Go to **Settings** > **Trakt**.
