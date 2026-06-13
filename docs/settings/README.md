@@ -17,8 +17,7 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 
 ## 3. Account Integrations
 - **Trakt.tv:** Syncs your "Up Next" list and watch history across all Nuvio devices.
-- **Simkl:** An alternative to Trakt for tracking anime and TV shows.
-- **Real-Debrid / Premiumize / AllDebrid:** 
+- **Torbox / Premiumize:** 
   - Essential for high-quality, buffer-free 4K streams.
   - Requires an API Key or Device Code for authorization.
 
