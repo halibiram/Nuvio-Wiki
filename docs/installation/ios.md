@@ -1,4 +1,4 @@
-# iOS Installation (WIP)
+# iOS Installation
 
 Nuvio on iOS typically requires **Sideloading** (AltStore/Sideloadly). Apple allows for 10k testflight users which is normally full.
 
