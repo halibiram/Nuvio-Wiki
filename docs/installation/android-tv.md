@@ -33,10 +33,3 @@ Just like on Android Mobile, there are two ways to install Nuvio on Android Mobi
 ## Troubleshooting
 - **Play Protect Warning:** Since Nuvio is not on the Play Store, you might see a "Blocked by Play Protect" popup. Tap **More details** > **Install anyway**.
 - **App Not Installed:** Ensure you have enough storage space and that you aren't trying to install the Android TV version on a mobile device.
-
-
-
-2.  Enable **Unknown Sources** in your TV settings.
-3.  Download the Nuvio TV APK from the official source.
-4.  Install using a file manager or "Downloader" app.
-5.  Open Nuvio and follow the on-screen setup.
