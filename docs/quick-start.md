@@ -1,4 +1,4 @@
-[🏠 Home](../../README.md) | [🛠️ Troubleshooting](troubleshooting.md) | [🔗 Official Links](official-links.md) | [📢 Report Issue](../../issues)
+[🏠 Home](/overview.md) | [🛠️ Troubleshooting](troubleshooting.md) | [🔗 Official Links](official-links.md) | [📢 Report Issue](../../issues)
 
 ---
 
