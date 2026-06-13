@@ -1,4 +1,4 @@
-# 🌌 Nuvio Unofficial Wiki
+# 🌌 Nuvio Wiki
 
 [**Quick Start**](docs/quick-start.md) | [**Troubleshooting**](docs/troubleshooting.md) | [**Official Links**](docs/official-links.md) | [**Report Issue**](../../issues)
 
