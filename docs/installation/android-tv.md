@@ -1,9 +1,12 @@
+[Home](../../README.md) | [Quick Start](../../docs/quick-start.md) | [Overview](../../docs/overview.md) | [Features](../../docs/features.md) | [Installation](../../docs/installation/README.md) | [Settings](../../docs/settings/README.md) | [Troubleshooting](../../docs/troubleshooting.md) | [FAQ](../../docs/faq.md)
+
+---
 # Android TV Installation
 
 Just like on Android Mobile, there are two ways to install Nuvio on Android Mobile. One, is getting it from the play store and the second, is sideloading it.
 
 > [!NOTE]
-> The google play store version lacks some features of the apk sideload version to comply with the Play Stores policies. It is recommened that you sideload it.
+> The google play store version lacks some features of the apk sideload version to comply with the Play Stores policies. It is recommended that you sideload it.
 
 **APK Version**
 1.  **Option 1 Enter the Downloader code**
@@ -25,10 +28,10 @@ Just like on Android Mobile, there are two ways to install Nuvio on Android Mobi
         - Open the app on your phone, select Send, locate the Nuvio APK in your downloads, and select your TV to push the file over.
         - Select the file on the TV and install it.
 
-3. Open Nuvio. You may be prompted to grant storage permissions and to allow nuvio to install unknown apps. This is to allow Nuvio to update itself.
+3. Open Nuvio. You may be prompted to grant storage permissions and to allow Nuvio to install unknown apps. This is to allow Nuvio to update itself.
 
 **Play Store**
-1. You can obtain the Offical Nuvio Play Store version by searching for it in the Play Store on the TV.
+1. You can obtain the Official Nuvio Play Store version by searching for it in the Play Store on the TV.
 
 ## Troubleshooting
 - **Play Protect Warning:** Since Nuvio is not on the Play Store, you might see a "Blocked by Play Protect" popup. Tap **More details** > **Install anyway**.

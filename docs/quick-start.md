@@ -1,7 +1,6 @@
-[🏠 Home](/docs/overview.md) | [🛠️ Troubleshooting](troubleshooting.md) | [🔗 Official Links](official-links.md) | [📢 Report Issue](../../issues)
+[Home](../README.md) | [Quick Start](../docs/quick-start.md) | [Overview](../docs/overview.md) | [Features](../docs/features.md) | [Installation](../docs/installation/README.md) | [Settings](../docs/settings/README.md) | [Troubleshooting](../docs/troubleshooting.md) | [FAQ](../docs/faq.md)
 
 ---
-
 # ⚡ Quick Start Guide
 
 Want to get Nuvio up and running in 10 minutes? Follow this sequence:

@@ -1,3 +1,6 @@
+[Home](../README.md) | [Quick Start](../docs/quick-start.md) | [Overview](../docs/overview.md) | [Features](../docs/features.md) | [Installation](../docs/installation/README.md) | [Settings](../docs/settings/README.md) | [Troubleshooting](../docs/troubleshooting.md) | [FAQ](../docs/faq.md)
+
+---
 ## Nuvio's features are vast. Here is an overview of what it has to offer:
 
 **UI, Customization & Organization 🎨**
@@ -13,5 +16,5 @@
 
 **Integration & Tracking**
 1. Native Trakt Integration: Nuvio connects directly to your Trakt account to automatically track your watch progress, sync your history across all your devices, and pull in your personalized watchlists.
-2. Debrid Integration: Nuvio has native debrid integraion for Torbox and Premiumize.
+2. Debrid Integration: Nuvio has native debrid integration for Torbox and Premiumize.
 3. Mobile Notifications: On iOS and Android, Nuvio can send push notifications to alert you when a new episode of a show you are tracking airs.

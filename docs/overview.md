@@ -1,7 +1,6 @@
-[🏠 Home](../../README.md) | [⚡ Quick Start](quick-start.md) | [📢 Report Issue](../../issues)
+[Home](../README.md) | [Quick Start](../docs/quick-start.md) | [Overview](../docs/overview.md) | [Features](../docs/features.md) | [Installation](../docs/installation/README.md) | [Settings](../docs/settings/README.md) | [Troubleshooting](../docs/troubleshooting.md) | [FAQ](../docs/faq.md)
 
 ---
-
 # 📖 General Overview
 
 Nuvio is a powerful media aggregator designed to provide a unified interface for various content sources. It allows users to browse and play media from multiple providers through a highly customizable and modern UI.
@@ -45,7 +44,7 @@ Nuvio operates on a modular architecture using **Addons**. By itself, Nuvio is a
 
 - **Cross-Platform:** Available on Android (Mobile & TV) and iOS.
 - **Unified Search:** Search across all installed addons simultaneously.
-- **Profiles:** Add profiles to keep everything seperate
+- **Profiles:** Add profiles to keep everything separate
 - **Intro/Outro Skip:** Uses introDB to skip intros and outros
 - **Auto Source Select:** Automatically plays a file based on your settings. No input needed.
 - **Trakt Integration:** Sync your watch history and lists.

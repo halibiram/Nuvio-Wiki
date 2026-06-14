@@ -1,7 +1,6 @@
-[🏠 Home](../../README.md) | [⚡ Quick Start](../quick-start.md) | [📢 Report Issue](../../../issues)
+[Home](../../README.md) | [Quick Start](../../docs/quick-start.md) | [Overview](../../docs/overview.md) | [Features](../../docs/features.md) | [Installation](../../docs/installation/README.md) | [Settings](../../docs/settings/README.md) | [Troubleshooting](../../docs/troubleshooting.md) | [FAQ](../../docs/faq.md)
 
 ---
-
 # 🔓 Debrid Integration Guide
 
 Debrid services are high-speed downloaders that fetch files from hosters and torrents, then stream them to you via a secure, high-bandwidth connection.
@@ -9,15 +8,15 @@ Debrid services are high-speed downloaders that fetch files from hosters and tor
 ## 🚀 Supported Services
 
 ### 1. TorBox (TB)
-A fast-growing service that excels in Usenet support (pro teir only) alongside traditional torrent debrid.
-- **Pros:** No limit on IP usage, Native Usenet support (pro teir), fast caching, modern API.
+A fast-growing service that excels in Usenet support (pro tier only) alongside traditional torrent debrid.
+- **Pros:** No limit on IP usage, Native Usenet support (pro tier), fast caching, modern API.
 - **Cons:** Newer service, can have stability issues.
 - **Setup:** [torbox.app/settings](https://torbox.app)
 
 ### 2. Premiumize (PM)
 A premium all-in-one service that includes a personal cloud and a built-in VPN.
 - **Pros:** Personal cloud storage, 1TB limit, built-in VPN, allows multiple IPs.
-- **Cons:** More expensive than RD/AD. Has a points system the equuates to about 1 TB a month.
+- **Cons:** More expensive than RD/AD. Has a points system the equates to about 1 TB a month.
 - **Setup:** [premiumize.me/device](https://premiumize.me)
 
 ### 3. OffCloud
@@ -29,7 +28,7 @@ Uses PM Cache but without the extra PM services.
 ### 4. Real-Debrid (RD)
 The most popular and cost-effective service with the largest cache of files.
 > [!WARNING]
-> Real Debrid has recentley faced legal issues and a large amount of files are now being blocked. Your milage may vary based on usage of this service.
+> Real Debrid has recently faced legal issues and a large amount of files are now being blocked. Your mileage may vary based on usage of this service.
 - **Pros:** Massive cache(was?), affordable, high-speed servers.
 - **Cons:** Strict 1 IP rule (cannot use on two different internet connections at once), varying blocking of content
 - **Setup:** [real-debrid.com/device](https://real-debrid.com/)
