@@ -27,3 +27,7 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 ## 4. Advanced (Android TV Only)
 - **Refresh Rate Switching:** Automatically matches your TV's refresh rate to the content (e.g., 24fps) to eliminate judder.
 - **Tunnelled Playback:** Improves synchronization and reduces overhead on supported Android TV hardware.
+
+## 5. Customization & Management
+- **Profiles:** Manage multiple users, watch histories, and recommendations separately. [View Profiles Guide](profiles.md)
+- **Collections:** Create deep custom collections grouping media by genre, studio, or custom lists. [View Collections Guide](collections.md)

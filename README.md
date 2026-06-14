@@ -30,6 +30,8 @@ If you need something to help you get through this here is a [1 hour subway surf
 *   [Addons Guide](docs/addons/README.md)
 *   [Settings Breakdown](docs/settings/README.md)
 *   [Debrid Integration](docs/integrations/debrid.md)
+*   [Custom Collections](docs/settings/collections.md)
+*   [Profile Management](docs/settings/profiles.md)
 
 ### 🆘 Support & Info
 *   [Troubleshooting](docs/troubleshooting.md) - Fix common issues.
