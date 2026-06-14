@@ -10,7 +10,7 @@ Find solutions to common issues with Nuvio below.
 | :--- | :--- |
 | **Video Stutters / Buffers** | 1. Ensure a Debrid service is active. <br> 2. Toggle **Hardware Acceleration** in Settings. <br> 3. Check your internet connection. |
 | **No Audio / Black Screen** | Try switching to an **External Player** (VLC or MX Player) in Settings. |
-| **"No Streams Found"** | 1. Verify your Addons are enabled. <br> 2. Check if your Debrid subscription has expired. <br> 3. Try a different content source. |
+| **"No Streams Found"** | 1. Verify your Addons are enabled. <br> 2. Check if your Debrid subscription has expired. <br> 3. Try a different content source. <br> 4. Newly released content often does not have sources. |
 
 ## 2. App & Installation
 | Problem | Possible Solution |
