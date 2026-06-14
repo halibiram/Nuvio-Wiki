@@ -40,6 +40,7 @@ If you need something to help you get through this here is a [1 hour subway surf
 If you would like to support some of the developers of Nuvio:
 
 [skoruppa](https://ko-fi.com/skoruppa)
+
 [halibiram](ko-fi.com/halibiram)
 ---
 
