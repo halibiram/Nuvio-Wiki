@@ -45,6 +45,8 @@ If you would like to support some of the developers of Nuvio:
 
 [halibiram](https://ko-fi.com/halibiram)
 
+[𝔈𝔡𝔬](https://ko-fi.com/edoedac)
+
 ---
 
 ### 🤝 Contribution
