@@ -5,8 +5,8 @@ Nuvio offers many player settings options. This section will discuss:
 - [Intro and Outro Skip](#Intro-and-Outro-Skip)
 - [Stream Selection and Stream Auto Play](#Stream-Selection-and-Stream-Auto-Play)
 - [Next Episode](#Next-Episode)
-- Subtitle and Audio
-- Decoder Options
+- [Subtitle and Audio](#Subtitle-and-Audio)
+- Player and Decoder Options
 - MPV
 
 
@@ -114,3 +114,4 @@ This will be used as a fallback if no outro skip is present. This can be set in 
 1. At 100%, if no outro skip exists, Nuvio will not begin the source selecting process until the show or movie is **completely** finished.
 2. At 97%, if no outro skip exists, Nuvio will begin the source selecting process when the show is 97% complete. E.g. IF the show is 30 minutes long, Nuvio will begin selecting next source at 29 minutes and 6 seconds.
 
+### Subtitle and Audio
