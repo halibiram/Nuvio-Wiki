@@ -130,11 +130,15 @@ These configurations control which text translations are displayed on screen and
 1. Preferred Language: The primary language you want for your subtitles.
 2. Secondary Preferred Language: Your fallback subtitle language. If your primary choice is unavailable, the application will attempt to load subtitles in this language instead.
 
-Use Forced Subtitles: When enabled, the player prioritizes "forced" subtitles that match your preferred language settings. Forced subtitles are meant to be turned on even if you don't use regular subtitles, as they translate foreign languages, alien dialogue, or on-screen text while the rest of the movie is in your primary spoken language. 
+Use Forced Subtitles
+
+When enabled, the player prioritizes "forced" subtitles that match your preferred language settings. Forced subtitles are meant to be turned on even if you don't use regular subtitles, as they translate foreign languages, alien dialogue, or on-screen text while the rest of the movie is in your primary spoken language. 
 
 - Options: Toggle (On/Off)
 
-Show Only Preferred Languages: Acts as a filter to clean up your subtitle menu. When enabled, it hides all subtitle tracks except the ones that exactly match your Preferred and Secondary Preferred Language settings.
+Show Only Preferred Languages 
+
+Acts as a filter to clean up your subtitle menu. When enabled, it hides all subtitle tracks except the ones that exactly match your Preferred and Secondary Preferred Language settings.
 Addon Subtitle Startup
 
 - Options: Toggle (On/Off)
