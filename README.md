@@ -1,7 +1,7 @@
 [Home](README.md) | [Quick Start](docs/quick-start.md) | [Overview](docs/overview.md) | [Features](docs/features.md) | [Installation](docs/installation/README.md) | [Settings](docs/settings/README.md) | [Troubleshooting](docs/troubleshooting.md) | [FAQ](docs/faq.md)
 
 ---
-# 🌌 Nuvio Wiki
+# 🌌 Nuvio Wiki - Everything you eanted to know anout Nuvio, and some stuff you don't
 
 Welcome to the unofficial hub for **Nuvio**, a modern media player and aggregator. This repository provides comprehensive guides and troubleshooting for users on all platforms.
 
@@ -17,7 +17,7 @@ If you need something to help you get through this here is a [1 hour subway surf
 ## 📚 Documentation
 
 ### 🚀 Getting Started
-*   [**Quick Start Guide**](docs/quick-start.md) - Get up and running in 5 minutes.
+*   [**Quick Start Guide**](docs/quick-start.md) - Get up and running.
 *   [General Overview](docs/overview.md) - How Nuvio works.
 *   [Glossary](docs/glossary.md) - Common terms explained.
 
