@@ -26,3 +26,7 @@ Trailers are checked for against TMDB first with the users set language. If no t
 
 ### Where do I get images or gifs for my collections or profile?
 The easiest way is to get them from [Nuvio's community covers](https://nuvio.tv/covers).
+
+### How do I turn subtitles off by default?
+
+You can turn subtitles off by default by setting your preferred language to none. 
