@@ -16,5 +16,6 @@
 ## Community Resources
 - **Viren070** - [Guide](https://guides.viren070.me/)
 - **Duckstreams:** - [Guide and Quickstart Tool](https://duckkota.gitlab.io/guides/nuvio/)
+- **Addons** - [List of Available Addons](https://stremio-addons.net/)
 - **Nuvio Reddit:** - [Community discussion and support](https://www.reddit.com/r/Nuvio/)
 
