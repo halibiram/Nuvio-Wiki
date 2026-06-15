@@ -34,7 +34,7 @@ Nuvio uses three separate databases for intro and outro skipping, prioritized in
 8. Copy the generated Client ID (a long string of numbers and letters).
 9. Go back into Nuvio, paste the Client ID, and select **Save**.
 
-**To submit Intros and Outros to IntroDB:**
+**To submit Intros and Outros to IntroDB (Mobile Only):**
 Nuvio allows you to submit timestamps to IntroDB's community-sourced database. You will need an API key:
 1. Go to [Intro DB](https://introdb.app).
 2. Create an account.
