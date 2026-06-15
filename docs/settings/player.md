@@ -43,6 +43,20 @@ Nuvio also has the ability to submit Intros and Outros to IntroDB's community so
 
 ## Stream Selection and Stream Auto Play
 
+### Stream Selection
+
+Stream selection has two options within it
+
+1. Reuse last link
+    - With this on, when you resume something you were watching, Nuvio will to use the same stream you selected before you stopped watching
+2. Last Link Cache Duration
+    - This tells Nuvio how long to hold onto the last link with the options for: 1, 6, and 12 hours. As well as 1, 2, 3, and 7 days.
+      >[!NOTE]
+      >Debrid service links are typically only valid for a certain time period. Selecting too long of a time period can cause Nuvio to attempt to play a link that is no longer valid.
+
+### Stream and Auto-Play
+
+
 
 ## Next Episode
 
