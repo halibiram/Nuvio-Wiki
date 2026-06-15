@@ -146,7 +146,7 @@ Controls the visual experience and interactions within the media player.
 * **Player:** Dictates which video engine handles your streams.
     * *Internal:* Keeps you inside Nuvio using its native player.
     * *Internal Engine:* Choose between ExoPlayer or libmpv as the primary renderer.
-    * *Auto-switch engine on startup error [TV Only]:* Automatically falls back from ExoPlayer to libmpv if a stream fails to initialize.
+    * *Auto-switch engine on startup error [TV Only]:* Automatically falls back from ExoPlayer to libmpv for detected anime or if a stream fails to initialize.
     * *External:* Passes the video link to a third-party application installed on your device (e.g., VLC, MX Player).
 * **Hold To Speed [Mobile Only]:** A touch-screen shortcut for skimming. Pressing and holding anywhere on the video player temporarily increases playback speed. Normal playback resumes when released.
 * **Hold Speed [Mobile Only]:** Configures the exact playback speed multiplier when using the "Hold To Speed" feature.
