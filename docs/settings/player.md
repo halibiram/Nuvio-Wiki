@@ -204,5 +204,49 @@ Overrides Media3's default buffering with custom values. When off, the player us
 
 ---
 
-## MPV (WIP)
-*(This section is currently a work in progress and will be updated in a future release.)*
+## MPV Video Engine
+
+### What is MPV?
+MPV is a free, open-source, and highly advanced media player engine. Unlike standard default video players, MPV gives you absolute granular control over the entire video rendering pipeline—from how the graphics chip processes colors to the exact mathematical algorithms used to resize pixels. 
+
+### Why is MPV especially good for Anime?
+Anime and animated content present unique challenges for video players. Standard players often struggle with **color banding** (where smooth color gradients, like a sunset sky or a shadow, look like harsh, blocky stripes) and line art distortion when upscaling a 1080p file to a 4K screen. If you are watching episodes of *One Piece* or *Dragon Ball Z Kai*, MPV includes highly specialized built-in tools like the `deband` filter, which completely smooths out these visual glitches. It also allows you to use complex upscalers that keep animated lines razor-sharp without adding blurry halos.
+
+### MPV Player Options Explained
+
+**Core Hardware & Output Settings:**
+* **Video Output (VO):** The core rendering engine. `gpu` is the standard, highly reliable engine. `gpu-next` is the newer, highly efficient engine rebuilt from the ground up, offering significantly better HDR tone mapping and color handling.
+* **GPU API:** The graphics instruction set communicating with your hardware. `vulkan` is modern and incredibly fast (and pairs best with `gpu-next` for high performance), while `opengl` is the older, highly compatible fallback.
+* **Hardware Decoding (hwdec):** Controls how the video is processed. Using `auto` or `mediacodec-copy` offloads the heavy lifting to your device's physical video chip rather than relying on software rendering, saving battery and preventing lag.
+
+**Scaling & Processing:**
+When your video resolution doesn't match your screen resolution, the player has to "guess" how to fill the remaining pixels (Upscaling) or crush them down (Downscaling).
+* **Scale (Luma) / CScale (Chroma) / DScale (Downscale):** The mathematical algorithms used to resize the image. 
+    * *Bilinear:* Fast, extremely low battery usage, but results in a soft or blurry image.
+    * *Spline36:* A great middle-ground for visual quality and performance.
+    * *EWA_Lanczossharp:* Very high quality. Keeps edges sharp (perfect for anime), but requires more GPU power.
+    * *Mitchell:* Highly recommended for downscaling (`dscale`) because it reduces visual artifacting.
+* **Deband:** A post-processing filter that smooths out ugly color blocking and jagged gradients. Turning this on is highly recommended when watching anime.
+* **Interpolation:** Also known as "smooth motion." It artificially blends frames together to prevent visual stuttering during slow camera panning shots. 
+
+---
+
+### Recommended Device Profiles
+
+**1. The High-End Device (Max Quality / Anime Focus)**
+*Requires a modern, powerful device (e.g., recent flagship phones, Nvidia Shield).*
+* **VO:** `gpu-next`
+* **GPU API:** `vulkan`
+* **HWDec:** `auto`
+* **Scale / CScale:** `ewa_lanczossharp`
+* **DScale:** `mitchell`
+* **Deband:** `Enabled` (Essential for anime)
+
+**2. The Standard / Battery-Saver Profile**
+*Best for older devices, budget TV sticks, or saving battery on long trips.*
+* **VO:** `gpu`
+* **GPU API:** `opengl`
+* **HWDec:** `mediacodec` or `auto`
+* **Scale / CScale:** `spline36` or `bilinear`
+* **DScale:** `bilinear`
+* **Deband:** `Disabled` (Unless explicitly watching heavily compressed anime, as it uses extra GPU resources)
