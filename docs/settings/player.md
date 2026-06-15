@@ -7,7 +7,7 @@ Nuvio offers many player settings options. This section will discuss:
 - [Next Episode](#Next-Episode)
 - [Subtitle and Audio](#Subtitle-and-Audio)
 - Player and Decoder Options
-- MPV
+- MPV(WIP)
 
 
 ## Intro and Outro Skip
