@@ -8,7 +8,7 @@ Nuvio offers a variety of player settings to customize your experience. This sec
 - [Subtitle and Audio](#subtitle-and-audio)
 - [Player and Decoder Options](#player-and-decoder-options)
 - [Buffer and Network](#buffer-and-network)
-- [MPV (WIP)](#mpv-wip)
+- [MPV](#mpv-wip)
 
 > [!IMPORTANT]
 > Aything not labeled [TV Only] or [Mobile Only] is a feature of both versions.
@@ -204,7 +204,7 @@ Overrides Media3's default buffering with custom values. When off, the player us
 
 ---
 
-## MPV Video Engine
+## MPV
 
 ### What is MPV?
 MPV is a free, open-source, and highly advanced media player engine. Unlike standard default video players, MPV gives you absolute granular control over the entire video rendering pipeline—from how the graphics chip processes colors to the exact mathematical algorithms used to resize pixels. 
