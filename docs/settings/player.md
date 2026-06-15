@@ -45,7 +45,7 @@ Nuvio also has the ability to submit Intros and Outros to IntroDB's community so
 5. Copy the Key
 6. Go back into Nuvio and paste the API key in and hit save
 
-## Next Episdoe
+## Next Episode
 
 Next Episode has a variety of options: Auto-Play Next Episode, Prefer Binge Group, Resue Binge Group, Next Episode Threshold Mode.
 
