@@ -2,7 +2,7 @@
 
 Nuvio offers many player settings options. This section will discuss:
 
-Intro and Outro Skip
+* [Intro and Outro Skip](#IntroandOutroSkip)
 Next Episode
 Subtitle and Audio
 Stream Selection
