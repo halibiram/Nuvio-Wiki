@@ -117,6 +117,8 @@ These settings determine the default spoken language tracks selected when a stre
 * **Secondary Audio Language:** Your fallback audio track if the primary choice is unavailable.
 * **Skip Silence:** Dynamically skips silent portions of audio during playback.
 * **Enable downmix:** Uses the FFmpeg downmix path for audio processing. When disabled, audio follows the standard Android/device path.
+  - "Downmixing" means taking a massive surround sound audio track (like 5.1 or 7.1 audio meant for 6 to 8 speakers) and squishing it down into just two channels (Left and Right) for a standard stereo setup.
+  - If you are just using your built-in TV speakers or a basic 2.0 soundbar, your system physically cannot play the dedicated "center channel" where 90% of the dialogue comes from in modern movies. If you ever feel like the explosions are deafening but the actors' voices are whispering, it is because you are missing the center channel. Turning this on forces the app to correctly blend all those surround sound speakers into a stereo format so you can hear the voices clearly.
 
 ### Subtitle Preferences
 These configurations control which text translations are displayed on screen and how menus are filtered.
@@ -126,6 +128,7 @@ These configurations control which text translations are displayed on screen and
 * **Show Only Preferred Languages (Toggle On/Off):** Filters the subtitle menu to hide all tracks except those that exactly match your primary and secondary language preferences.
 * **Subtitle Styling [TV Optimized]:** Offers granular control over subtitle aesthetics including **Size (Scaling)**, **Vertical Offset** (to accommodate letterboxing), **Text Color**, **Background Color**, and **Outline/Outline Color**.
 * **Use libass for ASS/SSA subtitles:** An experimental toggle to use the advanced libass engine for rendering complex styles, positioning, and animations of ASS/SSA subtitles.
+  - Turning this on tells the player to use a specialized graphics engine (libass) to draw complex subtitles perfectly. If left off, the player might strip out all the colors and placement formatting, or worse, crash trying to read the file.
 
 ### Addon Subtitle Startup
 Controls how aggressively Nuvio searches for external subtitles when a video begins playing, balancing load times against availability.
@@ -167,7 +170,11 @@ Technical settings that determine how your device's hardware and software proces
     * *On start:* Switch when playback starts.
     * *On start/stop:* Switch on start and restore on stop.
 * **Tunneled Playback:** An advanced Android TV feature. It allows audio and video streams to bypass standard OS pathways and process directly at the hardware level. This improves audio/video synchronization (lip-sync) and ensures smoother playback for heavy 4K HDR files.
+  - Normally, your TV's processor juggles everything at once—the video, the audio, the interface menus, and background apps. Tunneled Playback creates a fast lane that sends the raw video and audio straight to the TV's screen and speakers, completely bypassing the standard Android operating system.
+  - Recommendation: Leave this OFF by default. When to use it / Issues it can cause: You should only turn this on if you are experiencing "lip-sync" issues (where the audio doesn't match the actors' mouths) or if massive 4K HDR files are dropping frames and stuttering. Because this feature bypasses the normal TV operating system, it can cause very weird glitches if your TV hardware doesn't perfectly support it.
 * **Force AC-3 Transcoding (Optical/SPDIF):** Transcodes multichannel formats (TrueHD, DTS, AAC, etc.) to Dolby Digital 5.1 in real-time for Optical/SPDIF connections.
+  - Older optical audio cables (the ones with the glowing red light) have a strict bandwidth limit. They physically cannot transmit heavy, modern, uncompressed audio formats like TrueHD or DTS-HD. They max out at standard Dolby Digital 5.1 (also known as AC-3).
+  - If you have an older AV receiver or soundbar hooked up to your TV via an optical cable, trying to play a modern 4K movie with a TrueHD track will result in dead silence or horrible static. This setting acts as a live translator. It grabs the heavy modern audio and instantly crushes it down into standard Dolby Digital 5.1 on the fly, ensuring your older sound system can actually play the movie.
 
 ---
 
