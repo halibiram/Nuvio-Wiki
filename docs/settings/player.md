@@ -210,7 +210,7 @@ Overrides Media3's default buffering with custom values. When off, the player us
 MPV is a free, open-source, and highly advanced media player engine. Unlike standard default video players, MPV gives you absolute granular control over the entire video rendering pipeline—from how the graphics chip processes colors to the exact mathematical algorithms used to resize pixels. 
 
 ### Why is MPV especially good for Anime?
-Anime and animated content present unique challenges for video players. Standard players often struggle with **color banding** (where smooth color gradients, like a sunset sky or a shadow, look like harsh, blocky stripes) and line art distortion when upscaling a 1080p file to a 4K screen. If you are watching episodes of *One Piece* or *Dragon Ball Z Kai*, MPV includes highly specialized built-in tools like the `deband` filter, which completely smooths out these visual glitches. It also allows you to use complex upscalers that keep animated lines razor-sharp without adding blurry halos.
+Anime and animated content present unique challenges for video players. Standard players often struggle with **color banding** (where smooth color gradients, like a sunset sky or a shadow, look like harsh, blocky stripes) and line art distortion when upscaling a 1080p file to a 4K screen. If you are watching episodes of anime, MPV includes highly specialized built-in tools like the `deband` filter, which completely smooths out these visual glitches. It also allows you to use complex upscalers that keep animated lines razor-sharp without adding blurry halos.
 
 ### MPV Player Options Explained
 
