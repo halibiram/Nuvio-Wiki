@@ -1,203 +1,149 @@
 ## Nuvio Player Settings
 
-Nuvio offers many player settings options. This section will discuss:
+Nuvio offers a variety of player settings to customize your experience. This section covers:
 
-- [Intro and Outro Skip](#Intro-and-Outro-Skip)
-- [Stream Selection and Stream Auto Play](#Stream-Selection-and-Stream-Auto-Play)
-- [Next Episode](#Next-Episode)
-- [Subtitle and Audio](#Subtitle-and-Audio)
-- [Player and Decoder Options](#Player-and-Decoder-Options)
-- MPV(WIP)
+- [Intro and Outro Skip](#intro-and-outro-skip)
+- [Stream Selection and Stream Auto Play](#stream-selection-and-stream-auto-play)
+- [Next Episode](#next-episode)
+- [Subtitle and Audio](#subtitle-and-audio)
+- [Player and Decoder Options](#player-and-decoder-options)
+- [MPV (WIP)](#mpv-wip)
 
+---
 
 ## Intro and Outro Skip
 
-Nuvio uses 3 seperate databases for intro and outro skip in this order: IntroDB -> AniSkip -> Anime Skip. Anime Skip requires and ID to use. IntroDB and Anime Skip can be toggled on or off. Anime Skip is the only one that **requires** configuration to use.
+Nuvio uses three separate databases for intro and outro skipping, prioritized in this order: **IntroDB**, **AniSkip**, and **Anime Skip**. 
 
-To toggle these on go to:
+* **IntroDB** and **AniSkip** can be toggled on or off directly.
+* **Anime Skip** requires an ID and configuration to use.
 
-1. Settings
-2. Playback
-3. Skip Segments
+**To toggle these features:**
+1. Go to **Settings**.
+2. Select **Playback**.
+3. Select **Skip Segments**.
 
-To obtain a free AnimeSkip ClientID
+**To obtain a free Anime Skip Client ID:**
+1. Go to [Anime Skip](https://anime-skip.com).
+2. Create an account.
+3. Once logged in, go to your profile.
+4. Select **API Clients**.
+5. Select **Add a New Client**.
+6. Enter the app name "Nuvio" and a description of "Nuvio".
+7. Select **Create**.
+8. Copy the generated Client ID (a long string of numbers and letters).
+9. Go back into Nuvio, paste the Client ID, and select **Save**.
 
-1. Go to [Anime Skip](https://anime-skip.com)
-2. Create an Account
-3. Once logged in, go to your profile
-4. Select API Clients
-5. Select Add a New Client
-6. Enter the app name "Nuvio" and a description of "Nuvio"
-7. Select Create
-8. This will create a ClientID that is a long string of numbers and letters. Copy it.
-9. Go back into Nuvio and paste the ClientID and hit save
+**To submit Intros and Outros to IntroDB:**
+Nuvio allows you to submit timestamps to IntroDB's community-sourced database. You will need an API key:
+1. Go to [Intro DB](https://introdb.app).
+2. Create an account.
+3. Once logged in, go to **Account Settings**.
+4. Select **Generate Key**.
+5. Copy the Key.
+6. Go back into Nuvio, paste the API key, and select **Save**.
 
-Nuvio also has the ability to submit Intros and Outros to IntroDB's community sourced database. To do this you need to configure and API key.
-
-1. Go to [Intro DB](https://introdb.app)
-2. Create an Account
-3. Once logged in, go to account settings
-4. Select Generate Key
-5. Copy the Key
-6. Go back into Nuvio and paste the API key in and hit save
+---
 
 ## Stream Selection and Stream Auto Play
 
 ### Stream Selection
 
-Stream selection has two options within it
+Stream selection includes two main options:
 
-1. Reuse last link
-    - With this on, when you resume something you were watching, Nuvio will to use the same stream you selected before you stopped watching
-2. Last Link Cache Duration
-    - This tells Nuvio how long to hold onto the last link with the options for: 1, 6, and 12 hours. As well as 1, 2, 3, and 7 days.
-      >[!NOTE]
-      >Debrid service links are typically only valid for a certain time period. Selecting too long of a time period can cause Nuvio to attempt to play a link that is no longer valid.
+* **Reuse Last Link:** When resuming a title, Nuvio will attempt to use the exact same stream you selected during your previous session.
+* **Last Link Cache Duration:** Determines how long Nuvio holds onto the last selected link. Options include 1, 6, and 12 hours, as well as 1, 2, 3, and 7 days.
+    > [!NOTE]
+    > Debrid service links are typically only valid for a specific time period. Selecting a duration that is too long can cause Nuvio to attempt playback on an expired, invalid link.
 
 ### Stream and Auto-Play
 
-This section dictates how the application behaves when you click on a media item—whether it automatically launches a stream or lets you choose your own link.
+This section dictates how the application behaves when you select a media item—whether it automatically launches a stream or lets you choose your own link.
 
-Selection Mode: Determines the logic used to handle available streams.
+**Selection Mode**
+Determines the logic used to handle available streams:
+* **Auto-play first source:** Automatically scans for media streams and instantly plays the first valid source it encounters without prompting you.
+* **Manual:** Displays a comprehensive list of all discovered streams, allowing you to manually review and select based on quality, file size, or source.
+* **Regex (Regular Expression):** An advanced filtering mode that scans stream titles or metadata for specific text patterns (e.g., 1080p, 4K, HEVC, specific release groups) and prioritizes or filters matches based on your custom expressions.
 
-- Options: Auto-play first source, Manual, Regex
-    - Auto-play first source: The app will automatically scan for media streams and instantly play the very first valid source it encounters without prompting you.
-    - Manual: Displays a comprehensive list of all discovered streams, allowing you to manually review and pick the specific quality, file size, or source you prefer.
-    - Regex (Regular Expression): An advanced filtering mode that scans stream titles or metadata for specific text patterns (like 1080p, 4K, HEVC, or specific release groups) and prioritizes or filters matches based on your custom expressions.
+**Stream Selection Timeout**
+Sets the maximum duration the application will wait for addons or plugins to return their results before proceeding:
+* **Options:** Instant, 5s to 30s (in 5-second increments), Unlimited.
+* *How it works:* If a timeout is hit, Nuvio stops searching and plays the best option found so far (if auto-playing) or presents a partial list (if manual). Choosing **Unlimited** ensures the app waits until every provider has finished searching, regardless of the time it takes.
 
-Stream Selection Timeout: Sets the maximum duration the application will wait for addons, or plugins to return their results before proceeding.
+**Source & Addon Filtering**
+These configurations control exactly which addons or plugins are allowed to search for and supply streams.
 
-- Options: Instant, 5s to 30s (in 5-second increments), Unlimited
-    - If a timeout is hit, it stops looking and either plays the best option found so far (in auto-play) or presents the partial list (in manual). Choosing Unlimited ensures the app waits until every single provider has finished searching, regardless of how long it takes.
+* **Auto-play Source Scope:** Narrows down the pool of providers when using an automated playback mode.
+    * *Options:* All sources, Select addons, Plugins only.
+* **Allowed Addons:** Provides granular control over installed extensions during the search process.
+    * *Options:* All addons, Custom Selection.
+* **Allowed Plugins:** Controls the plugins used during the search process.
+    * *Options:* All enabled plugins, Custom Selection.
 
-Source & Addon Filtering: These configurations control exactly which addons or plugins are allowed to search for and supply streams during the selection process.
-Auto-play Source Scope
-
-Auto-play Source Scope
-- Options: All sources, Select addons, Plugins only
-- Description: Narrows down the pool of providers when using an automated playback mode. You can let the system pull from every available connection, or restrict auto-play exclusively to a trusted subset of addons or internal plugins.
-
-Allowed Addons
-- Options: All addons, Custom Selection
-- Description: Gives you granular control over your installed extensions. You can choose to allow All addons to participate in the source selection process or pick specific ones.
-
-Allowed Plugins
-- Options: All enabled plugins, Custom Selection
-- Description: Controls the plugins used during the search process. You can dictate whether the system leverages all currently active plugins or restrict it to a specific list of plugins.
+---
 
 ## Next Episode
 
-Next Episode has a variety of options: Auto-Play Next Episode, Prefer Binge Group, Resue Binge Group, Next Episode Threshold Mode.
+The Next Episode category includes several settings to optimize continuous viewing:
 
-**Auto-Play Next Episode**
+* **Auto-Play Next Episode:** When toggled on, Nuvio starts the source selection process as soon as the "next episode" prompt appears. This prompt is triggered by either:
+    * An Outro skip is triggered.
+    * If no Outro skip is present, the Next Episode Threshold is met.
+* **Prefer Binge Group:** Nuvio will try to find the next episode using the same source profile before falling back to other options. For example, if you watched an episode via *Aiostreams*, Nuvio will attempt to find the next episode from *Aiostreams* in the same quality before trying other providers.
+* **Reuse Binge Groups:** Ensures that when you return to a TV series, the app automatically remembers and prioritizes the exact same stream source or release group you were previously watching. If you selected a specific 1080p release group, your session anchors to that profile. When resuming from "Continue Watching," Nuvio will specifically look for that exact release group rather than auto-selecting a new source.
+* **Next Episode Threshold Mode:** Used as a fallback if no outro skip is present. This can be set in 0.5% increments from 100% down to 97%.
+    * *At 100%:* Nuvio will not begin the source selection process until the media is completely finished.
+    * *At 97%:* Nuvio will begin the source selection process when the media is 97% complete (e.g., for a 30-minute show, selection begins at 29 minutes and 6 seconds).
 
-1. With this toggled on, Nuvio will start source selecting process as soon as the prompt appears.
-2. This is trigged by whatever occurs first:
-    - Outro skip is trigged from skip outro
-    - Next episode Threshold is met
+---
 
-**Prefer Binge Group**
+## Subtitle and Audio
 
-This option will try the same source profile first for next episode before any other options. E.g. If you were watching Big Buck Bunny obtained from Aiostreams, Nuvio will attempt to find the next episode using Aiostreams with the same quality as the previous one. If it does not find one, it will fallback to another option.
+### Audio Settings
+These settings determine the default spoken language tracks selected when a stream starts.
+* **Preferred Audio Language:** The primary spoken language you want the application to automatically select if the media file contains multiple audio tracks.
+* **Secondary Audio Language:** Your fallback audio track if the primary choice is unavailable.
 
-**Reuse Binge Groups**
+### Subtitle Preferences
+These configurations control which text translations are displayed on screen and how menus are filtered.
+* **Preferred Language:** The primary language for your subtitles.
+* **Secondary Preferred Language:** Your fallback subtitle language.
+* **Use Forced Subtitles (Toggle On/Off):** Prioritizes "forced" subtitles that match your preferred language. Forced subtitles translate foreign languages, alien dialogue, or on-screen text while the rest of the media remains in your primary spoken language.
+* **Show Only Preferred Languages (Toggle On/Off):** Filters the subtitle menu to hide all tracks except those that exactly match your primary and secondary language preferences.
 
-With this on, Nuvio will ensure that when you return toa TV series, the app automatically remembers and prioritzes the exact same stream source or relase group you were previously watching
+### Addon Subtitle Startup
+Controls how aggressively Nuvio searches for external subtitles when a video begins playing, balancing load times against availability.
+* **Fast startup:** Prioritizes immediate video playback by skipping the automatic fetch of external addon subtitles. You must manually request them from within the player.
+* **Preferred only:** A balanced approach. Fetches subtitles from addons during the initial load, but only pulls those matching your language preferences.
+* **All subtitles:** Fetches and loads every available addon subtitle for the video, maximizing choice at the cost of slightly longer loading times.
 
-1. If you select a specfiic 1080p stream, Nuvio anchors your session to that specific release profile or "binge group"
-2. When you resume the show later, from continue watching or the series details page, it won't default back to auto-selecting a result or have you pick a new source. It looks for the next episde from that exact same release group.
+---
 
-**Next Episdoe Threshold Mode**
+## Player and Decoder Options
 
-This will be used as a fallback if no outro skip is present. This can be set in increments of .5% from 100% to 97%. 
+### Video Player & Interface
+Controls the visual experience and interactions within the media player.
 
-1. At 100%, if no outro skip exists, Nuvio will not begin the source selecting process until the show or movie is **completely** finished.
-2. At 97%, if no outro skip exists, Nuvio will begin the source selecting process when the show is 97% complete. E.g. IF the show is 30 minutes long, Nuvio will begin selecting next source at 29 minutes and 6 seconds.
+* **Loading Overlay:** Displays a continuous loading screen or graphic to hide buffering, black screens, or transitions. The overlay remains visible until the first frame of the video is ready.
+* **Player:** Dictates which video engine handles your streams.
+    * *Internal:* Keeps you inside Nuvio using its native player.
+    * *External:* Passes the video link to a third-party application installed on your device (e.g., VLC, MX Player).
+* **Hold To Speed (Mobile Only):** A touch-screen shortcut for skimming. Pressing and holding anywhere on the video player temporarily increases playback speed. Normal playback resumes when released.
+* **Hold Speed (Mobile Only):** Configures the exact playback speed multiplier when using the "Hold To Speed" feature.
 
-### Subtitle and Audio
+### Advanced Processing & Decoding
+Technical settings that determine how your device's hardware and software process raw video and audio data.
 
-Audio Settings
+* **Decoder Priority:** Tells the application how to translate the video file into images.
+    * *Prefer device decoders:* Relies on your device's hardware chips. Best for smooth playback and battery conservation.
+    * *Prefer app decoders (FFmpeg):* Relies on the app's software to decode video. Useful as a fallback for unusual video formats.
+    * *Device decoders only:* Strictly forces hardware decoding, refusing to fall back to software processing.
+* **DV7 - HEVC Fallback:** Dolby Vision Profile 7 (DV7) is a premium HDR format. Playing a DV7 file on unsupported hardware often results in distorted colors (e.g., a completely purple or green screen). Enabling this strips the unreadable Dolby Vision data and maps the video down to standard HEVC (H.265) for correct color playback.
+* **Tunneled Playback:** An advanced Android TV feature. It allows audio and video streams to bypass standard OS pathways and process directly at the hardware level. This improves audio/video synchronization (lip-sync) and ensures smoother playback for heavy 4K HDR files.
 
-These settings determine the default spoken language tracks selected when you start a stream.
+---
 
-1. Preferred Audio Language: The primary spoken language you want the application to automatically select if the media file contains multiple audio tracks.
-2. Secondary Audio Language: Your fallback audio track. If a stream does not have an audio track in your Preferred Audio Language, the system will automatically default to this secondary option.
+## MPV (WIP)
+*(This section is currently a work in progress and will be updated in a future release.)*
 
-Subtitle Preferences
-
-These configurations control which text translations are displayed on screen and how the menus are filtered.
-
-1. Preferred Language: The primary language you want for your subtitles.
-2. Secondary Preferred Language: Your fallback subtitle language. If your primary choice is unavailable, the application will attempt to load subtitles in this language instead.
-
-Use Forced Subtitles
-
-When enabled, the player prioritizes "forced" subtitles that match your preferred language settings. Forced subtitles are meant to be turned on even if you don't use regular subtitles, as they translate foreign languages, alien dialogue, or on-screen text while the rest of the movie is in your primary spoken language. 
-
-- Options: Toggle (On/Off)
-
-Show Only Preferred Languages 
-
-Acts as a filter to clean up your subtitle menu. When enabled, it hides all subtitle tracks except the ones that exactly match your Preferred and Secondary Preferred Language settings.
-Addon Subtitle Startup
-
-- Options: Toggle (On/Off)
-
-Addon Subtitle Startup
-
-This setting controls how aggressively Nuvio searches for external subtitles when a video begins playing, balancing load times against subtitle availability.
-Options: Fast startup, Preferred only, All subtitles
-
-1. Fast startup: Prioritizes getting the video playing immediately. It skips the automatic process of fetching external addon subtitles. You will need to manually request them from within the video player if you want them. 
-2. Preferred only: A balanced approach. The system fetches subtitles from your addons during the initial load but only pulls the ones that match your specific language preferences.
-3. All subtitles: The most comprehensive option. It fetches and loads every single available addon subtitle for the video, giving you the maximum number of choices at the cost of a slightly longer loading time.
-
-
-### Player and Decoder Options
-
-Video Player & Interface
-
-These settings control the visual experience and how you interact with the media player.
-
-Loading Overlay
-
-Displays a continuous loading screen or graphic to hide any buffering, black screens, or background transitions. The overlay remains visible until the exact moment the very first frame of the video is ready to be shown. 
-
-Player
-
-Dictates which video engine handles your streams.
-
-Options: Internal / External
-
-1. Internal: Keeps you inside the application using its native player.
-2. External: Passes the video link to a third-party application installed on your device (such as VLC or MX Player).
-
-Hold To Speed (Mobile Only)
-
-A touch-screen shortcut for quickly skimming through content. By pressing and holding your finger anywhere on the video player surface, the playback speed will temporarily increase. Normal playback resumes as soon as you lift your finger. 
-
-Hold Speed (Mobile Only)
-
-Configures exactly how fast the video plays when you are actively using the "Hold To Speed" feature.
-
-Advanced Processing & Decoding
-
-These are highly technical settings that determine how your device's hardware and software process the raw video and audio data.
-
-Decoder Priority
-
-Tells the application how to translate the video file into images on your screen.
-
-Options: Prefer device decoders, Prefer app decoders (FFmpeg), Device decoders only
-
-1. Prefer device decoders: Relies on your device's physical hardware chips. This is generally the best option for smooth playback and battery saving.
-2. Prefer app decoders (FFmpeg): Relies on the application's software to decode the video. This is useful as a fallback if your device struggles with a specific or unusual video format.
-3. Device decoders only: Strictly forces the hardware to do the work, refusing to fall back to software processing.
-
-DV7 - HEVC Fallback
-
-Dolby Vision Profile 7 (DV7) is a premium HDR video format. If you attempt to play a DV7 file on a screen that doesn't have the proper hardware support, the picture will usually look severely distorted (often a completely purple or green screen). Enabling this setting strips the unreadable Dolby Vision data and maps the video down to standard HEVC (H.265), allowing the video to play with normal, correct colors. 
-
-Tunneled Playback
-
-An advanced feature primarily for Android TV devices. It allows the audio and video streams to bypass the standard operating system pathways and process directly at the hardware level. This greatly improves audio/video synchronization (lip-sync) and can result in smoother playback for heavy 4K HDR files. 
