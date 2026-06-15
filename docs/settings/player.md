@@ -58,27 +58,32 @@ Stream selection has two options within it
 
 This section dictates how the application behaves when you click on a media item—whether it automatically launches a stream or lets you choose your own link.
 
-Selection Mode
-Options: Auto-play first source, Manual, Regex
-Description: Determines the logic used to handle available streams.
-Auto-play first source: The app will automatically scan for media streams and instantly play the very first valid source it encounters without prompting you. 
-Manual: Displays a comprehensive list of all discovered streams, allowing you to manually review and pick the specific quality, file size, or source you prefer.
-Regex (Regular Expression): An advanced filtering mode that scans stream titles or metadata for specific text patterns (like 1080p, 4K, HEVC, or specific release groups) and prioritizes or filters matches based on your custom expressions. 
-Stream Selection Timeout
-Options: Instant, 5s to 30s (in 5-second increments), Unlimited
-Description: Sets the maximum duration the application will wait for scrapers, add-ons, or plugins to return their results before proceeding.
-If a timeout is hit, it stops looking and either plays the best option found so far (in auto-play) or presents the partial list (in manual). Choosing Unlimited ensures the app waits until every single provider has finished searching, regardless of how long it takes. 
-Source & Add-on Filtering
-These configurations control exactly which extensions and modules are allowed to search for and supply streams during the selection process.
+Selection Mode: Determines the logic used to handle available streams.
+
+- Options: Auto-play first source, Manual, Regex
+    - Auto-play first source: The app will automatically scan for media streams and instantly play the very first valid source it encounters without prompting you.
+    - Manual: Displays a comprehensive list of all discovered streams, allowing you to manually review and pick the specific quality, file size, or source you prefer.
+    - Regex (Regular Expression): An advanced filtering mode that scans stream titles or metadata for specific text patterns (like 1080p, 4K, HEVC, or specific release groups) and prioritizes or filters matches based on your custom expressions.
+
+Stream Selection Timeout: Sets the maximum duration the application will wait for scrapers, add-ons, or plugins to return their results before proceeding.
+
+- Options: Instant, 5s to 30s (in 5-second increments), Unlimited
+    - If a timeout is hit, it stops looking and either plays the best option found so far (in auto-play) or presents the partial list (in manual). Choosing Unlimited ensures the app waits until every single provider has finished searching, regardless of how long it takes.
+
+Source & Add-on Filtering: These configurations control exactly which extensions and modules are allowed to search for and supply streams during the selection process.
 Auto-play Source Scope
-Options: All sources, Select add-ons, Plugins only
-Description: Narrows down the pool of providers when using an automated playback mode. You can let the system pull from every available connection, or restrict auto-play exclusively to a trusted subset of add-ons or internal plugins.
+
+Auto-play Source Scope
+- Options: All sources, Select add-ons, Plugins only
+- Description: Narrows down the pool of providers when using an automated playback mode. You can let the system pull from every available connection, or restrict auto-play exclusively to a trusted subset of add-ons or internal plugins.
+
 Allowed Add-ons
-Options: All add-ons, Custom Selection
-Description: Gives you granular control over your installed extensions. You can choose to allow All add-ons to participate in the source selection process or hand-pick specific ones while disabling slower or lower-quality providers from running in the background.
+- Options: All add-ons, Custom Selection
+- Description: Gives you granular control over your installed extensions. You can choose to allow All add-ons to participate in the source selection process or hand-pick specific ones while disabling slower or lower-quality providers from running in the background.
+
 Allowed Plugins
-Options: All enabled plugins, Custom Selection
-Description: Controls the core system or application-level plugins used during the search process. You can dictate whether the system leverages all currently active plugins or restrict it to a specific list of approved plugins.
+- Options: All enabled plugins, Custom Selection
+- Description: Controls the core system or application-level plugins used during the search process. You can dictate whether the system leverages all currently active plugins or restrict it to a specific list of approved plugins.
 
 ## Next Episode
 
