@@ -235,6 +235,6 @@ The MPV configuration in Nuvio currently focuses on **Hardware Decoding**. This 
 
 * **For General Viewing:** Set to **Auto (auto-safe)** or **Hardware (direct)**. This will give you the best battery life and the smoothest playback for standard movies and TV shows.
 * **For Anime Watchers:** Set to **Hardware (copy) (mediacodec-copy)**. If you are watching anime with heavy, stylized subtitles and notice visual glitches or black screens, "copy" mode ensures the subtitles can be properly layered over the video.
->[WARNING]
+>[!WARNING]
 >This option can cause the player to lag if you do not have sufficient resources to decode the video. Weaker AndroidTV boxes can struggle with this option.
 * **For Troubleshooting:** If a specific video file is playing with a green screen, distorted colors, or just audio with no picture, change this to **Disabled (no)**. Forcing software decoding will usually bypass hardware incompatibilities and allow the file to play.
