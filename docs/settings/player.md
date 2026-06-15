@@ -115,3 +115,30 @@ This will be used as a fallback if no outro skip is present. This can be set in 
 2. At 97%, if no outro skip exists, Nuvio will begin the source selecting process when the show is 97% complete. E.g. IF the show is 30 minutes long, Nuvio will begin selecting next source at 29 minutes and 6 seconds.
 
 ### Subtitle and Audio
+
+Audio Settings
+
+These settings determine the default spoken language tracks selected when you start a stream.
+
+1. Preferred Audio Language: The primary spoken language you want the application to automatically select if the media file contains multiple audio tracks.
+2. Secondary Audio Language: Your fallback audio track. If a stream does not have an audio track in your Preferred Audio Language, the system will automatically default to this secondary option.
+
+Subtitle Preferences
+
+These configurations control which text translations are displayed on screen and how the menus are filtered.
+
+1. Preferred Language: The primary language you want for your subtitles.
+2. Secondary Preferred Language: Your fallback subtitle language. If your primary choice is unavailable, the application will attempt to load subtitles in this language instead.
+
+Use Forced Subtitles
+Options: Toggle (On/Off)
+Description: When enabled, the player prioritizes "forced" subtitles that match your preferred language settings. Forced subtitles are meant to be turned on even if you don't use regular subtitles, as they translate foreign languages, alien dialogue, or on-screen text while the rest of the movie is in your primary spoken language. 
+Show Only Preferred Languages
+Options: Toggle (On/Off)
+Description: Acts as a filter to clean up your subtitle menu. When enabled, it hides all subtitle tracks except the ones that exactly match your Preferred and Secondary Preferred Language settings.
+Addon Subtitle Startup
+This setting controls how aggressively Nuvio searches for external subtitles when a video begins playing, balancing load times against subtitle availability.
+Options: Fast startup, Preferred only, All subtitles
+Description: * Fast startup: Prioritizes getting the video playing immediately. It skips the automatic process of fetching external addon subtitles. You will need to manually request them from within the video player if you want them. 
+Preferred only: A balanced approach. The system fetches subtitles from your addons during the initial load but only pulls the ones that match your specific language preferences.
+All subtitles: The most comprehensive option. It fetches and loads every single available addon subtitle for the video, giving you the maximum number of choices at the cost of a slightly longer loading time. 
