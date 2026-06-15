@@ -10,6 +10,9 @@ Nuvio offers a variety of player settings to customize your experience. This sec
 - [Buffer and Network](#buffer-and-network)
 - [MPV (WIP)](#mpv-wip)
 
+> [!IMPORTANT]
+> Aything not labeled [TV Only] or [Mobile Only] is a feature of both versions.
+
 ---
 
 ## Intro and Outro Skip
