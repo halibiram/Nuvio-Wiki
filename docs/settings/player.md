@@ -8,7 +8,7 @@ Nuvio offers a variety of player settings to customize your experience. This sec
 - [Subtitle and Audio](#subtitle-and-audio)
 - [Player and Decoder Options](#player-and-decoder-options)
 - [Buffer and Network](#buffer-and-network)
-- [MPV](#mpv-wip)
+- [MPV](#MPV)
 
 > [!IMPORTANT]
 > Aything not labeled [TV Only] or [Mobile Only] is a feature of both versions.
