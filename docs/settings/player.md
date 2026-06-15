@@ -3,8 +3,8 @@
 Nuvio offers many player settings options. This section will discuss:
 
 - [Intro and Outro Skip](#Intro-and-Outro-Skip)
+- [Stream Selection and Stream Auto Play](#Stream-Selection-and-Stream-Auto-Play)
 - [Next Episode](#Next-Episode)
-- [Stream Selection](#Stream-Selection)
 - Subtitle and Audio
 - Decoder Options
 - MPV
@@ -41,6 +41,9 @@ Nuvio also has the ability to submit Intros and Outros to IntroDB's community so
 5. Copy the Key
 6. Go back into Nuvio and paste the API key in and hit save
 
+## Stream Selection and Stream Auto Play
+
+
 ## Next Episode
 
 Next Episode has a variety of options: Auto-Play Next Episode, Prefer Binge Group, Resue Binge Group, Next Episode Threshold Mode.
@@ -65,9 +68,8 @@ With this on, Nuvio will ensure that when you return toa TV series, the app auto
 
 **Next Episdoe Threshold Mode**
 
-## Stream Selection
-
 This will be used as a fallback if no outro skip is present. This can be set in increments of .5% from 100% to 97%. 
 
 1. At 100%, if no outro skip exists, Nuvio will not begin the source selecting process until the show or movie is **completely** finished.
 2. At 97%, if no outro skip exists, Nuvio will begin the source selecting process when the show is 97% complete. E.g. IF the show is 30 minutes long, Nuvio will begin selecting next source at 29 minutes and 6 seconds.
+
