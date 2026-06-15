@@ -156,28 +156,48 @@ Options: Fast startup, Preferred only, All subtitles
 ### Player and Decoder Options
 
 Video Player & Interface
+
 These settings control the visual experience and how you interact with the media player.
+
 Loading Overlay
-Description: Displays a continuous loading screen or graphic to hide any buffering, black screens, or background transitions. The overlay remains visible until the exact moment the very first frame of the video is ready to be shown. 
+
+Displays a continuous loading screen or graphic to hide any buffering, black screens, or background transitions. The overlay remains visible until the exact moment the very first frame of the video is ready to be shown. 
+
 Player
+
+Dictates which video engine handles your streams.
+
 Options: Internal / External
-Description: Dictates which video engine handles your streams.
-Internal: Keeps you inside the application using its native player.
-External: Passes the video link to a third-party application installed on your device (such as VLC or MX Player).
+
+1. Internal: Keeps you inside the application using its native player.
+2. External: Passes the video link to a third-party application installed on your device (such as VLC or MX Player).
+
 Hold To Speed (Mobile Only)
-Description: A touch-screen shortcut for quickly skimming through content. By pressing and holding your finger anywhere on the video player surface, the playback speed will temporarily increase. Normal playback resumes as soon as you lift your finger. 
+
+A touch-screen shortcut for quickly skimming through content. By pressing and holding your finger anywhere on the video player surface, the playback speed will temporarily increase. Normal playback resumes as soon as you lift your finger. 
+
 Hold Speed (Mobile Only)
-Options: 2x (and potentially other multipliers)
-Description: Configures exactly how fast the video plays when you are actively using the "Hold To Speed" feature. 🏃‍♂️
+
+Configures exactly how fast the video plays when you are actively using the "Hold To Speed" feature.
+
 Advanced Processing & Decoding
+
 These are highly technical settings that determine how your device's hardware and software process the raw video and audio data.
+
 Decoder Priority
+
+Tells the application how to translate the video file into images on your screen.
+
 Options: Prefer device decoders, Prefer app decoders (FFmpeg), Device decoders only
-Description: Tells the application how to translate the video file into images on your screen.
-Prefer device decoders: Relies on your device's physical hardware chips. This is generally the best option for smooth playback and battery saving.
-Prefer app decoders (FFmpeg): Relies on the application's software to decode the video. This is useful as a fallback if your device struggles with a specific or unusual video format.
-Device decoders only: Strictly forces the hardware to do the work, refusing to fall back to software processing.
+
+1. Prefer device decoders: Relies on your device's physical hardware chips. This is generally the best option for smooth playback and battery saving.
+2. Prefer app decoders (FFmpeg): Relies on the application's software to decode the video. This is useful as a fallback if your device struggles with a specific or unusual video format.
+3. Device decoders only: Strictly forces the hardware to do the work, refusing to fall back to software processing.
+
 DV7 - HEVC Fallback
-Description: Dolby Vision Profile 7 (DV7) is a premium HDR video format. If you attempt to play a DV7 file on a screen that doesn't have the proper hardware support, the picture will usually look severely distorted (often a completely purple or green screen). Enabling this setting strips the unreadable Dolby Vision data and maps the video down to standard HEVC (H.265), allowing the video to play with normal, correct colors. 
+
+Dolby Vision Profile 7 (DV7) is a premium HDR video format. If you attempt to play a DV7 file on a screen that doesn't have the proper hardware support, the picture will usually look severely distorted (often a completely purple or green screen). Enabling this setting strips the unreadable Dolby Vision data and maps the video down to standard HEVC (H.265), allowing the video to play with normal, correct colors. 
+
 Tunneled Playback
-Description: An advanced feature primarily for Android TV devices. It allows the audio and video streams to bypass the standard operating system pathways and process directly at the hardware level. This greatly improves audio/video synchronization (lip-sync) and can result in smoother playback for heavy 4K HDR files. 
+
+An advanced feature primarily for Android TV devices. It allows the audio and video streams to bypass the standard operating system pathways and process directly at the hardware level. This greatly improves audio/video synchronization (lip-sync) and can result in smoother playback for heavy 4K HDR files. 
