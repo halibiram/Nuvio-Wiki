@@ -80,7 +80,10 @@ After authenticating, customize your tracking features.
 
 * **Library Source:** Choose which library to use for saving and viewing your collection. Options include **Trakt** or **Nuvio**.
 * **Watch Progress:** Choose which progress source powers resume and continue watching. Options include **Trakt** or **Nuvio Sync**.
-  > **Important Note:** If you select **Nuvio Sync** as your primary watch progress source, Nuvio will still continue syncing your ongoing watch progress *to* Trakt in the background.
+
+> [!NOTE]
+> If you select **Nuvio Sync** as your primary watch progress source, Nuvio will still continue syncing your ongoing watch progress *to* Trakt in the background.
+
 * **Continue Watching Window:** Define the Trakt history timeframe considered for continuing a show (e.g., 60 days).
 * **Comments:** Toggle on to show Trakt user reviews on detail metadata pages.
 * **More Like This source:** Choose where recommendations come from on detail pages (e.g., Trakt).
