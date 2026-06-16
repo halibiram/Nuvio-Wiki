@@ -18,7 +18,7 @@ When launching Nuvio for the very first time, your immediate step will be creati
 ---
 
 ## 3. Connect Features & Integrations
-To populate your dashboard and enable metadata enrichment, configure your external accounts.
+To Enable metadata enrichment and external tracking, configure your external accounts.
 
 ### Trakt Configuration
 1. Navigate to **Settings** > **Trakt** and click **Connect Trakt**.
