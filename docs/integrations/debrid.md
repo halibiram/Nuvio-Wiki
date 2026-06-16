@@ -10,7 +10,6 @@
   * [Step 4: Granular Result Management](#step-4-granular-result-management)
   * [Step 5: Metadata & UI Formatting](#step-5-metadata--ui-formatting)
 * [Debrid Service Guide](#debrid-service-guide)
-  * [Supported Services](#supported-services)
     * [1. TorBox (TB)](#1-torbox-tb)
     * [2. Premiumize (PM)](#2-premiumize-pm)
     * [3. OffCloud](#3-offcloud)
@@ -89,8 +88,6 @@ At the bottom of the Connected Services menu, the **Formatting** section allows 
 ## Debrid Service Guide
 
 Debrid services are high-speed downloaders that fetch files from hosters and torrents, then stream them to you via a secure, high-bandwidth connection.
-
-### Supported Services
 
 #### 1. TorBox (TB)
 A fast-growing service that excels in Usenet support (pro tier only) alongside traditional torrent debrid.
