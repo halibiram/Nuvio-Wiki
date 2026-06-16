@@ -1,3 +1,5 @@
+
+```mermaid
 graph TD
     subgraph Resolution
         Res4K[4K] --> Res2K[2K]
@@ -72,4 +74,4 @@ graph TD
         EAVC --> EXviD[XviD]
         EXviD --> EDivX[DivX]
     end
-    
+```
