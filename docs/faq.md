@@ -30,3 +30,11 @@ The easiest way is to get them from [Nuvio's community covers](https://nuvio.tv/
 ### How do I turn subtitles off by default?
 
 You can turn subtitles off by default by setting your preferred language to none. 
+
+### How do I reset my nuvio account password?
+
+On [Nuvio.tv](https://nuvio.tv) go to the login page and select forgot password.
+
+### How do i delete my Nuvio account?
+
+Go to [Nuvio.tv](https://nuvio.tv) and login. While on the account tab click on **TV Settings** in the left side bar. On the bottom there will be a button to delete your account.
