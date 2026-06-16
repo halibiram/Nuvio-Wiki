@@ -18,7 +18,6 @@
   * [Why use Debrid?](#why-use-debrid)
   * [Setup Steps](#setup-steps)
   * [Troubleshooting](#troubleshooting)
-* [Explain Like I'm Five](#explain-like-im-five)
 
 ---
 
