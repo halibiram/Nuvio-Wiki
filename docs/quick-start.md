@@ -1,34 +1,51 @@
 [Home](../README.md) | [Quick Start](../docs/quick-start.md) | [Overview](../docs/overview.md) | [Features](../docs/features.md) | [Installation](../docs/installation/README.md) | [Settings](../docs/settings/README.md) | [Troubleshooting](../docs/troubleshooting.md) | [FAQ](../docs/faq.md)
 
 ---
+
 # ⚡ Quick Start Guide
 
-Want to get Nuvio up and running in 10 minutes? Follow this sequence:
-
 ## 1. Install the App
-- **Android:** Download the APK and install. [Full Guide](installation/android-mobile.md)
-- **Android TV:** Use the "Downloader" app to get the TV APK or sideload the APK. [Full Guide](installation/android-tv.md)
-- **iOS:** Sideload the .ipa. [Full Guide](installation/ios.md)
-
-## 2. Add Your First Addon
-Nuvio is empty by default. You need an addon to see content. See [Addons](addons/README.md).
-- Open Nuvio > **Settings** > **Addons**.
-- Tap **Install from URL**.
-- Enter a manifest link.
-
-## 3. (Optional but Recommended) Setup Debrid
-> [!CAUTION]
-> Continuing without a debrid service can put you at risk.
->
-
-For high-quality 4K streaming without buffering:
-- Go to **Settings** > **Integrations** > **Connected Services**.
-- Select your provider (Torbox or Premiumize).
-- Follow the on-screen instructions. [Debrid Guide](integrations/debrid.md)
-
-## 4. Setup Trakt (Optional)
-- Go to **Settings** > **Trakt**.
-- Login with Trakt to sync your watchlist and progress.
+Before configuring anything, ensure you have the correct version installed for your platform. 
+* Refer to the [Full Installation Guides](installation/README.md) to get the application up and running.
 
 ---
-**Need more help?** Dive into the [Full Documentation](settings/README.md).
+
+## 2. First App Open & Profile Setup
+When launching Nuvio for the very first time, your immediate step will be creating a profile.
+* **Primary Profile:** Note that the **first profile you create will be designated as the Primary profile**. 
+* For details on managing multiple accounts or tweaking restrictions, see the [Profile Settings Section](settings/profiles.md).
+
+---
+
+## 3. Connect Features & Integrations
+To populate your dashboard and enable metadata enrichment, configure your external accounts.
+
+### Trakt Configuration
+1. Navigate to **Settings** > **Trakt** and click **Connect Trakt**.
+2. Complete the external authentication, then return to the Nuvio Trakt settings screen.
+3. Select your preferred **Library Source**.
+4. Set your watch progress tracking options. You can sync between Trakt or Nuvio, but selecting **Nuvio Sync** is highly recommended for the most accurate watch progress.
+5. Toggle **Comments On** if you want to view community discussions.
+
+### Metadata Enrichment
+Go to **Settings** > **Integrations** to add your developer API keys:
+* **TMDB Enrichment:** Toggle this feature **On** and input your personal **TMDB API Key** to fetch rich asset metadata.
+* **MDBList:** Toggle this feature **On** and input your **MDBList API Key** to bring in advanced user lists and rating data.
+
+---
+
+## 4. Recommended Playback Settings
+Optimize how your player handles streams, episodes, and specialty content formats under **Settings** > **Player**.
+
+* **Intro Skip:** Turn this option on to automatically bypass TV show introductions.
+* **Anime Skip:** Toggle this feature on and enter your unique **Client ID**. For step-by-step instructions on acquiring your ID, check the [Player Settings Section](settings/player.md).
+* **Auto-Play Next Episode:** Turn this on to seamlessly transition to the next episode in a series without returning to the menu.
+* **Auto Stream Selection:** Change this setting to **Auto-play first source** to bypass manual link picking and let Nuvio instantly launch the top scraped result.
+* **Advanced Subtitle Rendering:** Turn on **Use libass for ASS/SSA subtitles** to ensure high-styled typesetting layout styles render correctly. For deep technical details, see the [Full Settings Wiki](settings/README.md).
+* **TV Device Enhancements:** If you are running Nuvio on an Android TV or television box, turn on the **Auto Switch Feature for Anime** specifically optimized for the MPV internal player backend.
+
+### Subtitles and Audio Defaults
+Tailor your default language tracks so you do not have to change them every time you launch a stream:
+* **Preferred Audio Language:** Set your default voice/audio track language.
+* **Preferred Subtitle Language:** Choose your primary text language. 
+* *Tip:* If you prefer streams to launch completely clean without overlays, **set this to None to keep default subtitles off**.
