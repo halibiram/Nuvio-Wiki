@@ -30,7 +30,7 @@ To populate your dashboard and enable metadata enrichment, configure your extern
 ### Metadata Enrichment
 Go to **Settings** > **Integrations** to add your developer API keys:
 * **TMDB Enrichment:** Toggle this feature **On** and input your personal **TMDB API Key** to fetch rich asset metadata.
-* **MDBList:** Toggle this feature **On** and input your **MDBList API Key** to bring in advanced user lists and rating data.
+* **MDBList:** Toggle this feature **On** and input your **MDBList API Key** to bring in rating data.
 
 ---
 
@@ -49,3 +49,26 @@ Tailor your default language tracks so you do not have to change them every time
 * **Preferred Audio Language:** Set your default voice/audio track language.
 * **Preferred Subtitle Language:** Choose your primary text language. 
 * *Tip:* If you prefer streams to launch completely clean without overlays, **set this to None to keep default subtitles off**.
+
+---
+
+# Addons & Plugins
+
+By default, Nuvio comes with **Cinemeta** and **Open Subtitles** installed out of the box. While these provide basic metadata and subtitle support, Nuvio is effectively an empty shell upon first launch. 
+
+**You will need to configure your own add-ons and plugins to make the app useful and populate it with playable content.**
+
+For mire detail on addons: [Addons Guide](addons/README.md).
+
+## Navigation & Installation
+
+The menus to access your Addons and Plugins differ depending on the device you are using:
+
+### On Mobile Devices
+1. Navigate to **Settings**.
+2. Select **Content and Discovery**.
+3. From here, choose either the **Addons** or **Plugins** section to add your manifest URLs or manage existing installations.
+
+### On TV Devices
+*   **Addons:** Accessible directly from the main **Sidebar** menu.
+*   **Plugins:** Navigate to **Settings** > **Plugins**.
