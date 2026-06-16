@@ -178,7 +178,7 @@ Technical settings that determine how your device's hardware and software proces
 
 ---
 
-## Buffer and Network
+## Buffer and Network [TV Only]
 
 These settings manage how much video data is kept in memory and how peer-to-peer streams are handled.
 
