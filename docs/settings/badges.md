@@ -1,7 +1,8 @@
 
 ```mermaid
-graph TD
+flowchart LR
     subgraph Resolution
+        direction TB
         Res4K["4K"] --> Res2K["2K"]
         Res2K --> ResFHD["FHD"]
         ResFHD --> ResHD["HD"]
@@ -13,6 +14,7 @@ graph TD
     end
 
     subgraph Quality
+        direction TB
         QRemux["Remux"] --> QBluRay["BluRay"]
         QBluRay --> QWebDL["WebDL"]
         QWebDL --> QWebRip["WebRip"]
@@ -27,10 +29,12 @@ graph TD
     end
 
     subgraph IMAX
+        direction TB
         IMAXE["IMAX Enhanced"] --> IMAXB["IMAX"]
     end
 
     subgraph Visual
+        direction TB
         VDV["Dolby Vision"] --> VHDR10P["HDR10+"]
         VHDR10P --> VHDR10["HDR10"]
         VHDR10 --> VHDR["HDR"]
@@ -41,6 +45,7 @@ graph TD
     end
 
     subgraph Audio
+        direction TB
         %% Dolby Branch
         A_ATMOS_TRUE["ATMOS / TRUEHD"] --> A_ATMOS_DDP["ATMOS / DD+"]
         A_ATMOS_TRUE --> A_TRUEHD["TRUEHD"]
@@ -62,6 +67,7 @@ graph TD
     end
 
     subgraph Channels
+        direction TB
         C71["7.1"] --> C61["6.1"]
         C61 --> C51["5.1"]
         C51 --> C20["2.0"]
@@ -69,6 +75,7 @@ graph TD
     end
 
     subgraph Encoder
+        direction TB
         EAV1["AV1"] --> EHEVC["HEVC"]
         EHEVC --> EAVC["AVC"]
         EAVC --> EXviD["XviD"]
