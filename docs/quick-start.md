@@ -51,7 +51,7 @@ To Enable metadata enrichment and external tracking, configure your external acc
 
 ### Metadata Enrichment
 Go to **Settings** > **Integrations** to add your developer API keys:
-* **TMDB Enrichment:** Toggle this feature **On** and input your personal **TMDB API Key** to fetch rich asset metadata.
+* **TMDB Enrichment [REQUIRED FOR MOBILE ONLY]:** Toggle this feature **On** and input your personal **TMDB API Key** to fetch rich asset metadata.
 * **MDBList:** Toggle this feature **On** and input your **MDBList API Key** to bring in rating data.
 
 ---
