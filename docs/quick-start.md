@@ -17,7 +17,7 @@ Want to get Nuvio up and running in 10 minutes? Follow this sequence:
 
 ## 2. Add Your First Addon
 Nuvio is empty by default. You need an addon to see content. See [Addons](addons/README.md).
-- [Nuvio Mobile] Open Nuvio > **Settings** > **Addons**.
+- [Nuvio Mobile] Open Nuvio > **Settings** > **Content and Discovery** > **Addons**.
 - [Nuvio TV] The addons menu is accessible from the side bar. 
 - Tap **Install from URL**.
 - Enter a manifest link.
