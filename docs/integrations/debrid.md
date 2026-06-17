@@ -6,9 +6,10 @@
 * [Debrid Integration](#debrid-integration)
   * [Step 1: Accessing Connected Services](#step-1-accessing-connected-services)
   * [Step 2: Linking an Account & Initial Toggles](#step-2-linking-an-account--initial-toggles)
-  * [Step 3: Optimizing Link Preparation & Performance](#step-3-optimizing-link-preparation--performance)
-  * [Step 4: Granular Result Management](#step-4-granular-result-management)
-  * [Step 5: Metadata & UI Formatting](#step-5-metadata--ui-formatting)
+  * [Step 3: Configuring AIOStreams & P2P Addons](#step-3-configuring-aiostreams--p2p-addons)
+  * [Step 4: Optimizing Link Preparation & Performance](#step-4-optimizing-link-preparation--performance)
+  * [Step 5: Granular Result Management](#step-5-granular-result-management)
+  * [Step 6: Metadata & UI Formatting](#step-6-metadata--ui-formatting)
 * [Debrid Service Guide](#debrid-service-guide)
     * [1. TorBox (TB)](#1-torbox-tb)
     * [2. Premiumize (PM)](#2-premiumize-pm)
@@ -23,7 +24,10 @@
 
 ## Debrid Integration
 
-Nuvio utilizes a centralized architecture for debrid integration. Instead of passing personal API keys to individual P2P scraping addons, accounts are linked directly within the core Nuvio application. Nuvio intercepts hashes from your addons, verifies cache availability, and handles the link resolution natively.
+Nuvio utilizes a centralized architecture for debrid integration. Instead of passing personal API keys to individual P2P scraping addons, accounts are linked directly within the core Nuvio Android and TV application. Nuvio intercepts the raw P2P hashes from your configured addons, verifies cache availability, and handles the link resolution natively by wrapping the addon in your debrid service.
+
+> [!IMPORTANT]
+> Nuvio's debrid integration (TorBox or Premiumize) only resolves links — it cannot generate them on its own. You must have at least one **P2P-capable** scraper addon (such as AIOStreams, Comet, or Torrentio) installed and configured correctly, or Nuvio has nothing to wrap and resolve.
 
 ---
 
@@ -40,7 +44,32 @@ By default, your debrid providers will show as unlinked, and core features will 
 
 ---
 
-### Step 3: Optimizing Link Preparation & Performance
+### Step 3: Configuring AIOStreams & P2P Addons
+For Nuvio to resolve anything, it first needs a source to scrape the raw torrent hashes. You must configure your scraper addons **without** a Debrid API key and strictly in **P2P mode**. If a scraper addon resolves links itself (because a Debrid key was entered into it), Nuvio never sees a raw hash to wrap, and your TorBox/Premiumize linking in Steps 1-2 is effectively bypassed.
+
+#### Configuring AIOStreams for P2P
+1. **Pick an instance.** Open the configuration page of the AIOStreams instance you intend to use (a self-hosted instance, or a public instance that explicitly allows P2P). The official public ElfHosted instance disables P2P and HTTP streams by default for liability reasons, so it will not work for this setup — you'll need a private/self-hosted instance or an alternate public instance that permits P2P.
+2. **Skip the Services menu.** Click through to the **Services** menu and leave it empty — do not add or enable credentials for TorBox, Premiumize, Real-Debrid, or any other debrid service here. Entering a key in AIOStreams itself causes it to return already-resolved/cached debrid links instead of raw P2P hashes, which both defeats Nuvio's own resolution logic and can burn through your provider's rate limits outside of Nuvio's control.
+3. **Enable P2P in Stream Types / Filters.** Navigate to the Stream Types (or Filters) menu and make sure **P2P** is toggled on and set to at least **Preferred**, ideally **Required**. In the same menu, disable or exclude **Cached** and **Uncached** debrid stream types so AIOStreams only returns torrent/magnet results.
+4. **Save and generate your manifest.** Use the Save & Install (or equivalent) menu to generate your keyless AIOStreams manifest URL.
+5. **Install into Nuvio.** Add the generated manifest URL as an addon inside Nuvio the same way you would any other addon source.
+
+#### Other Addons (e.g., Comet, Torrentio)
+If you're running a Comet instance, Torrentio, or a similar scraper natively alongside or instead of AIOStreams:
+1. Open that addon's own configuration/settings page.
+2. Ensure no Debrid service field, API key field, or "cached" stream option is filled in or enabled.
+3. Confirm the addon's mode is set to output raw torrent/P2P links (this is sometimes labeled "P2P," "Torrent," or simply the default state when no debrid credentials are present).
+4. Install the resulting keyless addon URL into Nuvio.
+
+Once a working P2P addon is installed, selecting a title causes the addon to find P2P swarms, and Nuvio automatically wraps those raw hashes through your linked Torbox or Premiumize account to stream securely.
+
+> [!NOTE]
+> **P2P Availability Advisory:** 
+> Not all instances or addons provide access to P2P. Many public hosted instances explicitly block P2P scraping (including AIOStreams' own official public ElfHosted instance). Ensure the AIOStreams or Comet instance you are utilizing allows P2P connections so Nuvio receives the necessary hashes.
+
+---
+
+### Step 4: Optimizing Link Preparation & Performance
 When a provider is active, a **Link Preparation** section becomes available. 
 
 * **Prepare links**: Toggle this **On** to resolve playable streams immediately before you hit playback, minimizing buffer delays.
@@ -52,7 +81,7 @@ When a provider is active, a **Link Preparation** section becomes available.
 
 ---
 
-### Step 4: Granular Result Management
+### Step 5: Granular Result Management
 Nuvio provides deep filtering and sorting configurations under the **Result Management** section to control exactly how scraped streams are indexed and presented:
 
 #### Scraping & Capacity Limits
@@ -76,7 +105,7 @@ For almost every media metric, Nuvio employs a strict prioritizing system split 
 
 ---
 
-### Step 5: Metadata & UI Formatting
+### Step 6: Metadata & UI Formatting
 At the bottom of the Connected Services menu, the **Formatting** section allows you to customize the layout of the scraper results using variables:
 
 * **Name template**: Customizes how the title and main text of the stream results appear. Leaving this blank defaults to the raw name provided by the scraper.
