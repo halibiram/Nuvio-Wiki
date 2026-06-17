@@ -31,7 +31,7 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 - **Subtitle Layout Adjustments:** Tailors caption scaling sizes, custom text/background color profiles, outline parameters, and *Vertical Offset*. Includes an experimental toggle to deploy the **libass rendering engine** for heavy ASS/SSA dynamic typesetting scripts.
 - **Interface & Control Overlays:** Features standard *Loading Overlays* to hide network lag. Includes passive informational *Pause Overlays [TV Only]*, *OSD System Clocks [TV Only]*, touchscreen *Hold To Speed / Hold Speed* scaling multipliers **, and sliding vertical *Gesture Controls* for volume/brightness **[Mobile Only]**.
 
-## 3. Account Integrations: [View Integrations Guide](/integrations/README.md)
+## 3. Account Integrations: [View Integrations Guide](/docs/integrations/README.md)
 - **Trakt.tv:** Syncs your "Up Next" list and watch history across all Nuvio devices.
 - **Torbox / Premiumize:** 
   - Essential for high-quality, buffer-free 4K streams.
