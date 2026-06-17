@@ -27,7 +27,7 @@ By default, your debrid providers will show as unlinked, and core features will 
 ### Step 3: Configuring AIOStreams & P2P Addons
 Nuvio first needs a source to scrape the magnet links. You must configure your scraper addons **without** a Debrid API key and strictly in **P2P mode**. 
 
-* [Detailed instructions on configuring a p2p Addon are located here](docs/addons/README.md)
+* [Detailed instructions on configuring a p2p Addon are located here](addons/README.md)
 
 ---
 
