@@ -1,3 +1,7 @@
+[Home](../../README.md) | [Quick Start](../../docs/quick-start.md) | [Overview](../../docs/overview.md) | [Features](../../docs/features.md) | [Installation](../../docs/installation/README.md) | [Settings](../../docs/settings/README.md) | [Integrations](../../docs/integrations/README.md) | [Troubleshooting](../../docs/troubleshooting.md) | [FAQ](../../docs/faq.md)
+
+---
+
 ## Nuvio Player Settings
 
 Nuvio offers a variety of player settings to customize your experience. This section covers:
