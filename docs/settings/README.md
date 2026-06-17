@@ -17,7 +17,7 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 | **Up Next Behavior** | Configure granular tracking rules: **Prefer Episode Thumbnails**, **Up Next From Furthest Episode** (disable for rewatches to use most recent), **Show Unaired Next Up Episodes**, and **Blur Unwatched** to avoid spoilers. | Configure series playback lines using *Prefer Binge Group* rules, *Reuse Binge Groups*, and variable *Next Episode Threshold Mode* percentages. |
 | **Poster Card Style** | Fine-tune card **Width** (Compact, Dense, Standard, Balanced, Comfort, Large) and **Corner Radius** (Sharp, Subtle, Classic, Rounded, Pill) with a real-time pixel size **Live Preview**. Toggle **Landscape Posters** and **Hide labels**. | Fine-tune card Width metrics (Compact to Large), Corner Radius geometries (Sharp to Pill), and hover **Backdrop Expand Delay** timers. Toggle Landscape Posters. |
 
-## 2. Playback
+## 2. Playback [View Playback Guide](player.md)
 - **Internal Player:** Highly recommended for most users. Supports hardware decoding.
   - *Internal Engine:* Manually choose between ExoPlayer or libmpv as the primary background media core.
   - *Auto-switch engine on startup error [TV Only]:* Automatically falls back from ExoPlayer to libmpv for detected anime or if an initialization failure occurs.
@@ -31,7 +31,7 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 - **Subtitle Layout Adjustments:** Tailors caption scaling sizes, custom text/background color profiles, outline parameters, and *Vertical Offset*. Includes an experimental toggle to deploy the **libass rendering engine** for heavy ASS/SSA dynamic typesetting scripts.
 - **Interface & Control Overlays:** Features standard *Loading Overlays* to hide network lag. Includes passive informational *Pause Overlays [TV Only]*, *OSD System Clocks [TV Only]*, touchscreen *Hold To Speed / Hold Speed* scaling multipliers **, and sliding vertical *Gesture Controls* for volume/brightness **[Mobile Only]**.
 
-## 3. Account Integrations
+## 3. Account Integrations [View Integrations Guide](/integrations/README.md)
 - **Trakt.tv:** Syncs your "Up Next" list and watch history across all Nuvio devices.
 - **Torbox / Premiumize:** 
   - Essential for high-quality, buffer-free 4K streams.
