@@ -17,7 +17,7 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 | **Up Next Behavior** | Configure granular tracking rules: **Prefer Episode Thumbnails**, **Up Next From Furthest Episode** (disable for rewatches to use most recent), **Show Unaired Next Up Episodes**, and **Blur Unwatched** to avoid spoilers. | Configure series playback lines using *Prefer Binge Group* rules, *Reuse Binge Groups*, and variable *Next Episode Threshold Mode* percentages. |
 | **Poster Card Style** | Fine-tune card **Width** (Compact, Dense, Standard, Balanced, Comfort, Large) and **Corner Radius** (Sharp, Subtle, Classic, Rounded, Pill) with a real-time pixel size **Live Preview**. Toggle **Landscape Posters** and **Hide labels**. | Fine-tune card Width metrics (Compact to Large), Corner Radius geometries (Sharp to Pill), and hover **Backdrop Expand Delay** timers. Toggle Landscape Posters. |
 
-## 2. Playback [View Playback Guide](player.md)
+## 2. Playback: [View Playback Guide](player.md)
 - **Internal Player:** Highly recommended for most users. Supports hardware decoding.
   - *Internal Engine:* Manually choose between ExoPlayer or libmpv as the primary background media core.
   - *Auto-switch engine on startup error [TV Only]:* Automatically falls back from ExoPlayer to libmpv for detected anime or if an initialization failure occurs.
@@ -31,7 +31,7 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 - **Subtitle Layout Adjustments:** Tailors caption scaling sizes, custom text/background color profiles, outline parameters, and *Vertical Offset*. Includes an experimental toggle to deploy the **libass rendering engine** for heavy ASS/SSA dynamic typesetting scripts.
 - **Interface & Control Overlays:** Features standard *Loading Overlays* to hide network lag. Includes passive informational *Pause Overlays [TV Only]*, *OSD System Clocks [TV Only]*, touchscreen *Hold To Speed / Hold Speed* scaling multipliers **, and sliding vertical *Gesture Controls* for volume/brightness **[Mobile Only]**.
 
-## 3. Account Integrations [View Integrations Guide](/integrations/README.md)
+## 3. Account Integrations: [View Integrations Guide](/integrations/README.md)
 - **Trakt.tv:** Syncs your "Up Next" list and watch history across all Nuvio devices.
 - **Torbox / Premiumize:** 
   - Essential for high-quality, buffer-free 4K streams.
@@ -41,14 +41,14 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 - **MDBList Ratings API:** Connects a custom key to fetch and layer platform rating scores (Trakt, IMDb, TMDB, Letterboxd, Rotten Tomatoes, Audience, and Metacritic) over title dashboard views.
 - **Anime Skip Integration:** Authorizes account validation links via an external Client ID to activate accurate crowd-sourced timestamp skipping triggers.
 
-## 4. Advanced (Android TV Only)
+## 4. Advanced (Android TV Only): [View Playback Guide](player.md)
 - **Decoder Priority:** Dictates processing priorities across *Device decoders only* (strict hardware parsing), *Prefer device decoders* (hardware priority with software fallbacks), or *Prefer app decoders (FFmpeg)* (software processing for legacy formats).
 - **Advanced Display Formatting:** Utilizes standard *DV7 - HEVC Fallback* layers to fix distorted purple/green color rendering profiles. Adds options for *Preserve DV mapping (DV7 to DV8.1)* and *Convert DV5 to DV8.1* matrices.
 - **Refresh Rate Switching (AFR):** Automatically matches your TV's refresh rate to the content (e.g., 24fps) to eliminate judder. Configurable as *Off*, *On start*, or *On start/stop* parameters.
 - **Tunnelled Playback:** Improves synchronization and reduces overhead on supported Android TV hardware. It sends raw video streams directly to the display chips to optimize heavy 4K HDR playback rendering chains.
 - **Force AC-3 Transcoding (Optical/SPDIF):** Live-transcodes heavy modern multichannel sound formats (TrueHD, DTS, AAC) into traditional compressed Dolby Digital 5.1 tracks to maintain output over bandwidth-limited digital optical audio connections.
 
-## 5. Buffer and Network
+## 5. Buffer and Network: [View Playback Guide](player.md)
 These configurations govern internal memory allocation thresholds, local system caching pools, and network data transit rules.
 
 - **Custom Playback Buffers:** Completely overrides stock Media3 parameters with specialized processing limits:
