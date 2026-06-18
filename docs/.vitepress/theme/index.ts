@@ -1,4 +1,14 @@
 import DefaultTheme from 'vitepress/theme'
+import { h } from 'vue'
+import BackToTop from './BackToTop.vue'
 import './custom.css'
 
-export default DefaultTheme
+export default {
+  extends: DefaultTheme,
+  Layout: () => h(DefaultTheme.Layout, null, {
+    'doc-footer-before': () => h(BackToTop)
+  }),
+  enhanceApp({ app }) {
+    app.component('BackToTop', BackToTop)
+  }
+}

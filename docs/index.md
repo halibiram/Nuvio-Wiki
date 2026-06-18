@@ -76,3 +76,5 @@ If you would like to support some of the developers of Nuvio:
 ## Contribution
 
 Contributions are vital! Please see the [Contributing Guide](https://github.com/sappy-69/Nuvio-Wiki/blob/main/CONTRIBUTING.md) to help improve these docs.
+
+<BackToTop />

@@ -414,6 +414,37 @@ body {
   margin-top: 56px;
 }
 
+.back-to-top-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.back-to-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  color: var(--vp-c-brand-1);
+  font: inherit;
+  font-weight: 600;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.back-to-top:hover {
+  color: var(--vp-c-brand-2);
+}
+
+.back-to-top:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 4px;
+}
+
 .VPDocFooter .prev,
 .VPDocFooter .next {
   border-radius: 14px;
