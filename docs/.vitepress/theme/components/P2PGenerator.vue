@@ -238,9 +238,10 @@ function buildP2PConfig(template, options = {}) {
   if (options.formatterChoice) inputValues.formatterChoice = options.formatterChoice
   if (options.coreFilter) inputValues.coreFilter = options.coreFilter
   const miscDefaults = inputValues.misc ?? {}
+  const addonName = options.addonName?.trim() || 'AIOStreams'
   inputValues.misc = {
     ...miscDefaults,
-    ...(options.addonName !== undefined ? { addonName: options.addonName } : {}),
+    addonName,
     ...(options.showStats !== undefined ? { showStats: options.showStats ? 'true' : 'false' } : {}),
   }
   if (options.timeout !== undefined)
