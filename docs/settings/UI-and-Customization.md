@@ -46,6 +46,8 @@ Whether you are swiping through catalogs on a phone or navigating with a remote 
 ### Shared Features
 *(Detail page presentation is highly optimized for the specific device form factor; see platform-specific options below).*
 
+For metadata enrichment, ratings, see the [TMDb, MDblist, Trakt integration Guide](docs/integrations/imdb-mdblist-trakt.md)
+
 ### Mobile App
 * **Backgrounds & Artwork:** Enable *Cinematic Background* for blurred screen backdrops.
 * **Episodes Layout:** Choose between *Horizontal* (backdrop-style row cards) or *List* (detail-first stacked cards) when viewing seasons.
