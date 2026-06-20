@@ -5,6 +5,9 @@ Nuvio utilizes a centralized architecture for debrid integration. Instead of pas
 > [!IMPORTANT]
 > Nuvio's debrid integration (TorBox or Premiumize) only resolves links — it cannot generate them on its own. You must have at least one **P2P-capable** scraper addon (such as AIOStreams, Comet, or Torrentio) installed and configured correctly, or Nuvio has nothing to wrap and resolve.
 
+>[!NOTE]
+>Reminder: This project is not official. Do not contact Nuvio developers regarding issues with this wiki.
+
 ---
 
 ### Step 1: Accessing Connected Services
