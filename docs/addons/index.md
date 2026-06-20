@@ -5,6 +5,9 @@ Addons are the heart of the Nuvio experience. They provide the content and funct
 >[!WARNING]
 > This Wiki does not condone the use of any unlicensed copyrighted material.
 
+>[!NOTE]
+>Reminder: This project is not official. Do not contact Nuvio developers regarding issues with this wiki.
+
 ## Types of Addons
 
 There are 3 main types of addons for Nuvio:
