@@ -26,7 +26,7 @@ Navigate to one of these locations depending on your Nuvio version:
 
 ### How to import
 
-1. Obtain a badge JSON URL (see [Community Badge Sets](#community-badge-sets) below).
+1. Obtain a badge JSON URL (see [Community Badge Sets](#community-badge-sets) or [Creating them with Badger](#Creating-or-Customizing-Badges) below).
 2. Open Nuvio and go to the Badge URL field in settings.
 3. Paste the direct URL to the `.json` file.
 4. Press **Import**.
