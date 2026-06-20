@@ -32,8 +32,6 @@ Navigate to one of these locations depending on your Nuvio version:
 4. Press **Import**.
 5. You should see a confirmation such as `1/3 URLs imported`.
 
-> [!WARNING]
-> A known bug in some versions of Nuvio causes the Badge URL to be **removed if you press "Save Settings"** after importing. After importing your badge URL, exit the settings screen without pressing Save. Verify your badges appear on the stream selection screen before closing the app.
 
 > [!TIP]
 > Always use the **raw** GitHub/Gist URL for badge JSON files. The URL should start with `https://raw.githubusercontent.com/...` — not the standard GitHub page URL, which returns HTML, not the JSON content.
