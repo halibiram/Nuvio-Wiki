@@ -1,5 +1,8 @@
 # Installation Guides
 
+>[!NOTE]
+>Reminder: This project is not official. Do not contact Nuvio developers regarding issues with this wiki.
+
 Nuvio supports a variety of platforms. Select your device below for specific installation instructions:
 
 - [Android TV](android-tv.md) - Play Store or APK
