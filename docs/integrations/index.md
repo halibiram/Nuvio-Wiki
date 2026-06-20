@@ -18,9 +18,9 @@ Nuvio intercepts raw P2P hashes from your configured keyless addons and uses you
 Enhance the default scraping results with high-quality visual assets and aggregated rating scores.
 - **TMDB:** Supplies Nuvio with high-resolution artwork, episode titles, cast details, trailers, and localized descriptions.
 - **MDBList:** Aggregates critic and audience scores from external platforms (IMDb, Rotten Tomatoes, Metacritic, Letterboxd) directly onto Nuvio's detail pages.
-- **[Read the Metadata & Tracking Guide](./imdb-mdblist-trakt.md)**
+- **[Read the Metadata & Tracking Guide](./tmdb-mdblist-trakt.md)**
 
 ### 3. Watch Tracking & Syncing
 Keep your viewing history and custom lists synchronized across all your devices.
 - **Trakt (In-App):** Natively syncs your watch progress, scrobbles, and custom lists. Can be configured to run alongside or independently of Nuvio's internal sync engine. *Provides More Like This*.
-- **[Read the Metadata & Tracking Guide](./imdb-mdblist-trakt.md)**
+- **[Read the Metadata & Tracking Guide](./tmdb-mdblist-trakt.md)**
