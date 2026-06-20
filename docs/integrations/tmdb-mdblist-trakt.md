@@ -1,12 +1,5 @@
 # Content Enrichment & Tracking Guide
 
-## Table of Contents
-- [TMDB Enrichment](#tmdb-enrichment)
-- [MDBList Ratings](#mdblist-ratings)
-- [Trakt Integration](#trakt-integration)
-  - [In-App Configuration](#in-app-configuration)
-  - [Nuvio Trakt Bridge (Import Tool)](#nuvio-trakt-bridge-import-tool)
-
 ---
 
 ### TMDB Enrichment
