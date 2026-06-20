@@ -14,6 +14,8 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 | **Up Next Behavior** | Configure granular tracking rules: **Prefer Episode Thumbnails**, **Up Next From Furthest Episode** (disable for rewatches to use most recent), **Show Unaired Next Up Episodes**, and **Blur Unwatched** to avoid spoilers. | Configure series playback lines using *Prefer Binge Group* rules, *Reuse Binge Groups*, and variable *Next Episode Threshold Mode* percentages. |
 | **Poster Card Style** | Fine-tune card **Width** (Compact, Dense, Standard, Balanced, Comfort, Large) and **Corner Radius** (Sharp, Subtle, Classic, Rounded, Pill) with a real-time pixel size **Live Preview**. Toggle **Landscape Posters** and **Hide labels**. | Fine-tune card Width metrics (Compact to Large), Corner Radius geometries (Sharp to Pill), and hover **Backdrop Expand Delay** timers. Toggle Landscape Posters. |
 
+[Back to top](#settings-breakdown)
+
 ## 2. Playback: [View Playback Guide](player.md)
 - **Internal Player:** Highly recommended for most users. Supports hardware decoding.
   - *Internal Engine:* Manually choose between ExoPlayer or libmpv as the primary background media core.
@@ -28,6 +30,8 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 - **Subtitle Layout Adjustments:** Tailors caption scaling sizes, custom text/background color profiles, outline parameters, and *Vertical Offset*. Includes an experimental toggle to deploy the **libass rendering engine** for heavy ASS/SSA dynamic typesetting scripts.
 - **Interface & Control Overlays:** Features standard *Loading Overlays* to hide network lag. Includes passive informational *Pause Overlays* [Android TV Only], *OSD System Clocks* [Android TV Only], touchscreen *Hold To Speed / Hold Speed* scaling multipliers, and sliding vertical *Gesture Controls* for volume/brightness [Mobile Only].
 
+[Back to top](#settings-breakdown)
+
 ## 3. Account Integrations: [View Integrations Guide](/integrations/)
 - **Trakt.tv:** Syncs your "Up Next" list and watch history across all Nuvio devices.
 - **TorBox / Premiumize:**
@@ -38,12 +42,16 @@ Nuvio's settings allow for deep customization. Below is a detailed breakdown, no
 - **MDBList Ratings API:** Connects a custom key to fetch and layer platform rating scores (Trakt, IMDb, TMDB, Letterboxd, Rotten Tomatoes, Audience, and Metacritic) over title dashboard views.
 - **Anime Skip Integration:** Authorizes account validation links via an external Client ID to activate accurate crowd-sourced timestamp skipping triggers.
 
+[Back to top](#settings-breakdown)
+
 ## 4. Advanced [Android TV Only]: [View Playback Guide](player.md)
 - **Decoder Priority:** Dictates processing priorities across *Device decoders only* (strict hardware parsing), *Prefer device decoders* (hardware priority with software fallbacks), or *Prefer app decoders (FFmpeg)* (software processing for legacy formats).
 - **Advanced Display Formatting:** Uses standard *DV7 - HEVC Fallback* layers to fix distorted purple/green color rendering profiles. Adds options for *Preserve DV mapping (DV7 to DV8.1)* and *Convert DV5 to DV8.1* matrices.
 - **Refresh Rate Switching (AFR):** Automatically matches your TV's refresh rate to the content (e.g., 24fps) to eliminate judder. Configurable as *Off*, *On start*, or *On start/stop* parameters.
 - **Tunnelled Playback:** Improves synchronization and reduces overhead on supported Android TV hardware. It sends raw video streams directly to the display chips to optimize heavy 4K HDR playback rendering chains.
 - **Force AC-3 Transcoding (Optical/SPDIF):** Live-transcodes heavy modern multichannel sound formats (TrueHD, DTS, AAC) into traditional compressed Dolby Digital 5.1 tracks to maintain output over bandwidth-limited digital optical audio connections.
+
+[Back to top](#settings-breakdown)
 
 ## 5. Buffer and Network: [View Playback Guide](player.md)
 These configurations govern internal memory allocation thresholds, local system caching pools, and network data transit rules.
@@ -58,7 +66,11 @@ These configurations govern internal memory allocation thresholds, local system 
   - *Auto Size:* Automates cache constraints targeting roughly 10% of total available free space, with manual overrides to maintain strict storage headroom margins.
 - **Network & P2P Stream Filters:** Deploys a *Custom Network* filter to open parallel download connections for progressive links. Includes a toggle to clear *P2P Streaming* chains for torrent configurations and options to *Hide torrent stats* overlays during playback screens.
 
+[Back to top](#settings-breakdown)
+
 ## 6. Customization & Management
 - **Profiles:** Manage multiple users, watch histories, and recommendations separately. [View Profiles Guide](profiles.md)
 - **Collections:** Create deep custom collections grouping media by genre, studio, or custom lists. [View Collections Guide](collections.md).
 - **Backup & Synchronization:** Exports or imports compiled application configurations to instantly mirror visual formats, tracking scripts, and engine limits across backup hardware keys.
+
+[Back to top](#settings-breakdown)
