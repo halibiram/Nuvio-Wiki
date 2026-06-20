@@ -218,7 +218,5 @@ If you prefer to write your own badge JSON, Nuvio uses the following schema:
 | [NardBadges JSON (Slim)](https://raw.githubusercontent.com/vowl313/NardBadges/refs/heads/main/NardBadges_Slim.json) | Slim variant without tier indicators. |
 | [r/Nuvio](https://www.reddit.com/r/Nuvio/) | Community discussion — find new badge sets and formatter templates shared by other users. |
 | [Nuvio Discord](https://discord.gg/nuvio) | Live community help for badge configuration questions. |
-| [Duckstreams Guide](https://duckkota.gitlab.io/guides/nuvio/) | Community setup guide including badge and formatter configuration steps. |
-| [Viren070's Guide](https://guides.viren070.me/) | Comprehensive Nuvio setup guide maintained by the community. |
 
 [Back to top](#stream-badges-guide)
