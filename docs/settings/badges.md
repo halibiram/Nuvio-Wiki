@@ -1,6 +1,6 @@
 # Stream Badges Guide
 
-Nuvio uses a **Fusion-style badge system** — a fully customizable, image and color-based tagging layer that scans each stream's title or filename and displays visual badges on your stream selection screen. Badges are not fixed or built in; they come from a **JSON configuration file** that you import via a URL.
+Nuvio uses a fully customizable, image and color-based tagging layer for badges that scans each stream's title or filename and displays visual badges on your stream selection screen. Badges are not fixed or built in; they come from a **JSON configuration file** that you import via a URL.
 
 > [!NOTE]
 > Badges are community-created and fully customizable. The colors, icons, and labels you see depend entirely on the badge set you have imported. Nuvio has no hard-coded badge colors or styles.
