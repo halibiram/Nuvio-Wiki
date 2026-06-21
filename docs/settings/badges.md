@@ -64,12 +64,6 @@ A beautifully crafted configuration suite for Nuvio and AIOStreams with a bullet
 | **Colorful & Concise Badges** | `https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/Sterzeck_badge.json` |
 | **AIOStreams Formatter** | `https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/formatter.json` |
 
-**Preview:**
-
-![Colorful & Concise — Example 1](https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/images/Example1.png)
-
-![Colorful & Concise — Example 2](https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/images/Example2.png)
-
 **GitHub:** [danielsdian/ColorfulAndConcise](https://github.com/danielsdian/ColorfulAndConcise)
 
 ---
