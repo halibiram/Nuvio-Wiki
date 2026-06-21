@@ -1,12 +1,6 @@
-[Home](../../README.md) | [Quick Start](../../docs/quick-start.md) | [Overview](../../docs/overview.md) | [Features](../../docs/features.md) | [Installation](../../docs/installation/README.md) | [Settings](../../docs/settings/README.md) | [Integrations](../../docs/integrations/README.md) | [Troubleshooting](../../docs/troubleshooting.md) | [FAQ](../../docs/faq.md)
-
----
-
 # ⚡ Quick Start Guide
 
 Want to get Nuvio up and running in 10 minutes? Follow this sequence:
-
----
 
 ## 1. Install the App
 - **Android:** Download the APK and install. [Full Guide](installation/android-mobile.md)
@@ -17,35 +11,36 @@ Want to get Nuvio up and running in 10 minutes? Follow this sequence:
 
 ## 2. Add Your First Addon
 
->[!TIP]
->For an easier setup, use the [Nuvio Quickstart Tool](https://nuvio-quickstart.duckdns.org/) to setup Nuvio addons for you. This will install *Aiostreams* using Tam-Taro's template and *Cinemeta*. 
+> [!TIP]
+> For an easier setup, use the [Nuvio Quickstart Tool](https://nuvio-quickstart.duckdns.org/) to set up Nuvio addons for you. This will install *AIOStreams* using Tam-Taro's template and *Cinemeta*.
 
-Nuvio is empty by default. You need an addon to see content. See [Addons](addons/README.md).
-- [Nuvio Mobile] Open Nuvio > **Settings** > **Content and Discovery** > **Addons**.
-- [Nuvio TV] The addons menu is accessible from the side bar. 
+Nuvio is empty by default. You need an addon to see content. See [Addons](/addons/).
+- [Android Mobile Only] Open Nuvio > **Settings** > **Content and Discovery** > **Addons**.
+- [Android TV Only] The addons menu is accessible from the sidebar.
 - Tap **Install from URL**.
 - Enter a manifest link.
 
 ---
 
 ## 3. Connect Features & Integrations [Optional]
-To Enable metadata enrichment and external tracking, configure your external accounts.
+To enable metadata enrichment and external tracking, configure your external accounts.
 
 ### Trakt Configuration
 1. Navigate to **Settings** > **Trakt** and click **Connect Trakt**.
 2. Complete the external authentication, then return to the Nuvio Trakt settings screen.
 3. Select your preferred **Library Source**.
 4. Set your watch progress tracking options. You can sync between Trakt or Nuvio, but selecting **Nuvio Sync** is highly recommended for the most accurate watch progress.
->[!NOTE]
->Selecting Nuvio Sync will still allow Trakt to sync your watch progress. 
 
-6. Toggle **Comments On** if you want to view community discussions.
+> [!NOTE]
+> Selecting Nuvio Sync will still allow Trakt to sync your watch progress.
+
+5. Toggle **Comments On** if you want to view community discussions.
 
 ### Metadata Enrichment
 Go to **Settings** > **Integrations** to add your developer API keys:
-* **TMDB Enrichment [REQUIRED FOR MOBILE ONLY]:** Toggle this feature **On** and input your personal **TMDB API Key** to fetch rich asset metadata.
-* **MDBList:** Toggle this feature **On** and input your **MDBList API Key** to bring in rating data.
+- **TMDB Enrichment** [Required for Mobile]: Toggle this feature **On** and input your personal **TMDB API Key** to fetch rich asset metadata.
+- **MDBList:** Toggle this feature **On** and input your **MDBList API Key** to bring in rating data.
 
 ---
 
-**Need more help?** Dive into the [Full Documentation](/docs/settings/README.md).
+**Need more help?** Dive into the [Full Documentation](/settings/).

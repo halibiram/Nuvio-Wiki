@@ -1,21 +1,10 @@
-[Home](../../README.md) | [Quick Start](../../docs/quick-start.md) | [Overview](../../docs/overview.md) | [Features](../../docs/features.md) | [Installation](../../docs/installation/README.md) | [Settings](../../docs/settings/README.md) | [Integrations](../../docs/integrations/README.md) | [Troubleshooting](../../docs/troubleshooting.md) | [FAQ](../../docs/faq.md)
 
----
-
-## Nuvio Collections
+# Collections
 
 > [!CAUTION]
 > Creating collections should be considered an advanced user feature (seriously, this is a warning). If you don't consider yourself an advanced user, it's recommended to copy one from [Nuvio's community collections](https://nuvio.tv/community-collections) instead.
 
-### Contents
-
-- [Understanding Collection Structure](#understanding-collection-structure)
-- [Before You Start](#before-you-start)
-- [Creating Your First Collection](#creating-your-first-collection)
-- [The Folders Tab](#the-folders-tab)
-  - [Add Catalog](#add-catalog)
-  - [Add TMDB](#add-tmdb)
-  - [Add Trakt](#add-trakt)
+---
 
 ### Understanding Collection Structure
 
@@ -49,6 +38,8 @@ graph LR
     class Action_Movies_Catalog,Action_Shows_Catalog,SciFi_Movies_Catalog file
 ```
 
+[Back to top](#Collections)
+
 ### Before You Start
 
 You'll need two things to create a collection:
@@ -59,6 +50,8 @@ You'll need two things to create a collection:
      - ❌ Incorrect: `https://github.com/rrevanth/nuvio-assets/blob/main/popular/new/new-poster.png`
      - ✅ Correct: `https://raw.githubusercontent.com/rrevanth/nuvio-assets/refs/heads/main/popular/new/new-poster.png`
    - You're also welcome to upload your own images or GIFs to Nuvio's community collections for others to use.
+
+[Back to top](#Collections)
 
 ### Creating Your First Collection
 
@@ -81,6 +74,8 @@ You can create a collection either in the app or on the Nuvio website — the we
    - **Enable Focus Glow**: adds a highlight effect when hovering over the collection.
 6. Switch to the **Folders** tab to configure the collection's content — covered in detail below.
 
+[Back to top](#Collections)
+
 ### The Folders Tab
 
 The Folders tab is where you define the subfolders ("blocks") that make up your collection:
@@ -90,6 +85,8 @@ The Folders tab is where you define the subfolders ("blocks") that make up your 
 - **Folder Title**: the name shown for this folder's tab or row. For example, in an "Action" collection, folders might be titled "Action Movies 2020" and "Action Movies 2010".
 - **TileShape**: choose **Landscape**, **Square**, or **Portrait**.
 - **Sources**: populate the folder using **Add Catalog**, **Add TMDB**, or **Add Trakt**, described below.
+
+[Back to top](#Collections)
 
 #### Add Catalog
 
@@ -124,6 +121,8 @@ A couple of sources use different input fields instead of a standard ID:
 - **TMDB Discover**: instead of an ID, select one or more genres (e.g., Action, Horror, Science Fiction) from a dropdown. This dynamically builds a collection of media matching those categories from TMDB's database.
 - **Letterboxd List**: paste the full URL of the Letterboxd list you want to import. Use the exact link from your browser rather than searching for a separate ID.
 
+[Back to top](#Collections)
+
 #### Add Trakt
 
 Trakt sources are configured across two groups of settings.
@@ -153,3 +152,5 @@ After choosing your Trakt source type from the dropdown, configure its unique fi
 > - ❌ Incorrect: `https://app.trakt.tv/...`
 >
 > Using an `app.trakt.tv` link will cause the collection to fail syncing and remain empty.
+
+[Back to top](#Collections)

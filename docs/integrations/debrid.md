@@ -1,13 +1,12 @@
-[Home](../../README.md) | [Quick Start](../../docs/quick-start.md) | [Overview](../../docs/overview.md) | [Features](../../docs/features.md) | [Installation](../../docs/installation/README.md) | [Settings](../../docs/settings/README.md) | [Integrations](../../docs/integrations/README.md) | [Troubleshooting](../../docs/troubleshooting.md) | [FAQ](../../docs/faq.md)
-
----
-
 ## Debrid Integration
 
 Nuvio utilizes a centralized architecture for debrid integration. Instead of passing personal API keys to individual P2P scraping addons, accounts are linked directly within the core Nuvio Android and TV application. Nuvio intercepts the raw P2P hashes from your configured addons, verifies cache availability, and handles the link resolution natively by wrapping the addon in your debrid service.
 
 > [!IMPORTANT]
 > Nuvio's debrid integration (TorBox or Premiumize) only resolves links — it cannot generate them on its own. You must have at least one **P2P-capable** scraper addon (such as AIOStreams, Comet, or Torrentio) installed and configured correctly, or Nuvio has nothing to wrap and resolve.
+
+>[!NOTE]
+>Reminder: This project is not official. Do not contact Nuvio developers regarding issues with this wiki.
 
 ---
 
@@ -22,12 +21,16 @@ By default, your debrid providers will show as unlinked, and core features will 
 3. Under the **Connected Services** section, toggle **Cloud library** to **On** if you wish to browse and play media files already stored directly within your cloud provider's storage.
 4. Toggle **Resolve playable links** to **On**. This allows Nuvio to actively request playable streaming links from your provider when scraping results.
 
+[Back to top](#debrid-integration)
+
 ---
 
 ### Step 3: Configuring AIOStreams & P2P Addons
 Nuvio first needs a source to scrape the magnet links. You must configure your scraper addons **without** a Debrid API key and strictly in **P2P mode**. 
 
-* [Detailed instructions on configuring a p2p Addon are located here](../addons/README.md)
+* [Detailed instructions on configuring a p2p Addon are located here](../addons/index.md)
+
+[Back to top](#debrid-integration)
 
 ---
 
@@ -40,6 +43,8 @@ When a provider is active, a **Link Preparation** section becomes available.
 > [!WARNING]
 > **Important Rate-Limit Advisory:** 
 > It is highly recommended to use a lower link count (such as 2 links). Debrid providers strictly rate-limit how many resolution requests can be processed in a given timeframe. Simply opening a movie or episode details page pulls headers and counts toward those limits—even if you do not press "Watch"—because the links are actively prepared ahead of time.
+
+[Back to top](#debrid-integration)
 
 ---
 
@@ -65,6 +70,8 @@ For almost every media metric, Nuvio employs a strict prioritizing system split 
 | **Encodes** | AV1, HEVC (H.265), AVC (H.264). |
 | **Languages & Groups** | Audio language tracks and specific release group tags. |
 
+[Back to top](#debrid-integration)
+
 ---
 
 ### Step 6: Metadata & UI Formatting
@@ -72,6 +79,8 @@ At the bottom of the Connected Services menu, the **Formatting** section allows 
 
 * **Name template**: Customizes how the title and main text of the stream results appear. Leaving this blank defaults to the raw name provided by the scraper.
 * **Description template**: Controls the structural display of metadata (bitrate, size, codec tags) displayed beneath each result.
+
+[Back to top](#debrid-integration)
 
 ---
 
@@ -88,7 +97,7 @@ A fast-growing service that excels in Usenet support (pro tier only) alongside t
   * **Standard:** ~$5.00/month or ~$55.00/year
   * **Pro:** ~$10.00/month or ~$110.00/year: Provides access to Usenet
 * **Deals & Discounts:** Users can receive a referral bonus on their first purchase, adding 7 days of extra free time per month purchased. Annual plans combined with coupon codes and cryptocurrency payments can significantly lower the monthly equivalent cost. Torbox typically offers Black Friday sales for 30% off. 
-* **Setup:** [torbox.app/settings](https://torbox.app)
+* **Setup:** [torbox.app/settings](https://torbox.app/subscription?referral=41d1ac85-ee5e-4699-9f0a-92e67cbc2fb2)
 
 #### 2. Premiumize (PM)
 A premium all-in-one service that includes a personal cloud and a built-in VPN.
@@ -142,6 +151,8 @@ A highly reliable alternative to Real-Debrid with excellent customer support and
 * **Deals & Discounts:** They offer occasional seasonal sales, such as during Black Friday and Christmas. Paying with Bitcoin permanently secures a 10% discount.
 * **Setup:** [alldebrid.com/pin](https://alldebrid.com)
 
+[Back to top](#debrid-integration)
+
 ### Why use Debrid?
 1. **No Buffering:** Streams are served from high-speed data centers, not peer-to-peer.
 2. **Quality:** Access to massive 4K/Remux files (60GB+) that are impossible to stream via standard public links.
@@ -150,11 +161,17 @@ A highly reliable alternative to Real-Debrid with excellent customer support and
 > [!IMPORTANT]
 > It is highly recommended that you use a debrid service for safety and the best experience.
 
+[Back to top](#debrid-integration)
+
 ### Setup Steps
 1. **Get an Account:** Sign up on the respective website.
 2. **Retrieve API Key/Authorize:** Follow the individual provider's authorization steps.
 3. **Configure Addons:** Most Nuvio addons will automatically detect your Debrid service once linked.
 
+[Back to top](#debrid-integration)
+
 ### Troubleshooting
 * **"No Streams Found":** Check if your subscription has expired or if the addon supports your specific service.
 * **"Authorization Failed":** Ensure you are logged into the website on your browser before entering the device code.
+
+[Back to top](#debrid-integration)
