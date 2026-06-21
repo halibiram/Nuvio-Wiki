@@ -55,19 +55,6 @@ The NardBadges repository also includes recommended **Name** and **Description**
 
 ---
 
-### Colorful & Concise
-
-A beautifully crafted configuration suite for Nuvio and AIOStreams with a bulletproof regex engine — maintained by [danielsdian](https://github.com/danielsdian/ColorfulAndConcise). Eliminates cluttered streams and double badges with an airtight priority hierarchy, sticky audio tag parsing, and brand-accurate hex colors for streaming platforms (Netflix, Prime, Max, etc.). Also includes an AIOStreams formatter.
-
-| Variant | URL |
-| :--- | :--- |
-| **Colorful & Concise Badges** | `https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/Sterzeck_badge.json` |
-| **AIOStreams Formatter** | `https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/formatter.json` |
-
-**GitHub:** [danielsdian/ColorfulAndConcise](https://github.com/danielsdian/ColorfulAndConcise)
-
----
-
 ### BetterFormatter
 
 A highly configurable badge and formatter toolkit with 32 preset variants covering colored and monochrome styles across multiple layout modes — maintained by [9mousaa](https://github.com/9mousaa/BetterFormatter). Also includes a [web-based configurator](https://9mousaa.github.io/BetterFormatter/) for generating custom presets.
