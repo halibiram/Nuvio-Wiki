@@ -125,18 +125,6 @@ A clean, icon-based badge set designed for the Nuvio Android TV app with a focus
 
 ---
 
-### UME Badge Sets
-
-Badge sets from the UME (Unified Media Experience) project by [nobnobz](https://github.com/nobnobz), also the creator of the Fusion Widget Manager tool.
-
-| Variant | URL |
-| :--- | :--- |
-| **UME Minimalistic** | `https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/refs/heads/main/Other/fusion-tags-ume-minimalistic.json` |
-| **UME Colored** | `https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/refs/heads/main/Other/fusion-tags-ume-colored.json` |
-| **UME Standard** | `https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/fusion-tags-ume.json` |
-
----
-
 ## Badge Editor Tools
 
 Don't want to manually paste raw JSON URLs? These community-built web tools let you browse, customize, preview, and export badge configurations visually.
@@ -145,7 +133,6 @@ Don't want to manually paste raw JSON URLs? These community-built web tools let 
 | :--- | :--- |
 | [Badger](https://nintle.github.io/Badger/) | The most popular badge editor — browse community templates, toggle individual badges, change colors and images, preview against real titles, and generate a shareable JSON URL. ([GitHub](https://github.com/Nintle/Badger)) |
 | [BetterFormatter Configurator](https://9mousaa.github.io/BetterFormatter/) | Build custom BetterFormatter presets with a visual editor — choose style, layout, mode, and DV handling. |
-| [Fusion Widget Manager](https://nobnobz.github.io/fusion-widget-manager/) | Manage UME formatters and badge configurations with a companion web tool. |
 
 ---
 
@@ -296,7 +283,6 @@ If you prefer to write your own badge JSON, Nuvio uses the following schema:
 | [BetterFormatter Configurator](https://9mousaa.github.io/BetterFormatter/) | Web tool for building custom BetterFormatter badge presets. |
 | [Elite Badges GitHub](https://github.com/leonevz/Elite-Badges) | Premium-styled badge set by leonevz. |
 | [Minimalist Badges GitHub](https://github.com/sweatycab/nuvio-minimalist-badges) | Clean icon-based badges with AIOStreams formatter templates. |
-| [Fusion Widget Manager](https://nobnobz.github.io/fusion-widget-manager/) | Web tool for managing UME formatters and badge configurations. |
 | [r/Nuvio](https://www.reddit.com/r/Nuvio/) | Community discussion — find new badge sets and formatter templates shared by other users. |
 | [Nuvio Discord](https://discord.gg/nuvio) | Live community help for badge configuration questions. |
 
