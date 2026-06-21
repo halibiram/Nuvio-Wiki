@@ -26,7 +26,7 @@ Navigate to one of these locations depending on your Nuvio version:
 
 ### How to import
 
-1. Obtain a badge JSON URL (see [Community Badge Sets](#community-badge-sets) or [Creating them with Badger](#Creating-or-Customizing-Badges) below).
+1. Obtain a badge JSON URL (see [Community Badge Sets](#community-badge-sets) below).
 2. Open Nuvio and go to the Badge URL field in settings.
 3. Paste the direct URL to the `.json` file.
 4. Press **Import**.
@@ -40,7 +40,7 @@ Navigate to one of these locations depending on your Nuvio version:
 
 ## Community Badge Sets
 
-These are the most widely used and recommended badge configurations in the Nuvio community:
+These are the most widely used and recommended badge configurations in the Nuvio community. If you prefer not to import a raw URL directly, see the [Badge Editor Tools](#badge-editor-tools) section below for web-based tools that let you browse, preview, and customize these sets visually.
 
 ### NardBadges (Recommended)
 
@@ -52,6 +52,100 @@ A comprehensive set of 100+ badges covering Resolution, Quality, IMAX, Visual (H
 | **NardBadges Slim** (without tier indicators) | `https://raw.githubusercontent.com/vowl313/NardBadges/refs/heads/main/NardBadges_Slim.json` |
 
 The NardBadges repository also includes recommended **Name** and **Description** formatter templates to pair with the badges. Check the [NardBadges GitHub](https://github.com/vowl313/NardBadges) README for the latest formatter strings.
+
+---
+
+### Colorful & Concise
+
+A beautifully crafted configuration suite for Nuvio and AIOStreams with a bulletproof regex engine — maintained by [danielsdian](https://github.com/danielsdian/ColorfulAndConcise). Eliminates cluttered streams and double badges with an airtight priority hierarchy, sticky audio tag parsing, and brand-accurate hex colors for streaming platforms (Netflix, Prime, Max, etc.). Also includes an AIOStreams formatter.
+
+| Variant | URL |
+| :--- | :--- |
+| **Colorful & Concise Badges** | `https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/Sterzeck_badge.json` |
+| **AIOStreams Formatter** | `https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/formatter.json` |
+
+**Preview:**
+
+![Colorful & Concise — Example 1](https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/images/Example1.png)
+
+![Colorful & Concise — Example 2](https://raw.githubusercontent.com/danielsdian/ColorfulAndConcise/main/images/Example2.png)
+
+**GitHub:** [danielsdian/ColorfulAndConcise](https://github.com/danielsdian/ColorfulAndConcise)
+
+---
+
+### BetterFormatter
+
+A highly configurable badge and formatter toolkit with 32 preset variants covering colored and monochrome styles across multiple layout modes — maintained by [9mousaa](https://github.com/9mousaa/BetterFormatter). Also includes a [web-based configurator](https://9mousaa.github.io/BetterFormatter/) for generating custom presets.
+
+BetterFormatter presets follow a naming convention: `{style}-{layout}-{mode}-{dv}.json`
+
+- **Style:** `colored` (category-based colors) or `mono` (monochrome)
+- **Layout:** `bgb` (badge-based), `pct` (percentage), `src` (source), `tier` (tier-based)
+- **Mode:** `combo` (combined) or `sep` (separated)
+- **DV handling:** `always` (always show DV badge) or `nodv` (hide DV badge)
+
+| Variant | URL |
+| :--- | :--- |
+| **Colored Badge Combo** (no DV) | `https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/presets/colored-bgb-combo-nodv.json` |
+| **Colored Badge Combo** (always DV) | `https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/presets/colored-bgb-combo-always.json` |
+| **Mono Badge Combo** (no DV) | `https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/presets/mono-bgb-combo-nodv.json` |
+| **Mono Badge Combo** (always DV) | `https://raw.githubusercontent.com/9mousaa/BetterFormatter/main/presets/mono-bgb-combo-always.json` |
+
+> [!TIP]
+> The above table shows the most popular variants. See the [BetterFormatter GitHub](https://github.com/9mousaa/BetterFormatter/tree/main/presets) for the full list of 32 presets, or use the [BetterFormatter Configurator](https://9mousaa.github.io/BetterFormatter/) to build a custom set.
+
+---
+
+### Elite Badges
+
+A polished badge set for Nuvio with a premium look — maintained by [leonevz](https://github.com/leonevz/Elite-Badges).
+
+| Variant | URL |
+| :--- | :--- |
+| **Elite Badges** | `https://raw.githubusercontent.com/leonevz/Elite-Badges/main/badges.json` |
+
+**GitHub:** [leonevz/Elite-Badges](https://github.com/leonevz/Elite-Badges)
+
+---
+
+### Minimalist Badges
+
+A clean, icon-based badge set designed for the Nuvio Android TV app with a focus on readability — maintained by [sweatycab](https://github.com/sweatycab/nuvio-minimalist-badges). Includes AIOStreams formatter templates with invisible Unicode tokens for reliable dynamic range detection.
+
+| Variant | URL |
+| :--- | :--- |
+| **Minimalist White** | `https://raw.githubusercontent.com/sweatycab/nuvio-minimalist-badges/main/badges-white.json` |
+| **Minimalist White** (no codecs) | `https://raw.githubusercontent.com/sweatycab/nuvio-minimalist-badges/main/badges-white-no-codecs.json` |
+| **Minimalist Mixed** (color) | `https://raw.githubusercontent.com/sweatycab/nuvio-minimalist-badges/main/badges-mixed.json` |
+| **Minimalist Mixed** (no codecs) | `https://raw.githubusercontent.com/sweatycab/nuvio-minimalist-badges/main/badges-mixed-no-codecs.json` |
+
+> [!TIP]
+> The Minimalist set works best when paired with the included AIOStreams formatter templates. See the [repository README](https://github.com/sweatycab/nuvio-minimalist-badges) for the matching `title-template.txt` and `description-template.txt` files.
+
+---
+
+### UME Badge Sets
+
+Badge sets from the UME (Unified Media Experience) project by [nobnobz](https://github.com/nobnobz), also the creator of the Fusion Widget Manager tool.
+
+| Variant | URL |
+| :--- | :--- |
+| **UME Minimalistic** | `https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/refs/heads/main/Other/fusion-tags-ume-minimalistic.json` |
+| **UME Colored** | `https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/refs/heads/main/Other/fusion-tags-ume-colored.json` |
+| **UME Standard** | `https://raw.githubusercontent.com/nobnobz/Omni-Template-Bot-Bid-Raiser/main/Other/fusion-tags-ume.json` |
+
+---
+
+## Badge Editor Tools
+
+Don't want to manually paste raw JSON URLs? These community-built web tools let you browse, customize, preview, and export badge configurations visually.
+
+| Tool | Description |
+| :--- | :--- |
+| [Badger](https://nintle.github.io/Badger/) | The most popular badge editor — browse community templates, toggle individual badges, change colors and images, preview against real titles, and generate a shareable JSON URL. ([GitHub](https://github.com/Nintle/Badger)) |
+| [BetterFormatter Configurator](https://9mousaa.github.io/BetterFormatter/) | Build custom BetterFormatter presets with a visual editor — choose style, layout, mode, and DV handling. |
+| [Fusion Widget Manager](https://nobnobz.github.io/fusion-widget-manager/) | Manage UME formatters and badge configurations with a companion web tool. |
 
 ---
 
@@ -140,22 +234,7 @@ AV1 → HEVC → AVC → XviD → DivX
 
 ---
 
-## Creating or Customizing Badges
-
-### Using Badger (Recommended)
-
-**[Badger](https://nintle.github.io/Badger/)** is a free, community-made web tool built specifically for creating and editing Fusion/Nuvio badge configurations — no coding required.
-
-With Badger you can:
-- Browse and import existing badge set templates
-- Toggle individual badges on or off
-- Change badge colors, border colors, and images
-- Preview your configuration
-- Generate a shareable JSON URL to paste directly into Nuvio
-
-**GitHub:** [Nintle/Badger](https://github.com/Nintle/Badger)
-
-### Manual JSON Structure
+## Creating Custom Badges
 
 If you prefer to write your own badge JSON, Nuvio uses the following schema:
 
@@ -212,8 +291,12 @@ If you prefer to write your own badge JSON, Nuvio uses the following schema:
 | [Badger](https://nintle.github.io/Badger/) | Community web tool for creating and editing badge JSON without coding. |
 | [Badger GitHub](https://github.com/Nintle/Badger) | Source code and documentation for the Badger tool. |
 | [NardBadges GitHub](https://github.com/vowl313/NardBadges) | Popular 100+ badge set with full and slim variants, plus formatter templates. |
-| [NardBadges JSON (Full)](https://raw.githubusercontent.com/vowl313/NardBadges/refs/heads/main/NardBadges.json) | Direct raw URL — paste into Nuvio's Badge URL field. |
-| [NardBadges JSON (Slim)](https://raw.githubusercontent.com/vowl313/NardBadges/refs/heads/main/NardBadges_Slim.json) | Slim variant without tier indicators. |
+| [Colorful & Concise GitHub](https://github.com/danielsdian/ColorfulAndConcise) | Bulletproof badges with streaming platform branding and AIOStreams formatter. |
+| [BetterFormatter GitHub](https://github.com/9mousaa/BetterFormatter) | 32 preset variants with colored/mono styles and a web configurator. |
+| [BetterFormatter Configurator](https://9mousaa.github.io/BetterFormatter/) | Web tool for building custom BetterFormatter badge presets. |
+| [Elite Badges GitHub](https://github.com/leonevz/Elite-Badges) | Premium-styled badge set by leonevz. |
+| [Minimalist Badges GitHub](https://github.com/sweatycab/nuvio-minimalist-badges) | Clean icon-based badges with AIOStreams formatter templates. |
+| [Fusion Widget Manager](https://nobnobz.github.io/fusion-widget-manager/) | Web tool for managing UME formatters and badge configurations. |
 | [r/Nuvio](https://www.reddit.com/r/Nuvio/) | Community discussion — find new badge sets and formatter templates shared by other users. |
 | [Nuvio Discord](https://discord.gg/nuvio) | Live community help for badge configuration questions. |
 
