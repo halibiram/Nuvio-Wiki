@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { withBase } from 'vitepress'
+import { useData, withBase } from 'vitepress'
+
+const { frontmatter } = useData()
 
 const linkGroups = [
   {
@@ -39,7 +41,7 @@ function backToTop() {
 </script>
 
 <template>
-  <footer class="site-footer" aria-label="Site footer">
+  <footer v-if="frontmatter.layout === 'home'" class="site-footer" aria-label="Site footer">
     <div class="site-footer__inner">
       <div class="site-footer__grid">
         <section class="site-footer__brand" aria-labelledby="footer-brand-title">
