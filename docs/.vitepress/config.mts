@@ -1,4 +1,5 @@
 import { defineConfig, type DefaultTheme } from 'vitepress'
+import { generateSidebar } from 'vitepress-sidebar'
 import {
   englishLocale,
   localeLink,
@@ -56,55 +57,51 @@ function buildNav(locale: WikiLocale): DefaultTheme.NavItem[] {
   return nav
 }
 
-function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
-  const labels = locale.labels
-
-  return [
-    {
-      text: labels.gettingStarted,
-      items: [
-        { text: labels.welcome, link: localeRoot(locale) },
-        { text: labels.quickStart, link: localeLink(locale, siteRoutes.quickStart) },
-        { text: labels.overview, link: localeLink(locale, siteRoutes.overview) },
-        { text: labels.features, link: localeLink(locale, siteRoutes.features) },
-        { text: labels.glossary, link: localeLink(locale, siteRoutes.glossary) }
-      ]
-    },
-    {
-      text: labels.installation,
-      collapsed: false,
-      items: [
-        { text: labels.choosePlatform, link: localeLink(locale, siteRoutes.installation) },
-        { text: labels.androidTV, link: localeLink(locale, siteRoutes.androidTV) },
-        { text: labels.androidMobile, link: localeLink(locale, siteRoutes.androidMobile) },
-        { text: labels.ios, link: localeLink(locale, siteRoutes.ios) },
-        { text: labels.webos, link: localeLink(locale, siteRoutes.webos) }
-      ]
-    },
-    {
-      text: labels.configure,
-      collapsed: false,
-      items: [
-        { text: labels.addons, link: localeLink(locale, siteRoutes.addons) },
-        { text: labels.settings, link: localeLink(locale, siteRoutes.settings) },
-        { text: labels.player, link: localeLink(locale, siteRoutes.player) },
-        { text: labels.profiles, link: localeLink(locale, siteRoutes.profiles) },
-        { text: labels.collections, link: localeLink(locale, siteRoutes.collections) },
-        { text: labels.integrations, link: localeLink(locale, siteRoutes.integrations) },
-        { text: labels.debrid, link: localeLink(locale, siteRoutes.debrid) },
-        { text: labels.metadataTracking, link: localeLink(locale, siteRoutes.metadataTracking) }
-      ]
-    },
-    {
-      text: labels.help,
-      collapsed: false,
-      items: [
-        { text: labels.troubleshooting, link: localeLink(locale, siteRoutes.troubleshooting) },
-        { text: labels.faq, link: localeLink(locale, siteRoutes.faq) },
-        { text: labels.officialLinks, link: localeLink(locale, siteRoutes.officialLinks) }
-      ]
+function cleanSidebarLinks(items: any[] | undefined) {
+  if (!items) return
+  for (const item of items) {
+    if (item.link) {
+      if (item.link.endsWith('/index.md')) {
+        item.link = item.link.slice(0, -'/index.md'.length)
+      } else if (item.link.endsWith('.md')) {
+        item.link = item.link.slice(0, -3)
+      } else if (item.link === 'index.md') {
+        item.link = '/'
+      }
+      if (item.link.endsWith('/') && item.link.length > 1) {
+        item.link = item.link.slice(0, -1)
+      }
     }
-  ]
+    if (item.items) {
+      cleanSidebarLinks(item.items)
+    }
+  }
+}
+
+function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
+  const isRoot = locale.key === 'root'
+  const scanStartPath = isRoot ? '' : locale.key
+  const otherLocaleKeys = wikiLocales
+    .map(l => l.key)
+    .filter(k => k !== locale.key)
+  const excludeByGlobPattern = otherLocaleKeys.map(k => `${k}/**`)
+
+  const sidebar = generateSidebar({
+    documentRootPath: 'docs',
+    scanStartPath,
+    resolvePath: isRoot ? '/' : `/${locale.key}/`,
+    basePath: isRoot ? '/' : `/${locale.key}/`,
+    useTitleFromFileHeading: true,
+    useTitleFromFrontmatter: true,
+    useFolderTitleFromIndexFile: true,
+    useFolderLinkFromIndexFile: true,
+    collapsed: false,
+    excludeByGlobPattern
+  })
+
+  const sidebarItems = sidebar as DefaultTheme.SidebarItem[]
+  cleanSidebarLinks(sidebarItems)
+  return sidebarItems
 }
 
 const locales = Object.fromEntries(
