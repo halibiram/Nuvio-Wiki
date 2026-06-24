@@ -1,3 +1,5 @@
+# Profiles
+
 ## Profiles are one of the core Nuvio features. Here are some Profile features and limitations:
 1. Account Capacity: You can create and manage up to 5 profiles under a single Nuvio account.
 2. Add-on Inheritance vs. Independence: You can set a Primary Profile as your base. When creating additional profiles, you have total control over their sources:
