@@ -39,7 +39,7 @@ For Nuvio to resolve anything, it first needs a source to scrape the magnet link
 <P2PGenerator />
 
 > [!TIP]
-> The generator above resolves the full **Tam-Taro Complete SEL (TAMS)** template for P2P mode — no debrid services, P2P set to Required, debrid stream types excluded, and a curated set of P2P scrapers. It can either download a config JSON to import, or push straight to your instance to produce a manifest URL you paste into Nuvio. Use **Simple mode** for recommended defaults, or switch to **Advanced mode** for full control.
+> The generator above resolves the full **Tam-Taro Complete SEL (TAMS)** template for P2P mode, with no debrid services, P2P set to Required, debrid stream types excluded, and a curated set of P2P scrapers. It can either download a config JSON to import, or push straight to your instance to produce a manifest URL you paste into Nuvio. Use **Simple mode** for recommended defaults, or switch to **Advanced mode** for full control.
 
 #### Configuring AIOStreams for P2P (Manual)
 1. **Pick an instance.** Open the configuration page of the AIOStreams instance you intend to use (a self-hosted instance, or a public instance that explicitly allows P2P). The official public ElfHosted instance disables P2P and HTTP streams by default for liability reasons, so it will not work for this setup — you'll need a private/self-hosted instance or an alternate public instance that permits P2P.
