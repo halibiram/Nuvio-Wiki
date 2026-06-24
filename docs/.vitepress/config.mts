@@ -99,7 +99,32 @@ function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
     useFolderTitleFromIndexFile: true,
     useFolderLinkFromIndexFile: true,
     collapsed: false,
-    excludeByGlobPattern
+    excludeByGlobPattern,
+    manualSortFileNameByPriority: [
+      'quick-start.md',
+      'overview.md',
+      'features.md',
+      'glossary.md',
+      'installation',
+      'addons',
+      'settings',
+      'integrations',
+      'troubleshooting.md',
+      'faq.md',
+      'official-links.md',
+      'android-tv.md',
+      'android-mobile.md',
+      'ios.md',
+      'webos.md',
+      'player.md',
+      'profiles.md',
+      'collections.md',
+      'ui-and-customization.md',
+      'badges.md',
+      'debrid.md',
+      'tmdb-mdblist-trakt.md',
+      'trakt.md'
+    ]
   })
 
   const sidebarItems = sidebar as DefaultTheme.SidebarItem[]
