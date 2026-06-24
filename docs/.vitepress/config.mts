@@ -101,14 +101,14 @@ function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
     collapsed: false,
     excludeByGlobPattern,
     manualSortFileNameByPriority: [
-      'quick-start.md',
       'overview.md',
       'features.md',
-      'glossary.md',
+      'quick-start.md',
       'installation',
       'addons',
-      'settings',
       'integrations',
+      'settings',
+      'glossary.md',
       'troubleshooting.md',
       'faq.md',
       'official-links.md',
@@ -116,14 +116,14 @@ function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
       'android-mobile.md',
       'ios.md',
       'webos.md',
-      'player.md',
-      'profiles.md',
-      'collections.md',
-      'ui-and-customization.md',
-      'badges.md',
       'debrid.md',
       'tmdb-mdblist-trakt.md',
-      'trakt.md'
+      'trakt.md',
+      'player.md',
+      'ui-and-customization.md',
+      'profiles.md',
+      'collections.md',
+      'badges.md'
     ]
   })
 
