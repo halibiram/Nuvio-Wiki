@@ -69,6 +69,36 @@ export const englishLabels: LocaleLabels = {
   officialLinks: 'Official Links'
 }
 
+export const dutchLabels: LocaleLabels = {
+  getStarted: 'Aan de slag',
+  configure: 'Configureren',
+  help: 'Hulp',
+  linksAndResources: 'Links & Bronnen',
+  addons: 'Add-ons',
+  settings: 'Instellingen',
+  player: 'Speler',
+  integrations: 'Integraties',
+  debrid: 'Debrid',
+  metadataTracking: 'TMDb, MDBList, Trakt',
+  troubleshooting: 'Probleemoplossing',
+  faq: 'FAQ',
+  features: 'Functies',
+  gettingStarted: 'Aan de slag',
+  welcome: 'Welkom',
+  quickStart: 'Snelstartgids',
+  overview: 'Overzicht',
+  glossary: 'Begrippenlijst',
+  installation: 'Installatie',
+  choosePlatform: 'Kies een platform',
+  androidTV: 'Android TV',
+  androidMobile: 'Android Mobiel',
+  ios: 'iOS',
+  webos: 'WebOS',
+  profiles: 'Profielen',
+  collections: 'Collecties',
+  officialLinks: 'Officiële links'
+}
+
 // Register a translation only after its docs/<key>/index.md and navigation pages exist.
 export const wikiLocales: WikiLocale[] = [
   {
@@ -76,6 +106,12 @@ export const wikiLocales: WikiLocale[] = [
     label: 'English',
     lang: 'en-US',
     labels: englishLabels
+  },
+  {
+    key: 'nl',
+    label: 'Nederlands',
+    lang: 'nl-NL',
+    labels: dutchLabels
   }
 ]
 
