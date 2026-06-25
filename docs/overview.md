@@ -1,4 +1,4 @@
-# General Overview
+# 📖 General Overview
 
 Nuvio is a powerful media aggregator designed to provide a unified interface for various content sources. It allows users to browse and play media from multiple providers through a highly customizable and modern UI.
 

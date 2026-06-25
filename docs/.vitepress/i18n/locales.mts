@@ -28,7 +28,6 @@ export interface LocaleLabels {
   profiles: string
   collections: string
   officialLinks: string
-  helpTranslate: string
 }
 
 export interface WikiLocale {
@@ -67,39 +66,7 @@ export const englishLabels: LocaleLabels = {
   webos: 'WebOS',
   profiles: 'Profiles',
   collections: 'Collections',
-  officialLinks: 'Official Links',
-  helpTranslate: 'Help translate'
-}
-
-export const dutchLabels: LocaleLabels = {
-  getStarted: 'Aan de slag',
-  configure: 'Configureren',
-  help: 'Hulp',
-  linksAndResources: 'Links & Bronnen',
-  addons: 'Addons',
-  settings: 'Instellingen',
-  player: 'Player',
-  integrations: 'Integrations',
-  debrid: 'Debrid',
-  metadataTracking: 'TMDb, MDBList, Trakt',
-  troubleshooting: 'Troubleshooting',
-  faq: 'FAQ',
-  features: 'Features',
-  gettingStarted: 'Aan de slag',
-  welcome: 'Welkom',
-  quickStart: 'Quick Start',
-  overview: 'Overzicht',
-  glossary: 'Begrippenlijst',
-  installation: 'Installatie',
-  choosePlatform: 'Kies een platform',
-  androidTV: 'Android TV',
-  androidMobile: 'Android Mobile',
-  ios: 'iOS',
-  webos: 'WebOS',
-  profiles: 'Profiles',
-  collections: 'Collections',
-  officialLinks: 'Officiële links',
-  helpTranslate: 'Help vertalen'
+  officialLinks: 'Official Links'
 }
 
 // Register a translation only after its docs/<key>/index.md and navigation pages exist.
@@ -109,12 +76,6 @@ export const wikiLocales: WikiLocale[] = [
     label: 'English',
     lang: 'en-US',
     labels: englishLabels
-  },
-  {
-    key: 'nl',
-    label: 'Nederlands',
-    lang: 'nl-NL',
-    labels: dutchLabels
   }
 ]
 
