@@ -5,13 +5,13 @@ titleTemplate: false
 hero:
   name: Nuvio Wiki
   text: Alles wat je wilde weten over Nuvio, en een paar dingen die je niet wilt weten.
-  tagline: Het onofficiële centrum voor Nuvio, met uitgebreide handleidingen en probleemoplossing voor gebruikers op alle platforms.
+  tagline: Het onofficiële centrum voor Nuvio, met uitgebreide handleidingen en troubleshooting voor gebruikers op alle platforms.
   actions:
     - theme: brand
-      text: Snelstartgids
+      text: Quick Start Guide
       link: /nl/quick-start
     - theme: alt
-      text: Spelerinstellingen
+      text: Player settings
       link: /nl/settings/player
     - theme: alt
       text: Links & Bronnen
@@ -20,7 +20,7 @@ hero:
 features:
   - icon: "🚀"
     title: Aan de slag
-    details: Snelstartgids, Algemeen overzicht, Begrippenlijst en Officiële links.
+    details: Quick Start Guide, Algemeen overzicht, Begrippenlijst en Officiële links.
     link: /nl/quick-start
     linkText: Aan de slag
   - icon: "📥"
@@ -29,13 +29,13 @@ features:
     link: /nl/installation/
     linkText: Kies je platform
   - icon: "⚙️"
-    title: Configuratie & Integraties
-    details: Add-ons, instellingen, spelerinstellingen, debrid, IMDb, MDBList, Trakt, collecties en profielen.
+    title: Configuratie & Integrations
+    details: Addons, instellingen, player settings, debrid, IMDb, MDBList, Trakt, collections en profiles.
     link: /nl/settings/
     linkText: Nuvio configureren
   - icon: "🆘"
     title: Ondersteuning & Info
-    details: Probleemoplossing, veelgestelde vragen (FAQ) en een overzicht van de functies van Nuvio.
+    details: Troubleshooting, veelgestelde vragen (FAQ) en een overzicht van de features van Nuvio.
     link: /nl/troubleshooting
     linkText: Hulp krijgen
 ---
@@ -50,9 +50,9 @@ Nuvio is gratis en open source. [Overweeg een donatie te doen om gratis en open 
 
 Als je iets nodig hebt om je hier doorheen te slepen, is hier een [1-uur durende Subway Surfers video voor je vermaak](https://www.youtube.com/watch?v=ChBg4aowzX8).
 
-## Steun de Ontwikkelaars
+## Steun de Developers
 
-Als je een aantal van de ontwikkelaars van Nuvio wilt steunen:
+Als je een aantal van de developers van Nuvio wilt steunen:
 
 <div class="support-grid">
   <a class="support-button" href="https://ko-fi.com/skoruppa" target="_blank" rel="noopener">

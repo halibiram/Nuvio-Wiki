@@ -12,7 +12,7 @@ TMDB (The Movie Database) vormt de basis voor je metadata en haalt artwork van h
 5. Kopieer de verstrekte v3 API-sleutel (gebruik niet het v4 Read Access Token voor dit veld).
 
 **Nuvio-configuratie:**
-1. Navigeer naar **Integraties** > **TMDB Enrichment**.
+1. Navigeer naar **Integrations** > **TMDB Enrichment**.
 2. Schakel **Enable TMDB Enrichment** in (Aan).
 3. Plak je v3-sleutel in het veld **Personal API key** en klik op Opslaan.
 4. Stel je gewenste **Language code** in (bijv. `nl` voor Nederlands).
@@ -40,7 +40,7 @@ MDBList verzamelt beoordelingsscores van meerdere platforms, zodat je publieks- 
 3. Zorg ervoor dat je alleen de API-sleutel zelf kopieert, niet de volledige URL.
 
 **Nuvio-configuratie:**
-1. Navigeer naar **Integraties** > **MDBList Ratings**.
+1. Navigeer naar **Integrations** > **MDBList Ratings**.
 2. Schakel **Enable MDBList Ratings** in (Aan).
 3. Plak je sleutel in het veld **API Key** en klik op Opslaan.
 4. Selecteer de externe beoordelingsplatforms die je wilt weergeven. Ondersteunde opties zijn onder andere **IMDb**, **TMDB**, **Rotten Tomatoes**, **Metacritic**, **Trakt**, **Letterboxd** en **Audience Score**.
@@ -49,7 +49,7 @@ MDBList verzamelt beoordelingsscores van meerdere platforms, zodat je publieks- 
 
 ---
 
-### Trakt-integratie
+### Trakt-integration
 
 Trakt synchroniseert je kijkgeschiedenis, voortgang en persoonlijke lijsten op al je apparaten. Nuvio ondersteunt zowel live synchronisatie via de app als het importeren van historische gegevens via een webtool.
 
@@ -57,15 +57,15 @@ Trakt synchroniseert je kijkgeschiedenis, voortgang en persoonlijke lijsten op a
 
 **Hoe verbinding te maken met Trakt:**
 Je hoeft niet handmatig een API-sleutel te genereren voor Trakt.
-1. Navigeer naar **Integraties** > **Trakt**.
+1. Navigeer naar **Integrations** > **Trakt**.
 2. Klik op de knop **Connect Trakt**.
-3. Dit zal je vragen in te loggen op je Trakt-account en Nuvio te machtigen om toegang te krijgen tot je profiel.
+3. Dit zal je vragen in te loggen op je Trakt-account en Nuvio te machtigen om toegang te krijgen tot je profile.
 4. Zondat de verbinding is gemaakt, wordt de status bijgewerkt met je Trakt-gebruikersnaam.
 
 **Bibliotheek- en synchronisatie-opties:**
 Pas na de authenticatie je trackingfuncties aan.
 
-- **Library Source:** Kies welke bibliotheek je wilt gebruiken voor het opslaan en bekijken van je collectie. Opties zijn **Trakt** of **Nuvio**.
+- **Library Source:** Kies welke bibliotheek je wilt gebruiken voor het opslaan en bekijken van je collection. Opties zijn **Trakt** of **Nuvio**.
 - **Watch Progress:** Kies welke voortgangsbron wordt gebruikt voor hervatten en verder kijken. Opties zijn **Trakt** of **Nuvio Sync**.
 
 > [!NOTE]
@@ -83,7 +83,7 @@ Als je overstapt naar Nuvio en je bestaande Trakt-geschiedenis wilt importeren i
 1. Bezoek de [Nuvio Trakt Bridge](https://trakt-nuvio.duckdns.org/).
 2. Klik onder het gedeelte **Connect Trakt** op de knop om via Trakt OAuth de toegang goed te keuren in een pop-upvenster.
 3. Klik onder het gedeelte **Connect Nuvio** op de knop om in te loggen en voer het e-mailadres en wachtwoord in die horen bij je Nuvio-account.
-4. Selecteer het specifieke **Nuvio-profiel** waarin je de gegevens wilt importeren uit het dropdown-menu.
+4. Selecteer het specifieke **Nuvio-profile** waarin je de gegevens wilt importeren uit het dropdown-menu.
 5. Kies in het gedeelte **Import from Trakt** je synchronisatiebereiken:
     - **Watched history:** Importeert films en bekeken afleveringen.
     - **Continue watching:** Importeert de afspeelvoortgang.

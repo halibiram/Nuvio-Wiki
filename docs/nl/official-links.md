@@ -14,5 +14,5 @@
 ## Community-bronnen
 - **Viren070:** - [Gids](https://guides.viren070.me/)
 - **Duckstreams:** - [Gids en Quickstart-tool](https://duckkota.gitlab.io/guides/nuvio/)
-- **Nuvio Quickstart Tool:** - [Nuvio add-ons automatisch configureren](https://nuvio-quickstart.duckdns.org/)
-- **Add-ons:** - [Lijst van beschikbare add-ons](https://stremio-addons.net/)
+- **Nuvio Quickstart Tool:** - [Nuvio addons automatisch configureren](https://nuvio-quickstart.duckdns.org/)
+- **Addons:** - [Lijst van beschikbare addons](https://stremio-addons.net/)

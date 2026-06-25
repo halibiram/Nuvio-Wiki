@@ -1,9 +1,9 @@
-# Nuvio Spelerinstellingen
+# Nuvio Player settings
 
-Nuvio biedt verschillende spelerinstellingen om je ervaring aan te passen.
+Nuvio biedt verschillende player settings om je ervaring aan te passen.
 
 > [!IMPORTANT]
-> Elke functie die niet specifiek is gelabeld met [Android TV Only] of [Mobile Only], is beschikbaar op beide versies.
+> Elke feature die niet specifiek is gelabeld met [Android TV Only] of [Mobile Only], is beschikbaar op beide versies.
 
 ---
 
@@ -14,7 +14,7 @@ Nuvio maakt gebruik van drie afzonderlijke databases voor het overslaan van intr
 - **IntroDB** en **AniSkip** kunnen direct in- of uitgeschakeld worden.
 - **Anime Skip** vereist een ID en configuratie om te kunnen gebruiken.
 
-**Om deze functies in/uit te schakelen:**
+**Om deze features in/uit te schakelen:**
 1. Ga naar **Instellingen**.
 2. Selecteer **Afspelen** (Playback).
 3. Selecteer **Skip Segments**.
@@ -22,7 +22,7 @@ Nuvio maakt gebruik van drie afzonderlijke databases voor het overslaan van intr
 **Om een gratis Anime Skip Client ID te verkrijgen:**
 1. Ga naar [Anime Skip](https://anime-skip.com).
 2. Maak een account aan.
-3. Ga na het inloggen naar je profiel.
+3. Ga na het inloggen naar je profile.
 4. Selecteer **API Clients**.
 5. Selecteer **Add a New Client**.
 6. Voer de app-naam "Nuvio" en een beschrijving van "Nuvio" in.
@@ -44,7 +44,7 @@ Nuvio stelt je in staat om tijdstempels in te dienen bij de door de community ge
 - **Content Warnings:** Toont een ouderlijk toezicht overlay wanneer het afspelen start.
 - **Automatic Skipping:** Kies welke segmenten (intro's/outro's) automatisch worden overgeslagen zonder melding.
 
-[Terug naar boven](#nuvio-spelerinstellingen)
+[Terug naar boven](#nuvio-player settings)
 
 ---
 
@@ -71,12 +71,12 @@ Bepaalt de logica die wordt gebruikt om beschikbare streams af te handelen:
 - **Regex (Regular Expression):** Een geavanceerde filtermodus die streamtitels of metadata scant op specifieke tekstpatronen (bijv. 1080p, 4K, HEVC, specifieke release-groepen) en matches prioriteert of filtert op basis van je aangepaste expressies.
 
 **Stream Selection Timeout (Time-out voor streamselectie)**
-Stelt de maximale duur in die de applicatie wacht op resultaten van add-ons of plugins voordat deze verdergaat:
+Stelt de maximale duur in die de applicatie wacht op resultaten van addons of plugins voordat deze verdergaat:
 - **Opties:** Instant (Onmiddellijk), 5s tot 30s (in stappen van 5 seconden), Unlimited (Onbeperkt).
 - *Hoe het werkt:* Als een time-out wordt bereikt, stopt Nuvio met zoeken en speelt de beste optie af die tot dan toe is gevonden (indien automatisch afspelen is ingeschakeld) of toont een gedeeltelijke lijst (bij handmatige selectie). De optie **Unlimited** zorgt ervoor dat de app wacht tot elke provider klaar is met zoeken, ongeacht hoe lang dit duurt.
 
-**Bron- & add-on-filtering**
-Deze instellingen bepalen precies welke add-ons of plugins streams mogen zoeken en aanbieden.
+**Bron- & addon-filtering**
+Deze instellingen bepalen precies welke addons of plugins streams mogen zoeken en aanbieden.
 
 - **Auto-play Source Scope:** Beperkt de pool van providers bij het gebruik van een automatische afspeelmodus.
   - *Opties:* All sources (Alle bronnen), Select addons, Plugins only.
@@ -85,7 +85,7 @@ Deze instellingen bepalen precies welke add-ons of plugins streams mogen zoeken 
 - **Allowed Plugins:** Regelt welke plugins worden gebruikt tijdens het zoekproces.
   - *Opties:* All enabled plugins, Custom Selection.
 
-[Terug naar boven](#nuvio-spelerinstellingen)
+[Terug naar boven](#nuvio-player settings)
 
 ---
 
@@ -97,13 +97,13 @@ De categorie Next Episode bevat verschillende instellingen om continu kijken te 
   - Het overslaan van een outro (Outro skip).
   - Als er geen outro-skip aanwezig is, zodra de drempelwaarde voor de volgende aflevering (Next Episode Threshold) is bereikt.
 - **Prefer Binge Group:** Nuvio probeert de volgende aflevering te vinden met hetzelfde bronprofiel voordat het terugvalt op andere opties. Als je bijvoorbeeld een aflevering via *AIOStreams* hebt bekeken, zal Nuvio proberen de volgende aflevering van *AIOStreams* in dezelfde kwaliteit te vinden voordat het andere providers probeert.
-- **Reuse Binge Groups:** Zorgt ervoor dat wanneer je terugkeert naar een serie, de app automatisch dezelfde streambron of release-groep onthoudt en prioriteit geeft die je eerder bekeek. Als je een specifieke 1080p-release-groep hebt geselecteerd, wordt je sessie aan dat profiel gekoppeld. Bij hervatten via "Verder kijken" (Continue Watching) zoekt Nuvio specifiek naar die exacte release-groep in plaats van automatisch een nieuwe bron te selecteren.
+- **Reuse Binge Groups:** Zorgt ervoor dat wanneer je terugkeert naar een serie, de app automatisch dezelfde streambron of release-groep onthoudt en prioriteit geeft die je eerder bekeek. Als je een specifieke 1080p-release-groep hebt geselecteerd, wordt je sessie aan dat profile gekoppeld. Bij hervatten via "Verder kijken" (Continue Watching) zoekt Nuvio specifiek naar die exacte release-groep in plaats van automatisch een nieuwe bron te selecteren.
 - **Next Episode Threshold Mode:** Wordt gebruikt als terugval als er geen outro-skip aanwezig is. Dit kan worden ingesteld in stappen van 0,5% van 100% tot 97%.
   - *Op 100%:* Nuvio start het bronselectieproces pas als de media volledig is afgelopen.
   - *Op 97%:* Nuvio start het bronselectieproces wanneer de media voor 97% is voltooid (bijv. bij een aflevering van 30 minuten begint de selectie op 29 minuten en 6 seconden).
 - **Are You Still Watching?** [Android TV Only]: Vraagt de gebruiker na een ingesteld aantal opeenvolgende automatisch afgespeelde afleveringen of ze nog kijken, om oneindig afspelen te voorkomen als je in slaap valt.
 
-[Terug naar boven](#nuvio-spelerinstellingen)
+[Terug naar boven](#nuvio-player settings)
 
 ---
 
@@ -126,33 +126,33 @@ Deze instellingen bepalen welke tekstvertalingen op het scherm worden getoond en
 - **Show Only Preferred Languages (Aan/Uit):** Filtert het ondertitelmenu om alle sporen te verbergen die niet exact overeenkomen met je primaire en secundaire taalvoorkeuren.
 - **Subtitle Styling** [TV Optimized]: Biet fijnmazige controle over de weergave van ondertitels, waaronder **Size (grootte)**, **Vertical Offset** (om rekening te houden met zwarte balken), **Text Color** (tekstkleur), **Background Color** (achtergrondkleur) en **Outline/Outline Color** (randkleur).
 - **Use libass for ASS/SSA subtitles:** Een experimentele optie om de geavanceerde libass-engine te gebruiken voor het renderen van complexe stijlen, positionering en animaties van ASS/SSA-ondertitels.
-  - Door dit in te schakelen, gebruikt de speler een gespecialiseerde grafische engine (libass) om complexe ondertitels perfect te tekenen. Als dit uit staat, kan de speler alle kleuren en opmaak verwijderen, of erger nog, crashen bij het lezen van het bestand.
+  - Door dit in te schakelen, gebruikt de player een gespecialiseerde grafische engine (libass) om complexe ondertitels perfect te tekenen. Als dit uit staat, kan de player alle kleuren en opmaak verwijderen, of erger nog, crashen bij het lezen van het bestand.
 
-### Opstartgedrag van add-on-ondertitels
+### Opstartgedrag van addon-ondertitels
 Bepaalt hoe intensief Nuvio zoekt naar externe ondertitels wanneer een video begint te spelen, met een balans tussen laadtijd en beschikbaarheid.
-- **Fast startup:** Geeft prioriteit aan onmiddellijk afspelen door het automatisch ophalen van externe add-on-ondertitels over te slaan. Je moet ze handmatig aanvragen in de speler.
-- **Preferred only:** Een gebalanceerde aanpak. Haalt tijdens het laden ondertitels op van add-ons, maar alleen degene die overeenkomen met je taalvoorkeuren.
-- **All subtitles:** Haalt alle beschikbare add-on-ondertitels voor de video op en laadt ze, wat maximale keuze biedt ten koste van iets langere laadtijden.
+- **Fast startup:** Geeft prioriteit aan onmiddellijk afspelen door het automatisch ophalen van externe addon-ondertitels over te slaan. Je moet ze handmatig aanvragen in de player.
+- **Preferred only:** Een gebalanceerde aanpak. Haalt tijdens het laden ondertitels op van addons, maar alleen degene die overeenkomen met je taalvoorkeuren.
+- **All subtitles:** Haalt alle beschikbare addon-ondertitels voor de video op en laadt ze, wat maximale keuze biedt ten koste van iets langere laadtijden.
 
-[Terug naar boven](#nuvio-spelerinstellingen)
+[Terug naar boven](#nuvio-player settings)
 
 ---
 
-## Speler- en Decoder-opties
+## Player- en Decoder-opties
 
 ### Videospeler & Interface
-Regelt de visuele ervaring en interactie binnen de mediaspeler.
+Regelt de visuele ervaring en interactie binnen de media player.
 
 - **Loading Overlay:** Toont een laadscherm of laadanimatie om bufferen, zwarte schermen of overgangen te verbergen. De overlay blijft zichtbaar tot het eerste frame van de video klaar is.
 - **Pause Overlay** [Android TV Only]: Toont een detail-overlay na 5 seconden wanneer het afspelen is gepauzeerd.
 - **OSD Clock** [Android TV Only]: Toont de huidige tijd en de geschatte eindtijd wanneer de afspeelbediening op het scherm zichtbaar is.
-- **Player (Speler):** Bepaalt welke video-engine je streams verwerkt.
-  - *Internal:* Houdt je binnen Nuvio met de ingebouwde speler.
+- **Player (Player):** Bepaalt welke video-engine je streams verwerkt.
+  - *Internal:* Houdt je binnen Nuvio met de ingebouwde player.
   - *Internal Engine:* Kies tussen ExoPlayer of libmpv als de primaire renderer.
   - *Auto-switch engine on startup error* [Android TV Only]: Schakelt automatisch terug van ExoPlayer naar libmpv bij gedetecteerde anime of als een stream niet start.
   - *External:* Stuurt de videolink door naar een externe app die op je apparaat is geïnstalleerd (bijv. VLC, MX Player).
 - **Hold To Speed** [Mobile Only]: Een touchscreen-snelkoppeling om door te spoelen. Door ergens op de videospeler ingedrukt te houden, wordt de afspeelsnelheid tijdelijk verhoogd. Het afspelen hervat op normale snelheid bij loslaten.
-- **Hold Speed** [Mobile Only]: Configureert de exacte vermenigvuldigingsfactor van de afspeelsnelheid bij gebruik van de "Hold To Speed"-functie.
+- **Hold Speed** [Mobile Only]: Configureert de exacte vermenigvuldigingsfactor van de afspeelsnelheid bij gebruik van de "Hold To Speed"-feature.
 - **Gesture Controls** [Mobile Only]: Activeert verticale veeggebaren op de linker- en rechterkant van het scherm om snel het volume en de helderheid aan te passen.
 
 ### Geavanceerde verwerking & decodering
@@ -169,14 +169,14 @@ Technische instellingen die bepalen hoe de hardware en software van je apparaat 
   - *Off:* Wijzig de verversingssnelheid niet.
   - *On start:* Schakel over wanneer het afspelen begint.
   - *On start/stop:* Schakel over bij de start en herstel de oorspronkelijke snelheid bij het stoppen.
-- **Tunneled Playback:** Een geavanceerde Android TV-functie. Hiermee kunnen audio- en videostreams de standaard OS-paden omzeilen en direct op hardwareniveau worden verwerkt. Dit verbetert de synchronisatie tussen audio en video (lip-sync) en zorgt voor een soepelere weergave van zware 4K HDR-bestanden.
+- **Tunneled Playback:** Een geavanceerde Android TV-feature. Hiermee kunnen audio- en videostreams de standaard OS-paden omzeilen en direct op hardwareniveau worden verwerkt. Dit verbetert de synchronisatie tussen audio en video (lip-sync) en zorgt voor een soepelere weergave van zware 4K HDR-bestanden.
   - Normaal gesproken verdeelt de processor van je TV zijn aandacht over alles tegelijk: the video, the audio, the menu-interfaces en achtergrondapps. Tunneled Playback creëert een snelle route die de ruwe video and audio rechtstreeks naar het scherm en de luidsprekers van de TV stuurt, en het standaard Android-besturingssysteem volledig omzeilt.
-  - Aanbeveling: Laat dit standaard uit staan. Schakel dit alleen in als je te maken hebt met lip-sync-problemen (waarbij het geluid niet overeenkomt met de mond van de acteurs) of als enorme 4K HDR-bestanden frames verliezen en stotteren. Omdat deze functie het normale besturingssysteem van de TV omzeilt, kan het vreemde glitches veroorzaken als je TV-hardware het niet perfect ondersteunt.
+  - Aanbeveling: Laat dit standaard uit staan. Schakel dit alleen in als je te maken hebt met lip-sync-problemen (waarbij het geluid niet overeenkomt met de mond van de acteurs) of als enorme 4K HDR-bestanden frames verliezen en stotteren. Omdat deze feature het normale besturingssysteem van de TV omzeilt, kan het vreemde glitches veroorzaken als je TV-hardware het niet perfect ondersteunt.
 - **Force AC-3 Transcoding (Optisch/SPDIF):** Zet meerkanaals formaten (TrueHD, DTS, AAC, etc.) in realtime om naar Dolby Digital 5.1 voor optische/SPDIF-verbindingen.
   - Oudere optische audiokabels (met het rode lampje) hebben een strikte bandbreedtebeperking. Ze kunnen moderne, niet-gecomprimeerde audioformaten zoals TrueHD of DTS-HD fysiek niet doorsturen. Ze ondersteunen maximaal standaard Dolby Digital 5.1 (ook bekend als AC-3).
   - Als je een oudere AV-ontvanger of soundbar hebt die via een optische kabel op je TV is aangesloten, zal het afspelen van een moderne 4K-film met een TrueHD-track resulteren in stilte of harde ruis. Deze instelling werkt als een live vertaler: het pakt de zware moderne audio en zet deze direct om naar standaard Dolby Digital 5.1, zodat je oudere audiosysteem de film daadwerkelijk kan afspelen.
 
-[Terug naar boven](#nuvio-spelerinstellingen)
+[Terug naar boven](#nuvio-player settings)
 
 ---
 
@@ -185,8 +185,8 @@ Technische instellingen die bepalen hoe de hardware en software van je apparaat 
 Deze instellingen regelen hoeveel videogegevens in het geheugen worden bewaard en hoe peer-to-peer-streams worden verwerkt.
 
 ### Aangepaste afspeelbuffers (Custom Playback Buffers)
-Overschrijft de standaard buffering van Media3 met aangepaste waarden. Indien uitgeschakeld, gebruikt de speler de standaard bufferduur en targetgroottes van Media3.
-- **Min Buffer Duration:** Minimale hoeveelheid te bufferen media. De speler probeert ervoor te zorgen dat er altijd ten minste deze hoeveelheid inhoud is gebufferd ten opzichte van de huidige afspeelpositie.
+Overschrijft de standaard buffering van Media3 met aangepaste waarden. Indien uitgeschakeld, gebruikt de player de standaard bufferduur en targetgroottes van Media3.
+- **Min Buffer Duration:** Minimale hoeveelheid te bufferen media. De player probeert ervoor te zorgen dat er altijd ten minste deze hoeveelheid inhoud is gebufferd ten opzichte van de huidige afspeelpositie.
 - **Max Buffer Duration:** Maximale hoeveelheid te bufferen media. Moet ten minste gelijk zijn aan de minimale bufferduur. Hogere waarden gebruiken meer geheugen, maar zorgen voor een soepelere weergave bij onstabiele verbindingen.
 - **Initial Buffer:** Hoeveel inhoud moet worden gebufferd voordat het afspelen begint. Lagere waarden starten sneller, maar kunnen leiden tot haperingen bij het opstarten op trage verbindingen.
 - **Buffer After Rebuffer:** Hoeveel inhoud moet worden gebufferd nadat het afspelen is vastgelopen door bufferen. Hogere waarden verminderen herhaaldelijke bufferonderbrekingen.
@@ -204,7 +204,7 @@ Overschrijft de standaard buffering van Media3 met aangepaste waarden. Indien ui
 - **P2P Streaming:** Schakelt directe verwerkingsconfiguraties in of beperkt deze voor ruwe peer-to-peer (torrent) streams.
 - **Hide torrent stats:** Voorkomt dat realtime logbestanden van peer-verbindingen, seed-aantallen en overlays van downloadsnelheid verschijnen tijdens het laden en afspelen.
 
-[Terug naar boven](#nuvio-spelerinstellingen)
+[Terug naar boven](#nuvio-player settings)
 
 ---
 
@@ -214,11 +214,11 @@ Overschrijft de standaard buffering van Media3 met aangepaste waarden. Indien ui
 MPV is a highly advanced, open-source media player engine built into Nuvio as an alternative to the standard ExoPlayer.
 
 ### Waarom is MPV zo goed voor anime?
-Anime leunt zwaar op een complex ondertitelformaat genaamd **ASS/SSA**. Dit is niet zomaar platte tekst onderaan het scherm; het bevat aangepaste lettertypen, kleuren, animaties en nauwkeurige positionering op het scherm (zoals het vertalen van een Japans bord op de achtergrond of het tonen van stuiterende karaoke-teksten). Standaard spelers hebben vaak moeite om dit correct te renderen, wat leidt tot vertraging of ontbrekende tekst. MPV wordt alom beschouwd als de gouden standaard om deze complexe anime-ondertitels vlekkeloos te renderen zonder videoframes te verliezen.
+Anime leunt zwaar op een complex ondertitelformaat genaamd **ASS/SSA**. Dit is niet zomaar platte tekst onderaan het scherm; het bevat aangepaste lettertypen, kleuren, animaties en nauwkeurige positionering op het scherm (zoals het vertalen van een Japans bord op de achtergrond of het tonen van stuiterende karaoke-teksten). Standaard players hebben vaak moeite om dit correct te renderen, wat leidt tot vertraging of ontbrekende tekst. MPV wordt alom beschouwd als de gouden standaard om deze complexe anime-ondertitels vlekkeloos te renderen zonder videoframes te verliezen.
 
 ### Uitleg van MPV-opties
 
-De MPV-configuratie in Nuvio richt zich momenteel op **Hardware Decoding** (Hardware-decodering). Dit vertelt de speler hoe deze de fysieke chips van je apparaat moet gebruiken om de video te verwerken.
+De MPV-configuratie in Nuvio richt zich momenteel op **Hardware Decoding** (Hardware-decodering). Dit vertelt de player hoe deze de fysieke chips van je apparaat moet gebruiken om de video te verwerken.
 
 - **Auto (auto-safe)**
   - *Wat het is:* Een slimme automatische modus.
@@ -228,7 +228,7 @@ De MPV-configuratie in Nuvio richt zich momenteel op **Hardware Decoding** (Hard
   - *Wat het doet:* Het stuurt de video rechtstreeks via de hardwaredecoder van je apparaat naar het scherm. Dit verbruikt de minste batterij en zorgt voor de soepelste weergave op compatibele apparaten.
 - **Hardware (copy) (mediacodec-copy)**
   - *What het is:* Hardware-decodering met een tussenstap.
-  - *Wat het doet:* Het gebruikt de hardwarechip om de video te decoderen, maar kopieert de videoframes vervolgens terug naar het softwaregeheugen van het systeem voordat ze op het scherm worden getoond. Dit is vaak nodig zodat de speler complexe anime-ondertitels correct over het videoframe kan "tekenen".
+  - *Wat het doet:* Het gebruikt de hardwarechip om de video te decoderen, maar kopieert de videoframes vervolgens terug naar het softwaregeheugen van het systeem voordat ze op het scherm worden getoond. Dit is vaak nodig zodat de player complexe anime-ondertitels correct over het videoframe kan "tekenen".
 - **Disabled (no) (Uitgeschakeld)**
   - *Wat het is:* Pure software-decodering.
   - *Wat het doet:* Schakelt de hardwarechips volledig uit en dwingt de hoofdprocessor (CPU) van je apparaat om al het zware werk te doen.
@@ -241,8 +241,8 @@ De MPV-configuratie in Nuvio richt zich momenteel op **Hardware Decoding** (Hard
 - **Voor anime-kijkers:** Stel in op **Hardware (copy) (mediacodec-copy)**. Als je anime bekijkt met zware, gestileerde ondertiteling en visuele haperingen of zwarte schermen opmerkt, zorgt de "copy"-modus ervoor dat de ondertiteling correct over de video kan worden geplaatst.
 
 > [!WARNING]
-> Deze optie kan ertoe leiden dat de speler gaat haperen als je apparaat niet over voldoende bronnen beschikt om de video te decoderen. Zwakkere Android TV-boxen kunnen moeite hebben met deze optie.
+> Deze optie kan ertoe leiden dat de player gaat haperen als je apparaat niet over voldoende bronnen beschikt om de video te decoderen. Zwakkere Android TV-boxen kunnen moeite hebben met deze optie.
 
-- **Voor probleemoplossing:** Als een specifiek videobestand wordt afgespeeld met een groen scherm, vervormde kleuren of alleen geluid zonder beeld, verander dit dan in **Disabled (no)**. Het forceren van software-decodering omzeilt meestal hardware-incompatibiliteiten, waardoor het bestand toch kan worden afgespeeld.
+- **Voor troubleshooting:** Als een specifiek videobestand wordt afgespeeld met een groen scherm, vervormde kleuren of alleen geluid zonder beeld, verander dit dan in **Disabled (no)**. Het forceren van software-decodering omzeilt meestal hardware-incompatibiliteiten, waardoor het bestand toch kan worden afgespeeld.
 
-[Terug naar boven](#nuvio-spelerinstellingen)
+[Terug naar boven](#nuvio-player settings)

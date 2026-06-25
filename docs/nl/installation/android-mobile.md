@@ -3,7 +3,7 @@
 Er zijn twee manieren om Nuvio op Android Mobiel te installeren. De eerste is via de Play Store, de tweede is via sideloading.
 
 > [!NOTE]
-> De versie in de Google Play Store mist enkele functies ten opzichte van de gesideloade APK-versie om te voldoen aan het beleid van de Play Store. Het wordt aanbevolen om de app te sideloaden.
+> De versie in de Google Play Store mist enkele features ten opzichte van de gesideloade APK-versie om te voldoen aan het beleid van de Play Store. Het wordt aanbevolen om de app te sideloaden.
 
 **APK-versie**
 1.  **Download de APK:** Download de nieuwste [mobiele APK van Nuvio's officiële GitHub](https://github.com/NuvioMedia/NuvioMobile/releases/latest).
@@ -16,6 +16,6 @@ Er zijn twee manieren om Nuvio op Android Mobiel te installeren. De eerste is vi
 **Play Store**
 1. Je kunt de officiële Nuvio Play Store-versie [hier](https://play.google.com/store/apps/details?id=com.nuvio.app&utm_source=na_Med) downloaden.
 
-## Probleemoplossing
+## Troubleshooting
 - **Play Protect-waarschuwing:** Omdat Nuvio niet in de Play Store staat, krijg je mogelijk een "Geblokkeerd door Play Protect"-melding te zien. Tik op **Meer details** > **Toch installeren**.
 - **App niet geïnstalleerd:** Zorg ervoor dat je voldoende opslagruimte hebt en dat je niet probeert de Android TV-versie op een mobiel apparaat te installeren.

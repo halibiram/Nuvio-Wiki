@@ -3,7 +3,7 @@
 Nuvio op iOS vereist doorgaans **Sideloading** (AltStore/Sideloadly). Apple staat maximaal 10.000 TestFlight-gebruikers toe, wat normaal gesproken vol is.
 
 >[!NOTE]
->Stuur de Nuvio-ontwikkelaars a.u.b. geen berichten met de vraag wanneer er TestFlight-plekken vrijkomen. Dit ligt niet in hun macht.
+>Stuur de Nuvio-developers a.u.b. geen berichten met de vraag wanneer er TestFlight-plekken vrijkomen. Dit ligt niet in hun macht.
 
 **Sideloadly-methode**
 
@@ -21,13 +21,13 @@ Nuvio op iOS vereist doorgaans **Sideloading** (AltStore/Sideloadly). Apple staa
     - Typ het e-mailadres van je Apple ID in het daarvoor bestemde vak. 
     - Klik onderaan op de Start-knop. Er verschijnt een pop-up waarin om het wachtwoord van je Apple ID wordt gevraagd. Voer dit in zodat Sideloadly het handtekeningcertificaat bij Apple kan aanvragen.
     
-7. **Vertrouw het ontwikkelaarsprofiel:** Vereist om de app te kunnen openen.
+7. **Vertrouw het developer profile:** Vereist om de app te kunnen openen.
     - Zonsa Sideloadly "Done" (Gereed) aangeeft en de app op het startscherm van je telefoon verschijnt, open je deze nog niet. 
     - Ga naar de instellingen van je iPhone > Algemeen > VPN- en apparaatbeheer. 
-    - Tik op je Apple ID onder "Ontwikkelaar-app" (Developer App) en selecteer Vertrouw.
+    - Tik op je Apple ID onder "Developer-app"  en selecteer Vertrouw.
     
-8. **Ontwikkelaarsmodus inschakelen:** Vereist op iOS 16 en nieuwer.
-    - Als je dit nog niet hebt gedaan voor een eerdere app, ga dan naar Instellingen > Privacy en beveiliging > Ontwikkelaarsmodus. Schakel deze in en start je telefoon opnieuw op.
+8. **Developer Mode inschakelen:** Vereist op iOS 16 en nieuwer.
+    - Als je dit nog niet hebt gedaan voor een eerdere app, ga dan naar Instellingen > Privacy en beveiliging > Developer Mode. Schakel deze in en start je telefoon opnieuw op.
 
 
 **AltStore-methode**
@@ -42,13 +42,13 @@ Nuvio op iOS vereist doorgaans **Sideloading** (AltStore/Sideloadly). Apple staa
     - Start AltServer op je computer. 
     - Klik op het AltServer-pictogram in de menubalk (Mac) of het systeemvak (Windows), selecteer Install AltStore en kies je verbonden iPhone. Je moet je Apple ID en wachtwoord invoeren om de app digitaal te ondertekenen.
       
-4. **Vertrouw het ontwikkelaarsprofiel:** Vereist om gesideloade apps uit te voeren.
+4. **Vertrouw het developer profile:** Vereist om gesideloade apps uit te voeren.
     - Open de Instellingen-app van je iPhone. 
     - Navigeer naar Algemeen > VPN- en apparaatbeheer. 
-    - Under het gedeelte "Ontwikkelaar-app" (Developer App) tik je op het e-mailadres van je Apple ID en selecteer je Vertrouw.
-5. **Ontwikkelaarsmodus inschakelen:** Vereist op iOS 16 en nieuwer.
+    - Under het gedeelte "Developer-app"  tik je op het e-mailadres van je Apple ID en selecteer je Vertrouw.
+5. **Developer Mode inschakelen:** Vereist op iOS 16 en nieuwer.
     - Ga naar Instellingen > Privacy en beveiliging. 
-    - Scrol naar de onderkant en tik op Ontwikkelaarsmodus. Schakel dit in, waarna je telefoon opnieuw wordt opgestart om de wijziging toe te passen.
+    - Scrol naar de onderkant en tik op Developer Mode. Schakel dit in, waarna je telefoon opnieuw wordt opgestart om de wijziging toe te passen.
       
 6. **Sideload het IPA-bestand:**
     - Download het [.ipa-bestand](https://github.com/luqmanfadlli/NuvioMobile-iOS/releases/download/0.2.9/Nuvio-v0.2.9-Full.ipa) met behulp van Safari op je iPhone. 

@@ -1,38 +1,38 @@
-# Add-ons-gids
+# Addons Guide
 
-Add-ons vormen het hart van de Nuvio-ervaring. Ze leveren de inhoud en functionaliteit die de app nuttig maken.
+Addons vormen het hart van de Nuvio-ervaring. Ze leveren de inhoud en functionaliteit die de app nuttig maken.
 
 >[!WARNING]
 > Deze Wiki keurt het gebruik van niet-gelicentieerd auteursrechtelijk beschermd materiaal niet goed.
 
 >[!NOTE]
->Herinnering: Dit project is niet officieel. Neem geen contact op met Nuvio-ontwikkelaars over problemen met deze wiki.
+>Herinnering: Dit project is niet officieel. Neem geen contact op met Nuvio-developers over problemen met deze wiki.
 
-## Type add-ons
+## Type addons
 
-Er zijn 3 hoofdtypen add-ons voor Nuvio:
+Er zijn 3 hoofdtypen addons voor Nuvio:
   - **Content Providers:** Deze halen streams op voor films, series of anime.
   - **Metadata Providers:** Verbeteren de gebruikersinterface met posters, beoordelingen en samenvattingen.
-  - **Utility Addons:** Bieden extra functies zoals ondertiteling of afspeelsynchronisatie.
+  - **Utility Addons:** Bieden extra features zoals ondertiteling of afspeelsynchronisatie.
 
-[Terug naar boven](#add-ons-gids)
+[Terug naar boven](#addons guide)
 
-## Hoe voeg je een add-on toe
+## Hoe voeg je een addon toe
 
-Om een add-on toe te voegen, heb je meestal een manifest-URL nodig die je van de add-on krijgt:
-- Deze wordt gegenereerd bij het configureren van de add-on.
-- Het gegenereerde manifest plak je in het tabblad add-ons van Nuvio.
+Om een addon toe te voegen, heb je meestal een manifest-URL nodig die je van de addon krijgt:
+- Deze wordt gegenereerd bij het configureren van de addon.
+- Het gegenereerde manifest plak je in het tabblad addons van Nuvio.
 
-[Terug naar boven](#add-ons-gids)
-
----
-
-## Een add-on configureren voor gebruik met Nuvio Debrid-integratie
+[Terug naar boven](#addons guide)
 
 ---
 
-### AIOStreams & P2P-add-ons configureren
-Om ervoor te zorgen dat Nuvio links kan oplossen, is er eerst een bron nodig om magnet-links te scrapen. Je moet je scraper-add-ons configureren **zonder** een Debrid-API-sleutel en strikt in **P2P-modus**. Als een scraper-add-on zelf links oplost (omdat er een Debrid-sleutel is ingevoerd), ziet Nuvio nooit een hash om te verwerken, waardoor je TorBox/Premiumize-koppeling uit stap 1 en 2 effectief wordt omzeild.
+## Een addon configureren voor gebruik met Nuvio Debrid-integration
+
+---
+
+### AIOStreams & P2P-addons configureren
+Om ervoor te zorgen dat Nuvio links kan oplossen, is er eerst een bron nodig om magnet-links te scrapen. Je moet je scraper-addons configureren **zonder** een Debrid-API-sleutel en strikt in **P2P-modus**. Als een scraper-addon zelf links oplost (omdat er een Debrid-sleutel is ingevoerd), ziet Nuvio nooit een hash om te verwerken, waardoor je TorBox/Premiumize-koppeling uit stap 1 en 2 effectief wordt omzeild.
 
 #### Directe P2P-installatiegenerator
 
@@ -46,19 +46,19 @@ Om ervoor te zorgen dat Nuvio links kan oplossen, is er eerst een bron nodig om 
 2. **Sla het Services-menu over.** Navigeer naar het **Services**-menu en laat dit leeg — voeg hier geen inloggegevens of sleutels toe voor TorBox, Premiumize, Real-Debrid of andere debrid-diensten en schakel ze niet in. Als je een sleutel invoert in AIOStreams zelf, zal het reeds opgeloste/gecachte debrid-links retourneren in plaats van ruwe P2P-hashes. Dit omzeilt de eigen resolutie-logica van Nuvio en kan de limieten (rate limits) van je provider verbruiken buiten de controle van Nuvio om.
 3. **Schakel P2P in bij Stream Types / Filters.** Navigeer naar het menu Stream Types (of Filters) en zorg ervoor dat **P2P** is ingeschakeld en is ingesteld op ten minste **Preferred** (Voorkeur), idealiter **Required** (Vereist). Schakel in hetzelfde menu de debrid-streamtypen **Cached** en **Uncached** uit of sluit ze uit, zodat AIOStreams alleen magnet-resultaten retourneert.
 4. **Sla op en genereer je manifest.** Gebruik het menu Save & Install (of het equivalent daarvan) om je sleutelloze AIOStreams-manifest-URL te genereren.
-5. **Installeer in Nuvio.** Voeg de gegenereerde manifest-URL toe als een add-on binnen Nuvio, op dezelfde manier als elke andere add-on-bron.
+5. **Installeer in Nuvio.** Voeg de gegenereerde manifest-URL toe als een addon binnen Nuvio, op dezelfde manier als elke andere addon-bron.
 
-#### Andere add-ons (bijv. Comet, Torrentio)
+#### Andere addons (bijv. Comet, Torrentio)
 Als je een Comet-instantie, Torrentio of een soortgelijke scraper native draait naast of in plaats van AIOStreams:
-1. Open de configuratie-/instellingenpagina van die add-on.
+1. Open de configuratie-/instellingenpagina van die addon.
 2. Zorg ervoor dat er geen veld voor een Debrid-dienst, API-sleutelveld of de optie voor "gecachte" streams is ingevuld of ingeschakeld.
-3. Controleer of de modus van de add-on is ingesteld op het uitvoeren van ruwe P2P-links (dit is soms gelabeld als "P2P" of is simpelweg de standaardstatus wanneer er geen debrid-inloggegevens aanwezig zijn).
-4. Installeer de resulterende sleutelloze add-on-URL in Nuvio.
+3. Controleer of de modus van de addon is ingesteld op het uitvoeren van ruwe P2P-links (dit is soms gelabeld als "P2P" of is simpelweg de standaardstatus wanneer er geen debrid-inloggegevens aanwezig zijn).
+4. Installeer de resulterende sleutelloze addon-URL in Nuvio.
 
-Zonda een werkende P2P-add-on is geïnstalleerd, zal het selecteren van een titel ervoor zorgen dat de add-on P2P-swarms zoekt, en Nuvio verwerkt deze ruwe hashes vervolgens automatisch via je gekoppelde TorBox- of Premiumize-account om veilig te streamen.
+Zonda een werkende P2P-addon is geïnstalleerd, zal het selecteren van een titel ervoor zorgen dat de addon P2P-swarms zoekt, en Nuvio verwerkt deze ruwe hashes vervolgens automatisch via je gekoppelde TorBox- of Premiumize-account om veilig te streamen.
 
 > [!NOTE]
 > **Advies over beschikbaarheid van P2P:** 
-> Niet all instanties of add-ons bieden toegang tot P2P. Veel openbare gehoste instanties blokkeren P2P-scraping expliciet (inclusief de officiële openbare ElfHosted-instantie van AIOStreams). Zorg ervoor dat de AIOStreams- of Comet-instantie die je gebruikt P2P-verbindingen toestaat, zodat Nuvio de benodigde hashes ontvangt.
+> Niet all instanties of addons bieden toegang tot P2P. Veel openbare gehoste instanties blokkeren P2P-scraping expliciet (inclusief de officiële openbare ElfHosted-instantie van AIOStreams). Zorg ervoor dat de AIOStreams- of Comet-instantie die je gebruikt P2P-verbindingen toestaat, zodat Nuvio de benodigde hashes ontvangt.
 
-[Terug naar boven](#add-ons-gids)
+[Terug naar boven](#addons guide)

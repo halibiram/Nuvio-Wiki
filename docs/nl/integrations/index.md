@@ -1,20 +1,20 @@
-# Nuvio Integraties Overzicht
+# Nuvio Integrations Overzicht
 
 Nuvio ondersteunt een modulair integratiesysteem dat is ontworpen om linkresolutie, metadata-verrijking en synchronisatie van de kijkstatus native binnen de applicatie te verwerken door deze verbindingen te centraliseren.
 
 Deze map bevat de documentatie voor het configureren en optimaliseren van alle externe diensten die door Nuvio worden ondersteund.
 
 >[!NOTE]
->Herinnering: Dit project is niet officieel. Neem geen contact op met Nuvio-ontwikkelaars over problemen met deze wiki.
+>Herinnering: Dit project is niet officieel. Neem geen contact op met Nuvio-developers over problemen met deze wiki.
 
 ---
 
 ## Integratiecategorieën
 
 ### 1. Debrid-diensten (Linkresolutie)
-Nuvio onderschept ruwe P2P-hashes van je geconfigureerde sleutelloze add-ons en gebruikt je verbonden debrid-provider om bestanden met een hoge bandbreedte veilig op te lossen, te cachen en te streamen.
+Nuvio onderschept ruwe P2P-hashes van je geconfigureerde sleutelloze addons en gebruikt je verbonden debrid-provider om bestanden met een hoge bandbreedte veilig op te lossen, te cachen en te streamen.
 - **Ondersteunde providers:** TorBox, Premiumize.
-- **Belangrijkste functies:** Native cache-controle, gelijktijdige linkvoorbereiding en fijnmazige filtering op resolutie, kwaliteit en audio-/videotags.
+- **Belangrijkste features:** Native cache-controle, gelijktijdige linkvoorbereiding en fijnmazige filtering op resolutie, kwaliteit en audio-/videotags.
 - **[Lees de Debrid-integratiegids](./debrid.md)**
 
 ### 2. Metadata-verrijking

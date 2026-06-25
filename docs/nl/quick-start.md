@@ -1,4 +1,4 @@
-# Snelstartgids
+# Quick Start Guide
 
 Wil je Nuvio binnen 10 minuten werkend hebben? Volg deze stappen:
 
@@ -9,20 +9,20 @@ Wil je Nuvio binnen 10 minuten werkend hebben? Volg deze stappen:
 
 ---
 
-## 2. Voeg je eerste add-on toe
+## 2. Voeg je eerste addon toe
 
 > [!TIP]
-> Voor een eenvoudigere installatie kun je de [Nuvio Quickstart Tool](https://nuvio-quickstart.duckdns.org/) gebruiken om Nuvio add-ons voor je in te stellen. Dit installeert *AIOStreams* met behulp van het sjabloon van Tam-Taro en *Cinemeta*.
+> Voor een eenvoudigere installatie kun je de [Nuvio Quickstart Tool](https://nuvio-quickstart.duckdns.org/) gebruiken om Nuvio addons voor je in te stellen. Dit installeert *AIOStreams* met behulp van het sjabloon van Tam-Taro en *Cinemeta*.
 
-Nuvio is standaard leeg. Je hebt een add-on nodig om inhoud te zien. Zie [Add-ons](/nl/addons/).
+Nuvio is standaard leeg. Je hebt een addon nodig om inhoud te zien. Zie [Addons](/nl/addons/).
 - [Android Mobile Only] Open Nuvio > **Instellingen** > **Content and Discovery** > **Addons**.
-- [Android TV Only] Het add-ons menu is toegankelijk via de zijbalk.
+- [Android TV Only] Het addons menu is toegankelijk via de zijbalk.
 - Tik op **Install from URL**.
 - Voer een manifest-link in.
 
 ---
 
-## 3. Verbind functies & integraties [Optioneel]
+## 3. Verbind features & integrations [Optioneel]
 Configureer je externe accounts om metadata-verrijking en externe tracking in te schakelen.
 
 ### Trakt-configuratie
@@ -37,9 +37,9 @@ Configureer je externe accounts om metadata-verrijking en externe tracking in te
 5. Schakel **Comments On** in als je community-discussies wilt bekijken.
 
 ### Metadata-verrijking
-Ga naar **Instellingen** > **Integraties** om je ontwikkelaars-API-sleutels toe te voegen:
-- **TMDB Enrichment** [Required for Mobile]: Schakel deze functie **Aan** (On) en voer je persoonlijke **TMDB API Key** in om uitgebreide metadata op te halen.
-- **MDBList:** Schakel deze functie **Aan** (On) en voer je **MDBList API Key** in om beoordelingsgegevens op te halen.
+Ga naar **Instellingen** > **Integrations** om je developer API-sleutels toe te voegen:
+- **TMDB Enrichment** [Required for Mobile]: Schakel deze feature **Aan** (On) en voer je persoonlijke **TMDB API Key** in om uitgebreide metadata op te halen.
+- **MDBList:** Schakel deze feature **Aan** (On) en voer je **MDBList API Key** in om beoordelingsgegevens op te halen.
 
 ---
 

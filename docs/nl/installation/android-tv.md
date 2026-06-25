@@ -3,12 +3,12 @@
 Net als op Android Mobiel zijn er twee manieren om Nuvio op Android TV te installeren. De eerste is via de Play Store, de tweede is via sideloading.
 
 > [!NOTE]
-> De versie in de Google Play Store mist enkele functies ten opzichte van de gesideloade APK-versie om te voldoen aan het beleid van de Play Store. Het wordt aanbevolen om de app te sideloaden.
+> De versie in de Google Play Store mist enkele features ten opzichte van de gesideloade APK-versie om te voldoen aan het beleid van de Play Store. Het wordt aanbevolen om de app te sideloaden.
 
 **APK-versie**
 1.  **Optie 1: Voer de Downloader-code in**
-    - **Ontwikkelaarsopties inschakelen:**
-        - Ga naar de instellingen van je TV > Systeem (of Apparaatvoorkeuren) > Over. Scrol omlaag naar Android TV OS-versie (of gewoon Versie/Build) en klik 7 keer op de selectieknop van je afstandsbediening tot er een pop-up verschijnt met de tekst: "Je bent nu een ontwikkelaar!"
+    - **Developer options inschakelen:**
+        - Ga naar de instellingen van je TV > Systeem (of Apparaatvoorkeuren) > Over. Scrol omlaag naar Android TV OS-versie (of gewoon Versie/Build) en klik 7 keer op de selectieknop van je afstandsbediening tot er een pop-up verschijnt met de tekst: "Je bent nu een developer!"
         - Ga terug naar het hoofdmenu Instellingen. Navigeer naar Apps > Beveiliging & beperkingen > Onbekende bronnen (of Onbekende apps installeren). Zoek de Downloader-app in de lijst en zet de schakelaar op Aan.
     - **Gebruik de Downloader-app uit de Play Store:**
         - Open de Downloader-app vanaf je startscherm.
@@ -30,6 +30,6 @@ Net als op Android Mobiel zijn er twee manieren om Nuvio op Android TV te instal
 **Play Store**
 1. Je kunt de officiële Nuvio Play Store-versie downloaden door ernaar te zoeken in de Play Store op de TV.
 
-## Probleemoplossing
+## Troubleshooting
 - **Play Protect-waarschuwing:** Omdat Nuvio niet in de Play Store staat, krijg je mogelijk een "Geblokkeerd door Play Protect"-melding te zien. Tik op **Meer details** > **Toch installeren**.
 - **App niet geïnstalleerd:** Zorg ervoor dat je voldoende opslagruimte hebt en dat je niet probeert de Android TV-versie op een mobiel apparaat te installeren.

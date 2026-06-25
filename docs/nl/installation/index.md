@@ -1,7 +1,7 @@
 # Installatiehandleidingen
 
 >[!NOTE]
->Herinnering: Dit project is niet officieel. Neem geen contact op met Nuvio-ontwikkelaars over problemen met deze wiki.
+>Herinnering: Dit project is niet officieel. Neem geen contact op met Nuvio-developers over problemen met deze wiki.
 
 Nuvio ondersteunt verschillende platforms. Selecteer hieronder je apparaat voor specifieke installatie-instructies:
 

@@ -3,7 +3,7 @@
 De instellingen van Nuvio bieden diepgaande aanpassingsmogelijkheden. Hieronder vind je een gedetailleerd overzicht, inclusief de verschillen tussen de **Mobiele** en **Android TV**-versies.
 
 > [!IMPORTANT]
-> Elke functie die niet specifiek is gelabeld met [Android TV Only] of [Mobile Only], is beschikbaar op beide versies.
+> Elke feature die niet specifiek is gelabeld met [Android TV Only] of [Mobile Only], is beschikbaar op beide versies.
 
 ## 1. Algemeen & UI
 | Instelling | Mobiel | Android TV |
@@ -17,14 +17,14 @@ De instellingen van Nuvio bieden diepgaande aanpassingsmogelijkheden. Hieronder 
 [Terug naar boven](#overzicht-van-de-instellingen)
 
 ## 2. Afspelen: [Bekijk afspeelhandleiding](player.md)
-- **Interne speler:** Ten zeerste aanbevolen voor de meeste gebruikers. Ondersteunt hardware-decodering.
+- **Interne player:** Ten zeerste aanbevolen voor de meeste gebruikers. Ondersteunt hardware-decodering.
   - *Internal Engine:* Kies handmatig tussen ExoPlayer of libmpv als de primaire media-engine op de achtergrond.
   - *Auto-switch engine on startup error* [Android TV Only]: Schakelt automatisch terug van ExoPlayer naar libmpv bij gedetecteerde anime of wanneer er een initialisatiefout optreedt.
-- **Externe speler:** Handig als je codec-problemen ervaart. Nuvio kan de stream doorsturen naar VLC, MX Player of JustPlayer.
+- **Externe player:** Handig als je codec-problemen ervaart. Nuvio kan de stream doorsturen naar VLC, MX Player of JustPlayer.
 - **Hardwareversnelling:** Schakel dit in als je haperingen ervaart op oudere apparaten.
 - **Automatisch volgende afspelen:** Start automatisch de volgende aflevering van een serie.
 - **Intro en outro overslaan:** Geeft prioriteit aan databasefilters voor segmenten via IntroDB, AniSkip en Anime Skip. Bevat automatische tools voor het indienen van community-tijdstempels [Mobile Only] naast aangepaste inhoudswaarschuwingen (**Content Warnings**) en automatische filters voor het overslaan van segmenten [Android TV Only].
-- **Streamselectie & Automatisch afspelen:** Configureer verbindingsinstellingen zoals *Reuse Last Link*, limieten voor *Last Link Cache Duration*, expliciete *Selection Modes* (automatisch afspelen van de eerste bron, handmatige lijst of aangepaste Regex-tekstmatching), time-outinstellingen voor scrapers en fijnmazige *Filtering Scopes* voor plug-ins/add-ons.
+- **Streamselectie & Automatisch afspelen:** Configureer verbindingsinstellingen zoals *Reuse Last Link*, limieten voor *Last Link Cache Duration*, expliciete *Selection Modes* (automatisch afspelen van de eerste bron, handmatige lijst of aangepaste Regex-tekstmatching), time-outinstellingen voor scrapers en fijnmazige *Filtering Scopes* voor plug-ins/addons.
 - **Binge-opties:** Past geautomatiseerde afspeelreeksen aan via *Prefer Binge Group*-regels, *Reuse Binge Groups*, variabele percentages voor *Next Episode Threshold Mode*, en inactiviteitsmeldingen via *Are You Still Watching?* [Android TV Only].
 - **Ondertitel- en audiopreferenties:** Vergrendelt primaire en secundaire talen voor meersporen-audio/ondertitels, filtert niet-gewenste sporen uit, gebruikt een *Skip Silence*-trigger en biedt een *Enable downmix*-optie om meerkanaals surround sound om te zetten naar helder stereogeluid.
 - **Aanpassingen voor ondertitel-lay-out:** Past de grootte van ondertitels aan, evenals aangepaste tekst-/achtergrondkleurprofielen, randparameters en *Vertical Offset* (verticale verschuiving). Bevat een experimentele schakelaar om de **libass rendering engine** te gebruiken voor zware dynamic typesetting-scripts (ASS/SSA).
@@ -32,15 +32,15 @@ De instellingen van Nuvio bieden diepgaande aanpassingsmogelijkheden. Hieronder 
 
 [Terug naar boven](#overzicht-van-de-instellingen)
 
-## 3. Account-integraties: [Bekijk integratiehandleiding](/nl/integrations/)
+## 3. Account-integrations: [Bekijk integratiehandleiding](/nl/integrations/)
 - **Trakt.tv:** Synchroniseert je "Up Next"-lijst en kijkgeschiedenis over al je Nuvio-apparaten.
 - **TorBox / Premiumize:**
   - Essentieel voor buffer-vrije 4K-streams van hoge kwaliteit.
   - Vereist een API-sleutel of apparaatcode voor autorisatie.
-- **Plugins & Uitbreidingen:** Beheert externe scraper-opslagplaatsen wereldwijd, wat integraties via directe URL-invoer of mobiele QR-codes mogelijk maakt.
+- **Plugins & Uitbreidingen:** Beheert externe scraper-opslagplaatsen wereldwijd, wat integrations via directe URL-invoer of mobiele QR-codes mogelijk maakt.
 - **TMDB Enrichment Sourcing:** Haalt artwork, tekstloze achtergronden, gesynchroniseerde countdowns voor releases, cast- en crew-lijsten, productienetwerken en specifieke afleveringsduur binnen.
 - **MDBList Ratings API:** Koppelt een persoonlijke sleutel om beoordelingsscores van platforms (Trakt, IMDb, TMDB, Letterboxd, Rotten Tomatoes, Audience en Metacritic) op te halen en over titels in het dashboard te tonen.
-- **Anime Skip-integratie:** Autoriseert accountvalidatielinks via een externe Client ID om nauwkeurige, crowd-sourced tijdstempels te activeren voor het overslaan van segmenten.
+- **Anime Skip-integration:** Autoriseert accountvalidatielinks via een externe Client ID om nauwkeurige, crowd-sourced tijdstempels te activeren voor het overslaan van segmenten.
 
 [Terug naar boven](#overzicht-van-de-instellingen)
 
@@ -69,8 +69,8 @@ Deze instellingen bepalen de toewijzing van het interne geheugen, lokale caches 
 [Terug naar boven](#overzicht-van-de-instellingen)
 
 ## 6. Aanpassing & Beheer
-- **Profielen:** Beheer meerdere gebruikers, kijkgeschiedenissen en aanbevelingen afzonderlijk. [Bekijk profielenhandleiding](profiles.md)
-- **Collecties:** Maak uitgebreide aangepaste collecties door media te groeperen op genre, studio of aangepaste lijsten. [Bekijk collectieshandleiding](collections.md).
+- **Profiles:** Beheer meerdere gebruikers, kijkgeschiedenissen en aanbevelingen afzonderlijk. [Bekijk profielenhandleiding](profiles.md)
+- **Collections:** Maak uitgebreide aangepaste collections door media te groeperen op genre, studio of aangepaste lijsten. [Bekijk collectieshandleiding](collections.md).
 - **Back-up & Synchronisatie:** Exporteert of importeert gecompileerde applicatieconfiguraties om lay-outs, trackingscripts en engine-limieten direct te kopiëren naar back-upapparaten.
 
 [Terug naar boven](#overzicht-van-de-instellingen)

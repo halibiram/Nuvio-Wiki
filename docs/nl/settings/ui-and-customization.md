@@ -6,7 +6,7 @@ Of je nu door catalogi swipet op een telefoon of met een afstandsbediening vanaf
 
 ## 1. Thema's & Uiterlijk
 
-### Gedeelde functies
+### Gedeelde features
 - **Accentkleuren:** Kies uit White (Wit), Crimson (Karmozijnrood), Ocean (Oceaanblauw), Violet (Paars), Emerald (Smaragdgroen), Amber (Barnsteengeel) of Rose (Roze) om actieve menu's, knoppen en afspeelvoortgangsbalken te accentueren.
 
 ### Mobiele App
@@ -22,8 +22,8 @@ Of je nu door catalogi swipet op een telefoon of met een afstandsbediening vanaf
 
 ## 2. Startscherm & Lay-outstructuren
 
-### Gedeelde functies
-- **Catalogusbeheer:** Verberg nog niet uitgebrachte inhoud om je bibliotheek overzichtelijk te houden. Diepgaande organisatorische controle stelt je in staat om specifieke collecties te vergrendelen, te verbergen of vast te pinnen (zoals *Ontdekken*, *Franchises* of *Streamingdiensten*) om precies te bepalen wat er op je startscherm verschijnt.
+### Gedeelde features
+- **Catalogusbeheer:** Verberg nog niet uitgebrachte inhoud om je bibliotheek overzichtelijk te houden. Diepgaande organisatorische controle stelt je in staat om specifieke collections te vergrendelen, te verbergen of vast te pinnen (zoals *Ontdekken*, *Franchises* of *Streamingdiensten*) om precies te bepalen wat er op je startscherm verschijnt.
 - **Poster Card Style:** Pas de afmetingen van je mediakaarten aan. Kies een breedte-preset (**Width**: Compact, Dense, Standard, Balanced, Comfort of Large) en een hoekafrondings-preset (**Corner Radius**: Sharp, Subtle, Classic, Rounded of Pill). Een optie *Reset to Default* herstelt alle wijzigingen naar de standaardwaarden.
 - **Landscape Posters:** Schakel tussen traditionele verticale posters en horizontale liggende kaarten.
 
@@ -47,7 +47,7 @@ Of je nu door catalogi swipet op een telefoon of met een afstandsbediening vanaf
 
 ## 3. Detailpagina & Metadata-opmaak
 
-### Gedeelde functies
+### Gedeelde features
 *(De presentatie van de detailpagina is sterk geoptimaliseerd voor het specifieke apparaatformaat; zie de platformspecifieke opties hieronder).*
 
 Zie de [TMDb, MDBList, Trakt integratiegids](../integrations/tmdb-mdblist-trakt.md) voor metadata-verrijking en beoordelingen.
@@ -69,13 +69,13 @@ Zie de [TMDb, MDBList, Trakt integratiegids](../integrations/tmdb-mdblist-trakt.
 
 ## 4. "Verder kijken" & Up Next-gedrag (Volgende)
 
-### Gedeelde functies
+### Gedeelde features
 - **Afleveringen bijhouden:** Schakel **Up Next From Furthest Episode** in om ervoor te zorgen dat de app de nieuwste onbekeken aflevering toont.
 - **Toon niet-uitgezonden Up Next-afleveringen:** Neem toekomstige, nog niet uitgezonden afleveringen op in de "Verder kijken"-wachtrij voordat ze worden uitgezonden.
 - **Spoilerpreventie:** Gebruik **Blur Unwatched Episodes** (Detailpagina) en **Blur Unwatched in Continue Watching** zodat miniaturen geen belangrijke plotwendingen onthullen.
 - **Miniatuurvoorkeuren:** Schakel **Prefer/Use Episode Thumbnails** in/uit om prioriteit te geven aan specifieke stilstaande beelden van afleveringen boven de algemene achtergrond van de serie.
 - **Sorteervolgorde:** Sorteer je "Verder kijken"-wachtrij op **Default** (op basis van recentheid) of **Streaming Style** (uitgebrachte afleveringen krijgen prioriteit, waarbij toekomstige, nog niet uitgezonden afleveringen naar het einde worden verplaatst).
-- **Resume Prompt on Launch:** Toont een pop-up om verder te gaan waar je bent gebleven wanneer je de app opnieuw opent nadat je de speler hebt afgesloten.
+- **Resume Prompt on Launch:** Toont een pop-up om verder te gaan waar je bent gebleven wanneer je de app opnieuw opent nadat je de player hebt afgesloten.
 
 ### Mobiele App
 - **Poster Card Style:** Pas de "Verder kijken"-rij aan door te schakelen tussen de stijlen **Card** (TV-stijl), **Wide** (informatierijk) of **Poster** (gericht op artwork).
@@ -89,10 +89,10 @@ Zie de [TMDb, MDBList, Trakt integratiegids](../integrations/tmdb-mdblist-trakt.
 
 ### Snelnaslag: Platformvergelijking
 
-| Functie | Mobiele App | TV-App |
+| Feature | Mobiele App | TV-App |
 | :--- | :--- | :--- |
 | **Pure Black Surfaces** | AMOLED Black (Globale schakelaar) | Fijnmazig (Achtergronden vs. Panelen) |
-| **Catalogusbeheer** | Collecties verbergen, vergrendelen of vastpinnen | Collecties verbergen, vergrendelen of vastpinnen |
+| **Catalogusbeheer** | Collections verbergen, vergrendelen of vastpinnen | Collections verbergen, vergrendelen of vastpinnen |
 | **Startschermlay-out** | Verticaal scrollende rijen | Selecteerbare Modern-, Grid- of Classic-weergaven |
 | **Hero-secties** | Interactieve carrousel bovenaan | Dynamisch (Modern) of Roterende carrousel (Classic/Grid) |
 | **Poster-aanpassingen** | Grootte-presets + Liggend + Labels verbergen | Grootte-presets + Liggend + Uitklappen naar achtergrond |

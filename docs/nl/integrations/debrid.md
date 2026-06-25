@@ -1,17 +1,17 @@
-# Debrid-integratie
+# Debrid-integration
 
-Nuvio maakt gebruik van een gecentraliseerde architectuur voor Debrid-integratie. In plaats van persoonlijke API-sleutels door te geven aan afzonderlijke P2P-scraping-add-ons, worden accounts rechtstreeks gekoppeld binnen de core Nuvio Android- en TV-applicatie. Nuvio onderschept de ruwe P2P-hashes van je geconfigureerde add-ons, controleert de beschikbaarheid van de cache en verwerkt de linkresolutie native door de add-on te omhullen in je Debrid-dienst.
+Nuvio maakt gebruik van een gecentraliseerde architectuur voor Debrid-integration. In plaats van persoonlijke API-sleutels door te geven aan afzonderlijke P2P-scraping-addons, worden accounts rechtstreeks gekoppeld binnen de core Nuvio Android- en TV-applicatie. Nuvio onderschept de ruwe P2P-hashes van je geconfigureerde addons, controleert de beschikbaarheid van de cache en verwerkt de linkresolutie native door de addon te omhullen in je Debrid-dienst.
 
 > [!IMPORTANT]
-> Nuvio's Debrid-integratie (TorBox of Premiumize) lost alleen links op — het kan deze niet zelf genereren. Je moet ten minste één **P2P-compatibele** scraper-add-on (zoals AIOStreams, Comet, of Torrentio) hebben geïnstalleerd en correct hebben geconfigureerd, anders heeft Nuvio niets om te omhullen en op te lossen.
+> Nuvio's Debrid-integration (TorBox of Premiumize) lost alleen links op — het kan deze niet zelf genereren. Je moet ten minste één **P2P-compatibele** scraper-addon (zoals AIOStreams, Comet, of Torrentio) hebben geïnstalleerd en correct hebben geconfigureerd, anders heeft Nuvio niets om te omhullen en op te lossen.
 
 >[!NOTE]
->Herinnering: Dit project is niet officieel. Neem geen contact op met Nuvio-ontwikkelaars over problemen met deze wiki.
+>Herinnering: Dit project is niet officieel. Neem geen contact op met Nuvio-developers over problemen met deze wiki.
 
 ---
 
 ### Stap 1: Toegang tot verbonden diensten
-Om te beginnen met het configureren van je Debrid-provider, open je de applicatie en navigeer je naar **Instellingen** > **Integraties** > **Connected Services** (Verbonden diensten). Dit menu beheert accounts voor links en toegang tot bibliotheken.
+Om te beginnen met het configureren van je Debrid-provider, open je de applicatie en navigeer je naar **Instellingen** > **Integrations** > **Connected Services** (Verbonden diensten). Dit menu beheert accounts voor links en toegang tot bibliotheken.
 
 ### Stap 2: Een account koppelen & Eerste instellingen
 Standaard worden je Debrid-providers als niet-gekoppeld weergegeven en zijn de kernfuncties uitgeschakeld. 
@@ -21,16 +21,16 @@ Standaard worden je Debrid-providers als niet-gekoppeld weergegeven en zijn de k
 3. Onder het gedeelte **Connected Services** schakel je de optie **Cloud library** naar **Aan** (On) als je mediabestanden wilt bekijken en afspelen die al rechtstreeks in de cloudopslag van je provider zijn opgeslagen.
 4. Schakel **Resolve playable links** naar **Aan** (On). Dit stelt Nuvio in staat om actief afspeelbare streaming-links van je provider aan te vragen bij het ophalen van resultaten.
 
-[Terug naar boven](#debrid-integratie)
+[Terug naar boven](#debrid-integration)
 
 ---
 
-### Stap 3: AIOStreams & P2P-add-ons configureren
-Nuvio heeft eerst een bron nodig om de magnet-links te scrapen. Je moet je scraper-add-ons configureren **zonder** een Debrid-API-sleutel en strikt in **P2P-modus**. 
+### Stap 3: AIOStreams & P2P-addons configureren
+Nuvio heeft eerst een bron nodig om de magnet-links te scrapen. Je moet je scraper-addons configureren **zonder** een Debrid-API-sleutel en strikt in **P2P-modus**. 
 
-* [Gedetailleerde instructies over het configureren van een P2P-add-on vind je hier](../addons/index.md)
+* [Gedetailleerde instructies over het configureren van een P2P-addon vind je hier](../addons/index.md)
 
-[Terug naar boven](#debrid-integratie)
+[Terug naar boven](#debrid-integration)
 
 ---
 
@@ -44,7 +44,7 @@ Wanneer een provider actief is, komt het gedeelte **Link Preparation** (Linkvoor
 > **Belangrijke rate-limit waarschuwing:** 
 > Het wordt ten zeerste aanbevolen om een laag aantal links te gebruiken (zoals 2 links). Debrid-providers hanteren strikte limieten (rate-limits) voor het aantal resolutieverzoeken dat in een bepaald tijdsbestek kan worden verwerkt. Alleen al het openen van een film- of afleveringsdetailpagina haalt headers op en telt mee voor die limieten — zelfs als je niet op "Watch" (Kijken) drukt — omdat de links actief van tevoren worden voorbereid.
 
-[Terug naar boven](#debrid-integratie)
+[Terug naar boven](#debrid-integration)
 
 ---
 
@@ -70,7 +70,7 @@ Voor vrijwel elke media-eigenschap maakt Nuvio gebruik van een strikt prioriteit
 | **Encoderingen** | AV1, HEVC (H.265), AVC (H.264). |
 | **Talen & Groepen** | Audiotaalsporen en specifieke release-groepstags. |
 
-[Terug naar boven](#debrid-integratie)
+[Terug naar boven](#debrid-integration)
 
 ---
 
@@ -80,7 +80,7 @@ Onderaan het Connected Services-menu kun je in het gedeelte **Formatting** (Opma
 * **Name template**: Past aan hoe de titel en hoofdtekst van de stream-resultaten verschijnen. Als je dit leeg laat, wordt standaard de ruwe naam gebruikt die door de scraper wordt geleverd.
 * **Description template**: Bepaalt de weergave en structuur van de metadata (bitrate, grootte, codectags) die onder elk resultaat wordt getoond.
 
-[Terug naar boven](#debrid-integratie)
+[Terug naar boven](#debrid-integration)
 
 ---
 
@@ -151,7 +151,7 @@ Een zeer betrouwbaar alternatief voor Real-Debrid met uitstekende klantenservice
 * **Aanbiedingen & Kortingen:** Ze bieden af en toe seizoensgebonden aanbiedingen aan, zoals tijdens Black Friday en Kerst. Betalen met Bitcoin levert een permanente korting van 10% op.
 * **Installatie:** [alldebrid.com/pin](https://alldebrid.com)
 
-[Terug naar boven](#debrid-integratie)
+[Terug naar boven](#debrid-integration)
 
 ### Waarom Debrid gebruiken?
 1. **Geen buffering:** Streams worden geleverd vanuit snelle datacenters, niet via peer-to-peer.
@@ -161,17 +161,17 @@ Een zeer betrouwbaar alternatief voor Real-Debrid met uitstekende klantenservice
 > [!IMPORTANT]
 > Het wordt ten zeerste aanbevolen om een Debrid-dienst te gebruiken voor de veiligheid en de beste ervaring.
 
-[Terug naar boven](#debrid-integratie)
+[Terug naar boven](#debrid-integration)
 
 ### Installatiestappen
 1. **Neem een account:** Registreer je op de respectievelijke website.
 2. **Haal de API-sleutel op / Autoriseer:** Volg de autorisatiestappen van de individuele provider.
-3. **Configureer add-ons:** De meeste Nuvio-add-ons zullen je Debrid-dienst automatisch detecteren zodra deze gekoppeld is.
+3. **Configureer addons:** De meeste Nuvio-addons zullen je Debrid-dienst automatisch detecteren zodra deze gekoppeld is.
 
-[Terug naar boven](#debrid-integratie)
+[Terug naar boven](#debrid-integration)
 
-### Probleemoplossing
-* **"No Streams Found":** Controleer of je abonnement is verlopen of dat de add-on jouw specifieke dienst ondersteunt.
+### Troubleshooting
+* **"No Streams Found":** Controleer of je abonnement is verlopen of dat de addon jouw specifieke dienst ondersteunt.
 * **"Authorization Failed":** Zorg ervoor dat je bent ingelogd op de website in je browser voordat je de apparaatcode invoert.
 
-[Terug naar boven](#debrid-integratie)
+[Terug naar boven](#debrid-integration)

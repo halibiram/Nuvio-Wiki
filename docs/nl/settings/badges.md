@@ -9,7 +9,7 @@ Nuvio maakt gebruik van een volledig aanpasbare, op afbeeldingen en kleuren geba
 
 ## Hoe het badge-systeem werkt
 
-Wanneer je het streamselectiescherm opent, Nuvio leest de titeltekst die door je add-on voor elk resultaat wordt geretourneerd. Vervolgens vergelijkt het elke titel met een lijst van **regex-patronen** die in je badge-JSON zijn gedefinieerd. Wanneer een patroon overeenkomt, toont Nuvio de bijbehorende badge-afbeelding en kleur naast dat stream-item.
+Wanneer je het streamselectiescherm opent, Nuvio leest de titeltekst die door je addon voor elk resultaat wordt geretourneerd. Vervolgens vergelijkt het elke titel met een lijst van **regex-patronen** die in je badge-JSON zijn gedefinieerd. Wanneer een patroon overeenkomt, toont Nuvio de bijbehorende badge-afbeelding en kleur naast dat stream-item.
 
 Het badge-JSON-bestand wordt gehost op een URL (bijv. op GitHub) en eenmalig geïmporteerd in je Nuvio-instellingen. Je kunt tot **3 afzonderlijke badge-JSON-URL's** tegelijkertijd importeren, waardoor je badge-sets uit meerdere bronnen kunt combineren.
 
@@ -166,7 +166,7 @@ Het badge-systeem herkent metadata die rechtstreeks uit streamtitels is geanalys
 | **Encoder** | AV1, HEVC, AVC, XviD, DivX |
 | **Taal** | Verschillende landsvlaggen, afhankelijk van de badge-set |
 
-Badges worden alleen weergegeven als de streamtitel tekst bevat die overeenkomt met het regex-patroon van de badge. Als je add-on geen kwaliteitsinformatie in de streamtitels opneemt, worden er mogelijk geen badges weergegeven.
+Badges worden alleen weergegeven als de streamtitel tekst bevat die overeenkomt met het regex-patroon van de badge. Als je addon geen kwaliteitsinformatie in de streamtitels opneemt, worden er mogelijk geen badges weergegeven.
 
 [Terug naar boven](#stream-badges-gids)
 
@@ -280,14 +280,14 @@ Als je liever je eigen badge-JSON schrijft, gebruikt Nuvio het volgende schema:
 
 ---
 
-## Probleemoplossing
+## Troubleshooting
 
 | Probleem | Oplossing |
 | :--- | :--- |
 | Badges verschijnen niet na het importeren | Zorg ervoor dat je de **raw** GitHub-URL gebruikt (begint met `raw.githubusercontent.com`). |
 | Badge-URL verdwijnt na het opslaan | Bekend probleem — importeer de URL en **sluit af zonder op Save (Opslaan) te drukken**. |
 | Badges worden getoond maar met de verkeerde prioriteit | De volgorde van de `filters`-array in de badge-set bepaalt de prioriteit. Wijzig de volgorde van de items of gebruik Badger om dit aan te passen. |
-| Geen badges op streams van een specifieke add-on | De add-on bevat mogelijk geen kwaliteitsmetadata in de streamtitels. Controleer het uitvoerformaat van de add-on. |
+| Geen badges op streams van een specifieke addon | De addon bevat mogelijk geen kwaliteitsmetadata in de streamtitels. Controleer het uitvoerformaat van de addon. |
 | Badges zien er anders uit dan op de screenshots | Het uiterlijk van de badges hangt af van de set die je hebt geïmporteerd. Kleuren en pictogrammen zijn volledig aanpasbaar — verschillende sets zien er anders uit. |
 
 ---
