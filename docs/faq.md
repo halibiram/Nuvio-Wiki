@@ -21,7 +21,7 @@ Apple provides 10k spots to developers. These spots are often fully filled and r
 It is required that your metadata addons be first in the list of your addons. You can move them to the top spot within a Nuvio app under addons.
 
 ### Why can't I install plugins?
-If you installed Nuvio from an app store, the plugin feature is not included. You must use a sideload method to use Nuvio's plugin feature. When installing a plugin, you need to use the plugin section of Nuvio. Trying to install a plugin in the addon section of Nuvio will result in an error.
+If you installed Nuvio from an app store, the plugin feature is not included. You must use a sideload method for it to work. When installing a plugin, you need to use the plugin section of Nuvio. Trying to install a plugin in the addon section of Nuvio will result in an error.
 
 ### What's the deal with trailers?
 Trailers are checked against TMDB first with the user's set language. If no trailers are found in the user's set language, it defaults to English. Trailers are taken from YouTube and then extracted by Nuvio to be played in ExoPlayer. If trailers are not playing, check if you are using a VPN. Many VPNs are blocked by YouTube. Trailers are also only available on the sideload versions of Nuvio.
