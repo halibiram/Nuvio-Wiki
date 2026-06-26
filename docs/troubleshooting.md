@@ -3,7 +3,7 @@
 Find solutions to common issues with Nuvio below. Problems are grouped by category — jump to the section most relevant to your situation.
 
 > [!TIP]
-> Before diving into specific fixes, try the most common quick fixes first: **restart the app**, **check your internet connection**, and **verify your Debrid subscription is active**. These resolve the majority of reported issues.
+> Before diving into specific fixes, try the most common quick fixes first: **restart the app**, **clear the apps cache**, **check your internet connection**, and **verify your Debrid subscription is active**. These resolve the majority of reported issues.
 
 ---
 
@@ -64,15 +64,7 @@ Mismatched frame rates between the stream and your display can cause judder or d
 - Go to **Settings → Player → Advanced Processing & Decoding → Auto Frame Rate & Resolution** and experiment with the available options. Choices are **Off**, **On start** (switch when playback begins), and **On start/stop** (also restores your display's original rate when you stop).
 - If your TV/display does not support AFR well, setting it to **Off** may give smoother results.
 
-**Step 6 — Adjust Addon Subtitle Startup**
-
-Automatically fetching all available subtitle tracks at startup can delay or interrupt stream initialization.
-
-- Go to **Settings → Player → Subtitle and Audio → Addon Subtitle Startup** and set it to **Fast startup** (see [Player Settings](settings/player.md#subtitle-and-audio)).
-- This skips the automatic subtitle fetch so video begins immediately. You can still select subtitles manually from within the player menu during playback.
-- If you want subtitles loaded but with less overhead, **Preferred only** is a balanced middle option — it fetches only your configured language rather than every available track.
-
-**Step 7 — Adjust buffer settings** [Android TV Only]
+**Step 6 — Adjust buffer settings** [Android TV Only]
 
 On Android TV devices, you can manually increase how much video is pre-loaded into memory, which smooths out playback on slower or less stable connections.
 
@@ -81,6 +73,10 @@ On Android TV devices, you can manually increase how much video is pre-loaded in
 
 > [!NOTE]
 > Higher buffer values consume more RAM. Enable **Managed Memory Budget** to let Nuvio automatically cap buffer usage to a safe share of your device's available memory, which prevents instability on lower-end devices.
+
+**Step 7 — Dolby Vision Profile 7 (P7) Conversion** [Android TV Only]
+
+- DV P7 conversion can cause weaker hardware to buffer. Toggle it in the app.
 
 **Step 8 — Try an external player**
 
@@ -167,6 +163,14 @@ Some addons (e.g., AIOStreams) require specific configuration tied to your Debri
 > [!WARNING]
 > Do not share your addon manifest URL publicly — it typically contains your Debrid API key or account token.
 
+**Step 6 - Addon Returns No Results
+
+If an addon is installed and enabled but never returns streams:
+
+- Re-check the addon configuration. Many addons (e.g., AIOStreams) are configured with your Debrid credentials baked into the manifest URL. If your API key has changed or expired, you need to regenerate the manifest URL.
+- Look at whether the addon is specifically for movies, TV, or both. Some addons only index certain content types.
+- For self-hosted addons, verify the server is reachable and running. Check its logs for errors if you have access.
+
 ---
 
 ### 1.4 Poor Video Quality
@@ -215,7 +219,7 @@ This error occurs during installation and usually has one of two causes.
 
 **Cause 1 — Wrong APK version**
 
-Nuvio has separate builds for different device types. Installing the wrong version triggers this error.
+Nuvio has separate builds for different device types. Installing the wrong version triggers this error. Note that AndroidTV also needs to verify if it is the correct version
 
 - **Android phones/tablets:** Use the **Mobile** APK. See the [Android Mobile Installation Guide](installation/android-mobile.md).
 - **Android TV, Fire TV, Google TV:** Use the **TV** APK. See the [Android TV Installation Guide](installation/android-tv.md).
@@ -341,21 +345,10 @@ After a Nuvio update, addon configurations are sometimes reset.
 
 ---
 
-### 4.3 Addon Returns No Results
-
-If an addon is installed and enabled but never returns streams:
-
-- Re-check the addon configuration. Many addons (e.g., AIOStreams) are configured with your Debrid credentials baked into the manifest URL. If your API key has changed or expired, you need to regenerate the manifest URL.
-- Look at whether the addon is specifically for movies, TV, or both. Some addons only index certain content types.
-- For self-hosted addons, verify the server is reachable and running. Check its logs for errors if you have access.
-
----
-
 ### 4.4 Addon Loads Slowly
 
 Slow addon responses extend the time it takes for the stream list to appear.
 
-- Addons hosted in distant regions will have higher latency. Where possible, prefer addons with servers geographically close to you.
 - Some community addons run on low-resource servers and will simply be slow during peak hours.
 - If you self-host an addon, check its server resource usage and logs.
 
@@ -401,13 +394,12 @@ If Nuvio cannot reach its servers or load any content at all:
 
 ---
 
-### 6.2 6.2 VPN Conflicts
+### 6.2 VPN Conflicts
 
 VPNs are a common source of intermittent connectivity and playback issues.
 
 - **Try disabling your VPN** temporarily to test whether it is the cause.
 - If Nuvio works without the VPN, your VPN's servers may be throttling video traffic or your Debrid provider may be blocking VPN IPs.
-- If you must use a VPN, try switching to a different server or protocol (e.g., WireGuard instead of OpenVPN).
 - Some Debrid providers explicitly prohibit use through VPNs in their terms of service.
 
 ---
@@ -416,10 +408,19 @@ VPNs are a common source of intermittent connectivity and playback issues.
 
 If streams load but are consistently slow regardless of content:
 
+**Step1 - Test Internet
 - Run a speed test from the same device. If your measured speed is much lower than your subscribed plan, the issue is your ISP or local network, not Nuvio.
 - Check whether your ISP throttles video streaming traffic. A VPN may help in this case (test with and without).
 - Switch from Wi-Fi to a wired Ethernet connection where possible, particularly on TV devices.
 - On Wi-Fi, move closer to your router or switch to a 5 GHz network if your device supports it.
+
+**Step 2 — Adjust Addon Subtitle Startup**
+
+Automatically fetching all available subtitle tracks at startup can delay or interrupt stream initialization.
+
+- Go to **Settings → Player → Subtitle and Audio → Addon Subtitle Startup** and set it to **Fast startup** (see [Player Settings](settings/player.md#subtitle-and-audio)).
+- This skips the automatic subtitle fetch so video begins immediately. You can still select subtitles manually from within the player menu during playback.
+- If you want subtitles loaded but with less overhead, **Preferred only** is a balanced middle option — it fetches only your configured language rather than every available track.
 
 ---
 
