@@ -290,7 +290,7 @@ Trakt is used to sync your watch history, progress, and ratings across devices. 
 
 **Step 1 — Re-authenticate Trakt**
 
-- Go to **Settings → Integrations → Trakt**.
+- Go to **Settings → Trakt**.
 - Tap **Log Out**, then **Log In** and complete the authorization flow again.
 - This refreshes your access token and resolves the majority of Trakt sync failures.
 
@@ -298,15 +298,11 @@ Trakt is used to sync your watch history, progress, and ratings across devices. 
 
 Trakt occasionally experiences outages. If re-authentication does not help, check [Trakt's status page](https://trakt.tv) or community forums for reported issues.
 
-**Step 3 — Confirm sync is enabled**
-
-- In **Settings → Integrations → Trakt**, ensure that **Auto Sync** is toggled on for both scrobbling and history.
-
 ---
 
 ### 3.2 Watch Progress Not Saving
 
-- Confirm that Trakt integration is active and authenticated (see above).
+- Confirm that Trakt integration is active if using for watch progress and authenticated (see above).
 - Nuvio scrobbles progress when you reach a certain threshold of a video. Playing only a few seconds may not trigger a scrobble.
 - If you are using an external player, scrobbling may not be supported. Switch back to the internal player for automatic progress tracking.
 
@@ -314,9 +310,8 @@ Trakt occasionally experiences outages. If re-authentication does not help, chec
 
 ### 3.3 Library or Watchlist Not Updating
 
-- Pull-to-refresh your library or watchlist screen.
-- Go to **Settings → Integrations → Trakt → Sync Now** to force a manual sync.
-- If items added on another device are not appearing, confirm both devices are authenticated to the same Trakt account.
+- Go to **Device Settings → Apps → Nuvio → Storage → Clear Cache**.
+- If items added on another device are not appearing, confirm both devices are authenticated to the same Trakt account, if using Trakt.
 
 ---
 
@@ -438,11 +433,10 @@ If streams load but are consistently slow regardless of content:
 
 ---
 
-### 7.2 High Memory Usage or Battery Drain
+### 7.2 High Memory Usage
 
 - Decoder efficiency significantly affects battery life. Go to **Settings → Player → Advanced Processing & Decoding → Decoder Priority** and set it to **Prefer device decoders**. This uses your hardware decoder chips when available, offloading work from the CPU and reducing battery drain compared to software (FFmpeg) decoding.
 - Avoid leaving Nuvio running in the background indefinitely. Close it fully when not in use.
-- On Android, check **Battery Settings → Battery Usage** to confirm Nuvio is the source of drain and not a background service.
 
 ---
 
@@ -450,7 +444,7 @@ If streams load but are consistently slow regardless of content:
 
 ### 8.1 Android Phone & Tablet
 
-- **Sideloading:** Nuvio is distributed as an APK. Enable **Install from Unknown Sources** under **Settings → Security** (or **Settings → Apps → Special App Access → Install Unknown Apps**) before installing.
+- **Sideloading:** Nuvio is distributed can be distributed as an APK. Enable **Install from Unknown Sources** under **Settings → Security** (or **Settings → Apps → Special App Access → Install Unknown Apps**) before installing.
 - **Picture-in-Picture (PiP):** If PiP does not work, go to **Device Settings → Apps → Nuvio → Picture-in-Picture** and enable it.
 - **Orientation lock:** If the app is stuck in portrait or landscape mode, check your system-level screen rotation lock.
 
@@ -459,15 +453,14 @@ If streams load but are consistently slow regardless of content:
 ### 8.2 Android TV / Fire TV / Google TV
 
 - Always use the **TV build** of Nuvio. The Mobile build will not install or function correctly on TV devices.
-- **Remote navigation:** If certain UI elements are unreachable with a remote, try enabling **TV Mode** in Nuvio's settings if available.
 - **Fire TV:** If installation is blocked, go to **Settings → My Fire TV → Developer Options → Install Unknown Apps → Nuvio** and enable it.
-- **Google TV:** Use a file manager such as **Files by Marc** to locate and install the APK after downloading it.
+- **Google TV:** Use a file manager such as **Files by Marc** to locate and install the APK after downloading it if you cannot find it.
 
 ---
 
 ### 8.3 Samsung Smart TV (Tizen / TizenBrew)
 
-Samsung Tizen TVs do not support direct APK sideloading. Nuvio must be installed via **TizenBrew**.
+Samsung Tizen TVs do not support direct APK sideloading. Nuvio must be installed via the dedicated installation or **TizenBrew**.
 
 - For full installation instructions, see the [Tizen Installation Guide](tizen-installation.md).
 - If the app fails to load after installation, confirm TizenBrew is running the correct Nuvio Tizen build.
