@@ -292,7 +292,7 @@ Trakt is used to sync your watch history, progress, and ratings across devices. 
 **Step 1 — Re-authenticate Trakt**
 
 - Go to **Settings → Trakt**.
-- Tap **Log Out**, then **Log In** and complete the authorization flow again. For detailed setup and sync scopes, see [Trakt Integration](trakt.md) or the [Trakt Bridge Import Tool](tmdb-mdblist-trakt.md#trakt-integration).
+- Tap **Log Out**, then **Log In** and complete the authorization flow again. For detailed setup and sync scopes, see [Trakt Integration](integrations/trakt.mdd) or the [Trakt Bridge Import Tool](integrations/tmdb-mdblist-trakt.md#trakt-integration).
 - This refreshes your access token and resolves the majority of Trakt sync failures.
 
 **Step 2 — Check Trakt's service status**
@@ -453,7 +453,7 @@ If streams load but are consistently slow regardless of content:
 
 ### 8.2 Android TV / Fire TV / Google TV
 
-- Always use the **TV build** of Nuvio. The Mobile build will not install or function correctly on TV devices. For full installation instructions, see the [Android TV Installation Guide](../installation/android-tv.md).
+- Always use the **TV build** of Nuvio. The Mobile build will not install or function correctly on TV devices. For full installation instructions, see the [Android TV Installation Guide](installation/android-tv.md).
 - **Fire TV:** If installation is blocked, go to **Settings → My Fire TV → Developer Options → Install Unknown Apps → Nuvio** and enable it.
 - **Google TV:** Use a file manager such as **Files by Marc** to locate and install the APK after downloading it if you cannot find it.
 
@@ -463,18 +463,18 @@ If streams load but are consistently slow regardless of content:
 
 Samsung Tizen TVs do not support direct APK sideloading. Nuvio must be installed via the dedicated installation or **TizenBrew**.
 
-- For full installation instructions, see the [Tizen Installation Guide](../installation/tizen.md).
+- For full installation instructions, see the [Tizen Installation Guide](installation/tizen.md).
 - If the app fails to load after installation, confirm TizenBrew is running the correct Nuvio Tizen build.
-- Some Tizen features (hardware decoding, Dolby audio passthrough) depend on your TV model's capabilities. Check the [Platform Compatibility](../settings/ui-and-customization.md) guide for a full feature comparison.
+- Some Tizen features (hardware decoding, Dolby audio passthrough) depend on your TV model's capabilities. Check the [Platform Compatibility](settings/ui-and-customization.md) guide for a full feature comparison.
 
 > [!NOTE]
-> Not all player features available on Android are available on Tizen due to platform limitations. Check the [Platform Compatibility](../settings/ui-and-customization.md) guide for a full feature comparison.
+> Not all player features available on Android are available on Tizen due to platform limitations. Check the [Platform Compatibility](settings/ui-and-customization.md) guide for a full feature comparison.
 
 ---
 
 ### 8.4 iOS / iPadOS
 
-- Nuvio on iOS may require installation via **AltStore**, **Sideloadly**, or a similar sideloading tool, depending on the distribution method. For full installation instructions, see the [iOS Installation Guide](../installation/ios.md).
+- Nuvio on iOS may require installation via **AltStore**, **Sideloadly**, or a similar sideloading tool, depending on the distribution method. For full installation instructions, see the [iOS Installation Guide](installation/ios.md).
 - If the app expires (a common issue with sideloaded iOS apps), re-sign it using your tool of choice.
 - iOS has stricter background activity limits. Playback that pauses when the screen locks may require enabling **Background App Refresh** for Nuvio in iOS Settings.
 
