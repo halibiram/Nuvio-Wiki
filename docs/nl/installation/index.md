@@ -8,4 +8,5 @@ Nuvio ondersteunt verschillende platforms. Selecteer hieronder je apparaat voor 
 - [Android TV](android-tv.md) - Play Store of APK
 - [Android Mobiel](android-mobile.md) - Play Store of APK
 - [iOS](ios.md) - Installatie via sideloading of TestFlight.
-- [WebOS](webos.md) - Experimentele ondersteuning.
+- [WebOS](webos.md) - Developer Mode Installatie.
+- [Tizen](tizen.md) - Developer Mode Installatie.

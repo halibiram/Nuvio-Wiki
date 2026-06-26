@@ -44,7 +44,7 @@ Nuvio stelt je in staat om tijdstempels in te dienen bij de door de community ge
 - **Content Warnings:** Toont een ouderlijk toezicht overlay wanneer het afspelen start.
 - **Automatic Skipping:** Kies welke segmenten (intro's/outro's) automatisch worden overgeslagen zonder melding.
 
-[Terug naar boven](#nuvio-player settings)
+[Terug naar boven](#Nuvio-player settings)
 
 ---
 
@@ -85,7 +85,7 @@ Deze instellingen bepalen precies welke addons of plugins streams mogen zoeken e
 - **Allowed Plugins:** Regelt welke plugins worden gebruikt tijdens het zoekproces.
   - *Opties:* All enabled plugins, Custom Selection.
 
-[Terug naar boven](#nuvio-player settings)
+[Terug naar boven](#Nuvio-player settings)
 
 ---
 
@@ -103,7 +103,7 @@ De categorie Next Episode bevat verschillende instellingen om continu kijken te 
   - *Op 97%:* Nuvio start het bronselectieproces wanneer de media voor 97% is voltooid (bijv. bij een aflevering van 30 minuten begint de selectie op 29 minuten en 6 seconden).
 - **Are You Still Watching?** [Android TV Only]: Vraagt de gebruiker na een ingesteld aantal opeenvolgende automatisch afgespeelde afleveringen of ze nog kijken, om oneindig afspelen te voorkomen als je in slaap valt.
 
-[Terug naar boven](#nuvio-player settings)
+[Terug naar boven](#Nuvio-player settings)
 
 ---
 
@@ -134,7 +134,7 @@ Bepaalt hoe intensief Nuvio zoekt naar externe ondertitels wanneer een video beg
 - **Preferred only:** Een gebalanceerde aanpak. Haalt tijdens het laden ondertitels op van addons, maar alleen degene die overeenkomen met je taalvoorkeuren.
 - **All subtitles:** Haalt alle beschikbare addon-ondertitels voor de video op en laadt ze, wat maximale keuze biedt ten koste van iets langere laadtijden.
 
-[Terug naar boven](#nuvio-player settings)
+[Terug naar boven](#Nuvio-player settings)
 
 ---
 
@@ -176,7 +176,7 @@ Technische instellingen die bepalen hoe de hardware en software van je apparaat 
   - Oudere optische audiokabels (met het rode lampje) hebben een strikte bandbreedtebeperking. Ze kunnen moderne, niet-gecomprimeerde audioformaten zoals TrueHD of DTS-HD fysiek niet doorsturen. Ze ondersteunen maximaal standaard Dolby Digital 5.1 (ook bekend als AC-3).
   - Als je een oudere AV-ontvanger of soundbar hebt die via een optische kabel op je TV is aangesloten, zal het afspelen van een moderne 4K-film met een TrueHD-track resulteren in stilte of harde ruis. Deze instelling werkt als een live vertaler: het pakt de zware moderne audio en zet deze direct om naar standaard Dolby Digital 5.1, zodat je oudere audiosysteem de film daadwerkelijk kan afspelen.
 
-[Terug naar boven](#nuvio-player settings)
+[Terug naar boven](#Nuvio-player settings)
 
 ---
 
@@ -204,7 +204,7 @@ Overschrijft de standaard buffering van Media3 met aangepaste waarden. Indien ui
 - **P2P Streaming:** Schakelt directe verwerkingsconfiguraties in of beperkt deze voor ruwe peer-to-peer (torrent) streams.
 - **Hide torrent stats:** Voorkomt dat realtime logbestanden van peer-verbindingen, seed-aantallen en overlays van downloadsnelheid verschijnen tijdens het laden en afspelen.
 
-[Terug naar boven](#nuvio-player settings)
+[Terug naar boven](#Nuvio-player settings)
 
 ---
 
@@ -245,4 +245,4 @@ De MPV-configuratie in Nuvio richt zich momenteel op **Hardware Decoding** (Hard
 
 - **Voor troubleshooting:** Als een specifiek videobestand wordt afgespeeld met een groen scherm, vervormde kleuren of alleen geluid zonder beeld, verander dit dan in **Disabled (no)**. Het forceren van software-decodering omzeilt meestal hardware-incompatibiliteiten, waardoor het bestand toch kan worden afgespeeld.
 
-[Terug naar boven](#nuvio-player settings)
+[Terug naar boven](#Nuvio-player settings)

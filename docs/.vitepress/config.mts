@@ -282,7 +282,16 @@ export default defineConfig({
       }
     },
     build: {
-      target: 'esnext'
+      target: 'esnext',
+      chunkSizeWarningLimit: 3000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('mermaid')) return 'mermaid'
+            if (id.includes('P2PGenerator')) return 'p2p-generator'
+          }
+        }
+      }
     }
   }
 })

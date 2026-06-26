@@ -80,7 +80,7 @@ After authenticating, customize your tracking features.
 If you are migrating to Nuvio and want to bring your existing Trakt history into Nuvio's native tracking system, use the web-based bridge tool.
 
 **How to use the Trakt Bridge:**
-1. Visit the [Nuvio Trakt Bridge](https://trakt-nuvio.duckdns.org/).
+1. Visit the [Nuvio Trakt Bridge](https://trakt-Nuvio.duckdns.org/).
 2. Under the **Connect Trakt** section, click the button to use Trakt OAuth to approve access in a pop-up window.
 3. Under the **Connect Nuvio** section, enter the email address and password associated with your Nuvio account and click **Sign In**.
 4. Select the specific **Nuvio profile** you want to import the data into from the dropdown menu.

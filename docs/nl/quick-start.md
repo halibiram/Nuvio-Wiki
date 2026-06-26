@@ -6,6 +6,8 @@ Wil je Nuvio binnen 10 minuten werkend hebben? Volg deze stappen:
 - **Android:** Download de APK en installeer deze. [Volledige gids](installation/android-mobile.md)
 - **Android TV:** Gebruik de "Downloader" app om de TV APK op te halen of sideload de APK. [Volledige gids](installation/android-tv.md)
 - **iOS:** Sideload de .ipa. [Volledige gids](installation/ios.md)
+- **WebOS:** Developer Mode Installatie. [Volledige gids](installation/webos.md)
+- **Tizen:** Developer Mode Installatie. [Volledige gids](installation/tizen.md)
 
 ---
 

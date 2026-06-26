@@ -10,8 +10,15 @@ $RepoUrl = "https://github.com/haaihond/Nuvio-Wiki-Website.git"
 
 Set-Location -LiteralPath $PSScriptRoot
 
-git config user.email "haaihondschildpad@gmail.com"
-git config user.name "haaihond"
+$existingEmail = git config user.email 2>$null
+$existingName  = git config user.name  2>$null
+
+if (-not $existingEmail) {
+  git config user.email "haaihondschildpad@gmail.com"
+}
+if (-not $existingName) {
+  git config user.name "haaihond"
+}
 
 if (git remote | Select-String -Quiet -SimpleMatch $RemoteName) {
   git remote set-url $RemoteName $RepoUrl
