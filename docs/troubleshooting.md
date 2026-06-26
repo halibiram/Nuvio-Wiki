@@ -217,10 +217,10 @@ This error occurs during installation and usually has one of two causes.
 
 Nuvio has separate builds for different device types. Installing the wrong version triggers this error.
 
-- **Android phones/tablets:** Use the **Mobile** APK. See the [Android Mobile Installation Guide](../installation/android-mobile.md).
-- **Android TV, Fire TV, Google TV:** Use the **TV** APK. See the [Android TV Installation Guide](../installation/android-tv.md).
-- **Samsung Tizen (via TizenBrew):** Use the Tizen-specific installation process — see the [Tizen Installation Guide](../installation/tizen.md).
-- **LG WebOS:** See the [WebOS Installation Guide](../installation/webos.md).
+- **Android phones/tablets:** Use the **Mobile** APK. See the [Android Mobile Installation Guide](installation/android-mobile.md).
+- **Android TV, Fire TV, Google TV:** Use the **TV** APK. See the [Android TV Installation Guide](installation/android-tv.md).
+- **Samsung Tizen (via TizenBrew):** Use the Tizen-specific installation process — see the [Tizen Installation Guide](installation/tizen.md).
+- **LG WebOS:** See the [WebOS Installation Guide](installation/webos.md).
 
 Download the correct version from the [Official Links](official-links.md) page, which includes links to the GitHub release pages for each build (Mobile, TV, and WebOS).
 
