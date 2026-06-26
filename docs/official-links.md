@@ -3,6 +3,15 @@
 > [!CAUTION]
 > Always verify links. Never provide your Debrid API key or Trakt password to unofficial sites.
 
+## Downloads
+
+> [!NOTE]
+> Always download from the official GitHub repositories. Match the build to your device type — installing the wrong variant will fail.
+
+- **Nuvio Mobile (Android phones & tablets):** [Latest Releases](https://github.com/NuvioMedia/NuvioMobile/releases)
+- **Nuvio TV (Android TV, Fire TV, Google TV):** [Latest Releases](https://github.com/NuvioMedia/NuvioTV/releases)
+- **Nuvio WebOS (LG Smart TVs):** [Latest Releases](https://github.com/NuvioMedia/NuvioTVWebOS/releases)
+
 ## Official Channels
 - **Website:** - [Nuvio.tv](https://nuvio.tv)
 - **Discord:** - [Join the Community](https://discord.gg/nuvio)
@@ -16,3 +25,4 @@
 - **Duckstreams:** - [Guide and Quickstart Tool](https://duckkota.gitlab.io/guides/nuvio/)
 - **Nuvio Quickstart Tool:** - [Set up Nuvio addons automatically](https://nuvio-quickstart.duckdns.org/)
 - **Addons:** - [List of Available Addons](https://stremio-addons.net/)
+- 
