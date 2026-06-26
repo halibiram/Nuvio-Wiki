@@ -25,4 +25,6 @@
 - **Duckstreams:** - [Guide and Quickstart Tool](https://duckkota.gitlab.io/guides/nuvio/)
 - **Nuvio Quickstart Tool:** - [Set up Nuvio addons automatically](https://nuvio-quickstart.duckdns.org/)
 - **Addons:** - [List of Available Addons](https://stremio-addons.net/)
-- 
+- **Nuvio Trakt Bridge:** - [Import tool for Trakt history](https://trakt-nuvio.duckdns.org/)
+- **Anime Skip:** - [Generate Client ID for automatic skipping](https://anime-skip.com)
+- **Intro DB:** - [Generate API key for community intros/outros](https://introdb.app)
