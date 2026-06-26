@@ -68,7 +68,7 @@ Mismatched frame rates between the stream and your display can cause judder or d
 
 Automatically fetching all available subtitle tracks at startup can delay or interrupt stream initialization.
 
-- Go to **Settings → Player → Subtitle and Audio → Addon Subtitle Startup** and set it to **Fast startup** (see [Player Settings](player.md#subtitle-and-audio)).
+- Go to **Settings → Player → Subtitle and Audio → Addon Subtitle Startup** and set it to **Fast startup** (see [Player Settings](settings/player.md#subtitle-and-audio)).
 - This skips the automatic subtitle fetch so video begins immediately. You can still select subtitles manually from within the player menu during playback.
 - If you want subtitles loaded but with less overhead, **Preferred only** is a balanced middle option — it fetches only your configured language rather than every available track.
 
@@ -76,7 +76,7 @@ Automatically fetching all available subtitle tracks at startup can delay or int
 
 On Android TV devices, you can manually increase how much video is pre-loaded into memory, which smooths out playback on slower or less stable connections.
 
-- Go to **Settings → Player → Buffer and Network → Custom Playback Buffers** and enable it (see [Player Settings](player.md#buffer-and-network-android-tv-only)).
+- Go to **Settings → Player → Buffer and Network → Custom Playback Buffers** and enable it (see [Player Settings](settings/player.md#buffer-and-network-android-tv-only)).
 - Increase **Min Buffer Duration** and **Max Buffer Duration** to give the player more runway ahead of your current position. Start conservatively (e.g., 15s min, 50s max) and raise from there if buffering continues.
 
 > [!NOTE]
@@ -110,7 +110,7 @@ This is the fastest fix for codec-related rendering failures.
 
 If video plays but there is no audio, or dialogue is inaudible beneath loud effects:
 
-- Go to **Settings → Player → Subtitle and Audio → Audio Settings** and enable **Enable Downmix** (see [Player Settings](player.md#subtitle-and-audio)). This converts multichannel surround audio (5.1 or 7.1) into stereo, which resolves cases where the center dialogue channel is effectively silent on stereo setups.
+- Go to **Settings → Player → Subtitle and Audio → Audio Settings** and enable **Enable Downmix** (see [Player Settings](settings/player.md#subtitle-and-audio)). This converts multichannel surround audio (5.1 or 7.1) into stereo, which resolves cases where the center dialogue channel is effectively silent on stereo setups.
 - If you are connecting your TV to a sound system via an **optical/SPDIF cable**, go to **Settings → Player → Advanced Processing & Decoding** and enable **Force AC-3 Transcoding (Optical/SPDIF)**. Optical connections have a strict bandwidth limit and cannot carry modern uncompressed formats like TrueHD or DTS-HD. This setting transcodes them to Dolby Digital 5.1 in real-time so your receiver can decode them.
 - Confirm your TV or receiver is not muted and is not set to an audio format your hardware does not support.
 
@@ -118,7 +118,7 @@ If video plays but there is no audio, or dialogue is inaudible beneath loud effe
 
 If video plays but with obviously wrong colors — a green tint, purple cast, or a completely washed-out image — your content is likely Dolby Vision Profile 7 (DV7), which many devices cannot natively decode.
 
-- Go to **Settings → Player → Advanced Processing & Decoding** and enable **DV7 - HEVC Fallback** (see [Player Settings](player.md#player-and-decoder-options)). This strips the unreadable Dolby Vision layer and maps the video down to standard HEVC (H.265), restoring correct colors.
+- Go to **Settings → Player → Advanced Processing & Decoding** and enable **DV7 - HEVC Fallback** (see [Player Settings](settings/player.md#player-and-decoder-options)). This strips the unreadable Dolby Vision layer and maps the video down to standard HEVC (H.265), restoring correct colors.
 - If you are on Android TV and seeing issues specifically with DV5 content, you can additionally try enabling **Convert DV5 to DV8.1** in the same menu.
 
 **Step 4 — Try a different stream**
@@ -194,7 +194,7 @@ If content plays but the quality is lower than expected (e.g., 480p instead of 1
 
 **Subtitles cause stuttering at startup:**
 
-- Go to **Settings → Player → Subtitle and Audio → Addon Subtitle Startup** and set it to **Fast startup** (see [Player Settings](player.md#subtitle-and-audio)). This skips the automatic subtitle fetch so playback begins without waiting for external subtitle sources to respond. Subtitles can still be selected manually once the video is playing.
+- Go to **Settings → Player → Subtitle and Audio → Addon Subtitle Startup** and set it to **Fast startup** (see [Player Settings](settings/player.md#subtitle-and-audio)). This skips the automatic subtitle fetch so playback begins without waiting for external subtitle sources to respond. Subtitles can still be selected manually once the video is playing.
 
 ---
 
@@ -436,7 +436,7 @@ If streams load but are consistently slow regardless of content:
 
 ### 7.2 High Memory Usage
 
-- Decoder efficiency significantly affects battery life. Go to **Settings → Player → Advanced Processing & Decoding → Decoder Priority** and set it to **Prefer device decoders** (see [Player Settings](player.md#player-and-decoder-options)). This uses your hardware decoder chips when available, offloading work from the CPU and reducing battery drain compared to software (FFmpeg) decoding.
+- Decoder efficiency significantly affects battery life. Go to **Settings → Player → Advanced Processing & Decoding → Decoder Priority** and set it to **Prefer device decoders** (see [Player Settings](settings/player.md#player-and-decoder-options)). This uses your hardware decoder chips when available, offloading work from the CPU and reducing battery drain compared to software (FFmpeg) decoding.
 - Avoid leaving Nuvio running in the background indefinitely. Close it fully when not in use.
 
 ---
