@@ -10,7 +10,7 @@
 
 - **Nuvio Mobile (Android phones & tablets):** [Latest Releases](https://github.com/NuvioMedia/NuvioMobile/releases)
 - **Nuvio TV (Android TV, Fire TV, Google TV):** [Latest Releases](https://github.com/NuvioMedia/NuvioTV/releases)
-- **Nuvio WebOS/Tizen:** [Latest Releases](https://github.com/NuvioMedia/NuvioTVWebOS/releases)
+- **Nuvio WebOS/Tizen:** [Latest Releases](https://github.com/NuvioMedia/NuvioWeb/releases)
 - **Nuvio Desktop:** [Latest Releases](https://github.com/NuvioMedia/NuvioDesktop/releases)
 
 ## Official Channels
