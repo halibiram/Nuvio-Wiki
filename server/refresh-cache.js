@@ -9,35 +9,29 @@
  * Usage:
  *   node refresh-cache.js                  # default 48h TTL
  *   node refresh-cache.js --ttl 86400      # custom TTL in seconds
+ *
+ * Also exports buildAndSaveCache(ttlSeconds?) for programmatic use
+ * (e.g. lazy rebuild triggered by index.js when the cache expires).
  */
 
 import 'dotenv/config';
 import { GoogleGenAI } from '@google/genai';
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
-import { join, relative, extname } from 'path';
+import { join, extname } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const GEMINI_MODEL = 'gemini-3.1-flash-lite';
-const DOCS_DIR = join(__dirname, '..', 'docs');
-const CACHE_FILE = join(__dirname, 'cache.json');
+export const GEMINI_MODEL = 'gemini-3.1-flash-lite';
+export const DOCS_DIR = join(__dirname, '..', 'docs');
+export const CACHE_FILE = join(__dirname, 'cache.json');
+
+const DEFAULT_TTL_SECONDS = 48 * 3600; // 48 hours
 
 // Directories to exclude from the wiki content
 const EXCLUDE_DIRS = new Set(['.vitepress', 'public', 'nl', 'node_modules']);
-
-if (!process.env.GEMINI_API_KEY) {
-  console.error('❌  GEMINI_API_KEY is not set. Copy .env.example to .env and add your key.');
-  process.exit(1);
-}
-
-// Parse --ttl flag
-const ttlIndex = process.argv.indexOf('--ttl');
-const ttlSeconds = ttlIndex !== -1 && process.argv[ttlIndex + 1]
-  ? parseInt(process.argv[ttlIndex + 1], 10)
-  : 48 * 3600; // default 48 hours
 
 // ── Collect markdown files ──────────────────────────────────────────────
 
@@ -82,9 +76,16 @@ function buildWikiContent(files) {
   return sections.join('\n');
 }
 
-// ── Main ────────────────────────────────────────────────────────────────
+// ── Core build function (exported for programmatic use) ─────────────────
 
-async function main() {
+/**
+ * Collects all wiki markdown files, creates a new Gemini context cache,
+ * and writes the result to cache.json.
+ *
+ * @param {number} [ttlSeconds=172800] - Cache TTL in seconds (default 48h).
+ * @returns {Promise<string>} The new cache name (e.g. "cachedContents/...").
+ */
+export async function buildAndSaveCache(ttlSeconds = DEFAULT_TTL_SECONDS) {
   console.log('📚  Collecting wiki markdown files...');
   const files = collectMarkdownFiles(DOCS_DIR);
   console.log(`   Found ${files.length} markdown files\n`);
@@ -105,6 +106,10 @@ async function main() {
 
   console.log(`\n🔄  Creating context cache (TTL: ${ttlSeconds}s = ${(ttlSeconds / 3600).toFixed(1)}h)...`);
 
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY is not set.');
+  }
+
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const systemInstruction = `You are the Nuvio Wiki Assistant, a helpful AI that answers questions exclusively about Nuvio based on the wiki documentation provided below.
@@ -120,40 +125,59 @@ Rules:
 8. When listing steps, use numbered lists for clarity.
 9. The wiki pages are provided with their URL paths. Use these paths when creating links.`;
 
+  const cache = await ai.caches.create({
+    model: GEMINI_MODEL,
+    config: {
+      displayName: 'nuvio-wiki-content',
+      systemInstruction: systemInstruction,
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: `Here is the complete Nuvio Wiki documentation:\n\n${wikiContent}` }]
+        }
+      ],
+      ttl: `${ttlSeconds}s`
+    }
+  });
+
+  const cacheData = {
+    name: cache.name,
+    displayName: cache.displayName || 'nuvio-wiki-content',
+    model: GEMINI_MODEL,
+    createdAt: new Date().toISOString(),
+    ttlSeconds,
+    expiresAt: new Date(Date.now() + ttlSeconds * 1000).toISOString(),
+    fileCount: files.length,
+    contentChars: charCount,
+    estimatedTokens
+  };
+
+  writeFileSync(CACHE_FILE, JSON.stringify(cacheData, null, 2));
+
+  console.log(`\n✅  Cache created successfully!`);
+  console.log(`   Name: ${cache.name}`);
+  console.log(`   Expires: ${cacheData.expiresAt}`);
+  console.log(`   Saved to: ${CACHE_FILE}\n`);
+
+  return cache.name;
+}
+
+// ── CLI entry point ─────────────────────────────────────────────────────
+
+async function main() {
+  if (!process.env.GEMINI_API_KEY) {
+    console.error('❌  GEMINI_API_KEY is not set. Copy .env.example to .env and add your key.');
+    process.exit(1);
+  }
+
+  // Parse --ttl flag
+  const ttlIndex = process.argv.indexOf('--ttl');
+  const ttlSeconds = ttlIndex !== -1 && process.argv[ttlIndex + 1]
+    ? parseInt(process.argv[ttlIndex + 1], 10)
+    : DEFAULT_TTL_SECONDS;
+
   try {
-    const cache = await ai.caches.create({
-      model: GEMINI_MODEL,
-      config: {
-        displayName: 'nuvio-wiki-content',
-        systemInstruction: systemInstruction,
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: `Here is the complete Nuvio Wiki documentation:\n\n${wikiContent}` }]
-          }
-        ],
-        ttl: `${ttlSeconds}s`
-      }
-    });
-
-    const cacheData = {
-      name: cache.name,
-      displayName: cache.displayName || 'nuvio-wiki-content',
-      model: GEMINI_MODEL,
-      createdAt: new Date().toISOString(),
-      ttlSeconds,
-      expiresAt: new Date(Date.now() + ttlSeconds * 1000).toISOString(),
-      fileCount: files.length,
-      contentChars: charCount,
-      estimatedTokens
-    };
-
-    writeFileSync(CACHE_FILE, JSON.stringify(cacheData, null, 2));
-
-    console.log(`\n✅  Cache created successfully!`);
-    console.log(`   Name: ${cache.name}`);
-    console.log(`   Expires: ${cacheData.expiresAt}`);
-    console.log(`   Saved to: ${CACHE_FILE}\n`);
+    await buildAndSaveCache(ttlSeconds);
   } catch (err) {
     console.error('\n❌  Failed to create cache:', err.message);
     if (err.message?.includes('too few tokens')) {
@@ -163,4 +187,9 @@ Rules:
   }
 }
 
-main();
+// Only run when executed directly (node refresh-cache.js / npm run refresh-cache).
+// When imported as a module by index.js, this block is skipped.
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
+if (isMain) {
+  main();
+}

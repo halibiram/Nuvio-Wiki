@@ -6,6 +6,7 @@ import { GoogleGenAI } from '@google/genai';
 import { readFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { buildAndSaveCache } from './refresh-cache.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,18 +24,71 @@ if (!process.env.GEMINI_API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// ── Helpers ─────────────────────────────────────────────────────────────
+// ── Cache state ──────────────────────────────────────────────────────────
 
-/** Read the cached-content name written by refresh-cache.js */
-function getCacheName() {
+/**
+ * In-progress rebuild promise (acts as a mutex).
+ * Set while a rebuild is running; null when idle.
+ * All concurrent requests that arrive during a rebuild await the same promise.
+ * @type {Promise<string> | null}
+ */
+let rebuildPromise = null;
+
+/** Read cache.json and return its parsed data, or null if missing/corrupt. */
+function readCacheData() {
   if (!existsSync(CACHE_FILE)) return null;
   try {
-    const data = JSON.parse(readFileSync(CACHE_FILE, 'utf-8'));
-    return data.name || null;
+    return JSON.parse(readFileSync(CACHE_FILE, 'utf-8'));
   } catch {
     return null;
   }
 }
+
+/** Returns true if the cache.json entry is present and not yet expired. */
+function isCacheValid(data) {
+  if (!data?.name || !data?.expiresAt) return false;
+  return new Date(data.expiresAt) > new Date();
+}
+
+/**
+ * Ensure a valid context cache exists.
+ *
+ * - If cache.json exists and `expiresAt` is in the future, return the name immediately.
+ * - Otherwise, trigger a rebuild (or join an in-progress one) and return the new name.
+ *
+ * All concurrent callers awaiting a rebuild share the same promise so Gemini
+ * is only hit once.
+ *
+ * @returns {Promise<string | null>} Cache name, or null if rebuild fails.
+ */
+async function ensureCache() {
+  const data = readCacheData();
+
+  if (isCacheValid(data)) {
+    return data.name;
+  }
+
+  // Cache is missing or expired — rebuild (or join an in-progress rebuild).
+  if (!rebuildPromise) {
+    console.log('⚠️   Cache expired or missing — triggering lazy rebuild...');
+    rebuildPromise = buildAndSaveCache()
+      .finally(() => {
+        rebuildPromise = null;
+      });
+  } else {
+    console.log('⏳  Rebuild already in progress — queuing behind it...');
+  }
+
+  try {
+    const newCacheName = await rebuildPromise;
+    return newCacheName;
+  } catch (err) {
+    console.error('❌  Lazy cache rebuild failed:', err.message);
+    return null;
+  }
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────────
 
 /** System prompt used when there is NO cache (fallback) */
 const FALLBACK_SYSTEM = `You are the Nuvio Wiki Assistant. You help users with questions about Nuvio.
@@ -88,12 +142,15 @@ const perHour = rateLimit({
 // ── Routes ──────────────────────────────────────────────────────────────
 
 app.get('/api/ai/health', (_req, res) => {
-  const cacheName = getCacheName();
+  const data = readCacheData();
+  const cacheValid = isCacheValid(data);
   res.json({
     status: 'ok',
     model: GEMINI_MODEL,
-    cacheLoaded: !!cacheName,
-    cacheName: cacheName || null
+    cacheLoaded: cacheValid,
+    cacheName: cacheValid ? data.name : null,
+    rebuilding: rebuildPromise !== null,
+    cacheExpiresAt: data?.expiresAt || null
   });
 });
 
@@ -125,7 +182,9 @@ app.post('/api/ai/chat', perMinute, perHour, async (req, res) => {
       return res.status(400).json({ error: 'Conversation too long. Please start a new chat.' });
     }
 
-    const cacheName = getCacheName();
+    // Ensure we have a valid cache, rebuilding lazily if needed.
+    // This may take some time if a rebuild is triggered — the user waits silently.
+    const cacheName = await ensureCache();
 
     // Build the request config — NO web search tools
     const config = {
@@ -136,7 +195,7 @@ app.post('/api/ai/chat', perMinute, perHour, async (req, res) => {
     if (cacheName) {
       config.cachedContent = cacheName;
     } else {
-      // No cache — use fallback system prompt
+      // Rebuild failed — use fallback system prompt
       config.systemInstruction = FALLBACK_SYSTEM;
     }
 
@@ -188,14 +247,16 @@ app.post('/api/ai/chat', perMinute, perHour, async (req, res) => {
 
 // ── Start ───────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  const cacheName = getCacheName();
+  const data = readCacheData();
+  const cacheValid = isCacheValid(data);
   console.log(`\n🤖  Nuvio Wiki AI server running on http://localhost:${PORT}`);
   console.log(`📦  Model: ${GEMINI_MODEL}`);
   console.log(`🔗  CORS origin: ${ALLOWED_ORIGIN}`);
-  if (cacheName) {
-    console.log(`✅  Context cache loaded: ${cacheName}`);
+  if (cacheValid) {
+    console.log(`✅  Context cache loaded: ${data.name}`);
+    console.log(`⏰  Cache expires: ${data.expiresAt}`);
   } else {
-    console.log(`⚠️   No context cache found. Run: npm run refresh-cache`);
+    console.log(`⚠️   No valid context cache found — will rebuild lazily on first request.`);
   }
   console.log('');
 });
