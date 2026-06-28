@@ -23,14 +23,16 @@ import {
   writeFileSync
 } from 'fs';
 import { createHash } from 'crypto';
-import { dirname, extname, join } from 'path';
+import { dirname, extname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export const DOCS_DIR = join(__dirname, '..', 'docs');
-export const FILE_SEARCH_DATA_FILE = join(__dirname, 'file-search.json');
+export const FILE_SEARCH_DATA_FILE = process.env.FILE_SEARCH_DATA_FILE
+  ? resolve(process.env.FILE_SEARCH_DATA_FILE)
+  : join(__dirname, 'file-search.json');
 export const EMBEDDING_MODEL = 'models/gemini-embedding-001';
 export const DEFAULT_CHECK_INTERVAL_SECONDS = 48 * 3600;
 

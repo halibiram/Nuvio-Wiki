@@ -16,6 +16,14 @@ The server also checks lazily on the first request after 48 hours. It hashes the
 English wiki and only re-indexes when content changed. New stores are fully
 indexed before the server switches to them; the replaced store is then deleted.
 
+When the service runs as a non-root account, keep mutable metadata outside the
+repository in a directory owned by that account:
+
+```env
+FILE_SEARCH_DATA_FILE=/var/lib/nuvio-ai/file-search.json
+CACHE_DATA_FILE=/var/lib/nuvio-ai/cache.json
+```
+
 ## Roll back to explicit context caching
 
 The previous cache implementation remains intact. Set this environment variable

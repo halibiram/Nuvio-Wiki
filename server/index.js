@@ -5,7 +5,7 @@ import rateLimit from 'express-rate-limit';
 import { GoogleGenAI } from '@google/genai';
 import { readFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 import { buildAndSaveCache } from './refresh-cache.js';
 import {
   buildAndSaveFileSearchStore,
@@ -21,7 +21,9 @@ const PORT = process.env.PORT || 3001;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'http://localhost:5173';
 const GEMINI_MODEL = 'gemini-3.1-flash-lite';
 const KNOWLEDGE_MODE = (process.env.KNOWLEDGE_MODE || 'file-search').trim().toLowerCase();
-const CACHE_FILE = join(__dirname, 'cache.json');
+const CACHE_FILE = process.env.CACHE_DATA_FILE
+  ? resolve(process.env.CACHE_DATA_FILE)
+  : join(__dirname, 'cache.json');
 
 if (!['file-search', 'cache'].includes(KNOWLEDGE_MODE)) {
   console.error('❌  KNOWLEDGE_MODE must be either "file-search" or "cache".');

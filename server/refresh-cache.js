@@ -19,14 +19,16 @@ import { GoogleGenAI } from '@google/genai';
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join, extname } from 'path';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, resolve } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export const GEMINI_MODEL = 'gemini-3.1-flash-lite';
 export const DOCS_DIR = join(__dirname, '..', 'docs');
-export const CACHE_FILE = join(__dirname, 'cache.json');
+export const CACHE_FILE = process.env.CACHE_DATA_FILE
+  ? resolve(process.env.CACHE_DATA_FILE)
+  : join(__dirname, 'cache.json');
 
 const DEFAULT_TTL_SECONDS = 48 * 3600; // 48 hours
 
