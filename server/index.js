@@ -7,6 +7,11 @@ import { readFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { buildAndSaveCache } from './refresh-cache.js';
+import {
+  buildAndSaveFileSearchStore,
+  isFileSearchDataFresh,
+  readFileSearchData
+} from './refresh-file-search.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,7 +20,13 @@ const __dirname = dirname(__filename);
 const PORT = process.env.PORT || 3001;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'http://localhost:5173';
 const GEMINI_MODEL = 'gemini-3.1-flash-lite';
+const KNOWLEDGE_MODE = (process.env.KNOWLEDGE_MODE || 'file-search').trim().toLowerCase();
 const CACHE_FILE = join(__dirname, 'cache.json');
+
+if (!['file-search', 'cache'].includes(KNOWLEDGE_MODE)) {
+  console.error('❌  KNOWLEDGE_MODE must be either "file-search" or "cache".');
+  process.exit(1);
+}
 
 if (!process.env.GEMINI_API_KEY) {
   console.error('❌  GEMINI_API_KEY is not set. Copy .env.example to .env and add your key.');
@@ -88,6 +99,45 @@ async function ensureCache() {
   }
 }
 
+/**
+ * Ensure a usable File Search store exists. A stale store remains available if
+ * its scheduled content check fails, which is safer than dropping all context.
+ *
+ * @returns {Promise<string | null>} File Search store name, or null on failure.
+ */
+async function ensureFileSearchStore() {
+  const data = readFileSearchData();
+
+  if (isFileSearchDataFresh(data)) {
+    return data.storeName;
+  }
+
+  if (!rebuildPromise) {
+    console.log('⚠️   File Search store missing or due for a content check...');
+    rebuildPromise = buildAndSaveFileSearchStore()
+      .finally(() => {
+        rebuildPromise = null;
+      });
+  } else {
+    console.log('⏳  Knowledge refresh already in progress — queuing behind it...');
+  }
+
+  try {
+    return await rebuildPromise;
+  } catch (err) {
+    console.error('❌  File Search refresh failed:', err.message);
+    if (data?.storeName) {
+      console.warn('⚠️   Continuing with the previous File Search store.');
+      return data.storeName;
+    }
+    return null;
+  }
+}
+
+function ensureKnowledge() {
+  return KNOWLEDGE_MODE === 'cache' ? ensureCache() : ensureFileSearchStore();
+}
+
 // ── Helpers ─────────────────────────────────────────────────────────────
 
 /** System prompt used when there is NO cache (fallback) */
@@ -107,7 +157,8 @@ Rules:
 5. If the wiki doesn't cover a topic, say so honestly and suggest checking the Discord community.
 6. Never make up features or information not present in the wiki content.
 7. Format your responses in markdown. Use **bold**, bullet points, and code blocks where appropriate.
-8. When listing steps, use numbered lists for clarity.`;
+8. When listing steps, use numbered lists for clarity.
+9. Every retrieved document identifies its WIKI PAGE route. Use that exact route for internal markdown links.`;
 
 // ── Express app ─────────────────────────────────────────────────────────
 const app = express();
@@ -142,15 +193,25 @@ const perHour = rateLimit({
 // ── Routes ──────────────────────────────────────────────────────────────
 
 app.get('/api/ai/health', (_req, res) => {
-  const data = readCacheData();
-  const cacheValid = isCacheValid(data);
+  const cacheData = readCacheData();
+  const fileSearchData = readFileSearchData();
+  const cacheValid = isCacheValid(cacheData);
+  const fileSearchLoaded = Boolean(fileSearchData?.storeName);
+  const knowledgeLoaded = KNOWLEDGE_MODE === 'cache' ? cacheValid : fileSearchLoaded;
+
   res.json({
     status: 'ok',
     model: GEMINI_MODEL,
-    cacheLoaded: cacheValid,
-    cacheName: cacheValid ? data.name : null,
+    knowledgeMode: KNOWLEDGE_MODE,
+    knowledgeLoaded,
     rebuilding: rebuildPromise !== null,
-    cacheExpiresAt: data?.expiresAt || null
+    fileSearchStoreName: KNOWLEDGE_MODE === 'file-search' && fileSearchLoaded
+      ? fileSearchData.storeName
+      : null,
+    fileSearchNextCheckAt: fileSearchData?.nextCheckAt || null,
+    cacheLoaded: KNOWLEDGE_MODE === 'cache' && cacheValid,
+    cacheName: KNOWLEDGE_MODE === 'cache' && cacheValid ? cacheData.name : null,
+    cacheExpiresAt: cacheData?.expiresAt || null
   });
 });
 
@@ -182,20 +243,27 @@ app.post('/api/ai/chat', perMinute, perHour, async (req, res) => {
       return res.status(400).json({ error: 'Conversation too long. Please start a new chat.' });
     }
 
-    // Ensure we have a valid cache, rebuilding lazily if needed.
-    // This may take some time if a rebuild is triggered — the user waits silently.
-    const cacheName = await ensureCache();
+    // Ensure the configured knowledge backend is available. A first-time File
+    // Search build can take a little while; concurrent callers share one build.
+    const knowledgeName = await ensureKnowledge();
 
-    // Build the request config — NO web search tools
+    // Build the request config. Only the private File Search store is enabled;
+    // Google Search and every other external tool remain disabled.
     const config = {
-      // Explicitly disable all tools / grounding to prevent web search
       tools: [],
     };
 
-    if (cacheName) {
-      config.cachedContent = cacheName;
+    if (knowledgeName && KNOWLEDGE_MODE === 'file-search') {
+      config.systemInstruction = WIKI_SYSTEM;
+      config.tools = [{
+        fileSearch: {
+          fileSearchStoreNames: [knowledgeName]
+        }
+      }];
+    } else if (knowledgeName && KNOWLEDGE_MODE === 'cache') {
+      config.cachedContent = knowledgeName;
     } else {
-      // Rebuild failed — use fallback system prompt
+      // Knowledge setup failed — be explicit instead of hallucinating.
       config.systemInstruction = FALLBACK_SYSTEM;
     }
 
@@ -247,16 +315,24 @@ app.post('/api/ai/chat', perMinute, perHour, async (req, res) => {
 
 // ── Start ───────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  const data = readCacheData();
-  const cacheValid = isCacheValid(data);
+  const cacheData = readCacheData();
+  const fileSearchData = readFileSearchData();
+  const cacheValid = isCacheValid(cacheData);
   console.log(`\n🤖  Nuvio Wiki AI server running on http://localhost:${PORT}`);
   console.log(`📦  Model: ${GEMINI_MODEL}`);
+  console.log(`🧠  Knowledge mode: ${KNOWLEDGE_MODE}`);
   console.log(`🔗  CORS origin: ${ALLOWED_ORIGIN}`);
-  if (cacheValid) {
-    console.log(`✅  Context cache loaded: ${data.name}`);
-    console.log(`⏰  Cache expires: ${data.expiresAt}`);
+
+  if (KNOWLEDGE_MODE === 'file-search' && fileSearchData?.storeName) {
+    console.log(`✅  File Search store loaded: ${fileSearchData.storeName}`);
+    console.log(`⏰  Next content check: ${fileSearchData.nextCheckAt}`);
+  } else if (KNOWLEDGE_MODE === 'file-search') {
+    console.log('⚠️   No File Search store found — will build lazily on first request.');
+  } else if (cacheValid) {
+    console.log(`✅  Context cache loaded: ${cacheData.name}`);
+    console.log(`⏰  Cache expires: ${cacheData.expiresAt}`);
   } else {
-    console.log(`⚠️   No valid context cache found — will rebuild lazily on first request.`);
+    console.log('⚠️   No valid context cache found — will rebuild lazily on first request.');
   }
   console.log('');
 });

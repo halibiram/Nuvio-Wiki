@@ -7,4 +7,6 @@ docs/.vitepress/dist/
 # AI server
 server/.env
 server/cache.json
+server/file-search.json
+server/file-search.json.tmp
 server/node_modules/
