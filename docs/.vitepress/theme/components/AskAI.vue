@@ -48,7 +48,7 @@
       </header>
 
       <!-- Chat messages area -->
-      <div class="ask-ai-messages" ref="messagesContainer">
+      <div class="ask-ai-messages" ref="messagesContainer" @click="onMessageClick">
         <!-- Welcome message when empty -->
         <div v-if="messages.length === 0 && !isStreaming" class="ask-ai-welcome">
           <div class="ask-ai-welcome__icon">
@@ -120,6 +120,7 @@
 
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vitepress'
 
 // ── State ────────────────────────────────────────────────────────────────
 const isOpen = ref(false)
@@ -130,6 +131,7 @@ const streamingContent = ref('')
 const errorMsg = ref('')
 const messagesContainer = ref(null)
 const inputEl = ref(null)
+const router = useRouter()
 
 // ── Panel open/close ─────────────────────────────────────────────────────
 function open() {
@@ -139,6 +141,27 @@ function open() {
 
 function close() {
   isOpen.value = false
+}
+
+function onMessageClick(event) {
+  const link = event.target instanceof Element
+    ? event.target.closest('a.ask-ai-link')
+    : null
+
+  if (!link) return
+
+  const href = link.getAttribute('href')
+  if (href) {
+    const url = new URL(href, window.location.href)
+    if (url.origin === window.location.origin) {
+      event.preventDefault()
+      close()
+      router.go(`${url.pathname}${url.search}${url.hash}`)
+      return
+    }
+  }
+
+  close()
 }
 
 function clearChat() {
