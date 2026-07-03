@@ -9,7 +9,7 @@ export const siteRoutes = {
   androidMobile: '/installation/android-mobile',
   ios: '/installation/ios',
   webos: '/installation/webos',
-  addons: '/addons/',
+  addons: '/integrations/addons',
   settings: '/settings/',
   player: '/settings/player',
   profiles: '/settings/profiles',
@@ -28,5 +28,7 @@ export type SiteRoute = (typeof siteRoutes)[keyof typeof siteRoutes]
 
 // Keep old public URLs working when a document is renamed or moved.
 export const legacyRouteRedirects = {
+  '/addons': siteRoutes.addons,
+  '/nl/addons': '/nl/integrations/addons',
   '/integrations/imdb-mdblist-trakt': siteRoutes.metadataTracking
-} satisfies Record<string, SiteRoute>
+} satisfies Record<string, string>

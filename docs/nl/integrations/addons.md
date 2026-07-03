@@ -15,7 +15,7 @@ Er zijn 3 hoofdtypen addons voor Nuvio:
   - **Metadata Providers:** Verbeteren de gebruikersinterface met posters, beoordelingen en samenvattingen.
   - **Utility Addons:** Bieden extra features zoals ondertiteling of afspeelsynchronisatie.
 
-[Terug naar boven](#addons guide)
+[Terug naar boven](#addons-guide)
 
 ## Hoe voeg je een addon toe
 
@@ -23,7 +23,7 @@ Om een addon toe te voegen, heb je meestal een manifest-URL nodig die je van de 
 - Deze wordt gegenereerd bij het configureren van de addon.
 - Het gegenereerde manifest plak je in het tabblad addons van Nuvio.
 
-[Terug naar boven](#addons guide)
+[Terug naar boven](#addons-guide)
 
 ---
 
@@ -55,10 +55,10 @@ Als je een Comet-instantie, Torrentio of een soortgelijke scraper native draait 
 3. Controleer of de modus van de addon is ingesteld op het uitvoeren van ruwe P2P-links (dit is soms gelabeld als "P2P" of is simpelweg de standaardstatus wanneer er geen debrid-inloggegevens aanwezig zijn).
 4. Installeer de resulterende sleutelloze addon-URL in Nuvio.
 
-Zodra een werkende P2P-addon is geïnstalleerd, zal het selecteren van een titel ervoor zorgen dat de addon P2P-swarms zoekt, en Nuvio verwerkt deze ruwe hashes vervolgens automatisch via je gekoppelde TorBox- of Premiumize-account om veilig te streamen.
+Once a working P2P addon is installed, selecting a title causes the addon to find P2P swarms, and Nuvio automatically wraps those raw hashes through your linked Torbox or Premiumize account to stream securely.
 
 > [!NOTE]
 > **Advies over beschikbaarheid van P2P:** 
 > Niet all instanties of addons bieden toegang tot P2P. Veel openbare gehoste instanties blokkeren P2P-scraping expliciet (inclusief de officiële openbare ElfHosted-instantie van AIOStreams). Zorg ervoor dat de AIOStreams- of Comet-instantie die je gebruikt P2P-verbindingen toestaat, zodat Nuvio de benodigde hashes ontvangt.
 
-[Terug naar boven](#addons guide)
+[Terug naar boven](#addons-guide)

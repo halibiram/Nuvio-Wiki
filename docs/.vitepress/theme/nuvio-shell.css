@@ -1,0 +1,554 @@
+:root {
+  --nuvio-sidebar-width: 268px;
+  --nuvio-sidebar-surface: #f1f1f1;
+  --nuvio-sidebar-border: rgba(0, 0, 0, 0.08);
+  --nuvio-sidebar-muted: #6f747d;
+  --nuvio-sidebar-foreground: #1b1d21;
+  --nuvio-sidebar-hover: rgba(107, 22, 237, 0.05);
+  --nuvio-sidebar-active: color-mix(in srgb, var(--vp-c-brand-1) 11%, transparent);
+  --nuvio-sidebar-active-text: var(--vp-c-brand-1);
+  --nuvio-sidebar-duration: 250ms;
+  --nuvio-footer-bg: #e4e4e7;
+  --nuvio-theme-active-bg: var(--nuvio-sidebar-active);
+  --nuvio-theme-active-color: var(--nuvio-sidebar-active-text);
+}
+
+.dark {
+  --nuvio-sidebar-surface: #191919;
+  --nuvio-sidebar-border: rgba(102, 102, 102, 0.2);
+  --nuvio-sidebar-muted: #b8b8b8;
+  --nuvio-sidebar-foreground: #ebebeb;
+  --nuvio-sidebar-hover: rgba(192, 132, 252, 0.12);
+  --nuvio-sidebar-active: color-mix(in srgb, var(--vp-c-brand-1) 12%, transparent);
+  --nuvio-sidebar-active-text: color-mix(in srgb, var(--vp-c-brand-1) 82%, white);
+  --nuvio-footer-bg: #222222;
+  --nuvio-theme-active-bg: rgba(192, 132, 252, 0.22);
+  --nuvio-theme-active-color: rgb(251, 247, 255);
+}
+
+.nuvio-sidebar,
+.nuvio-sidebar * {
+  box-sizing: border-box;
+}
+
+.nuvio-sidebar {
+  position: fixed;
+  z-index: 60;
+  inset: 0 auto 0 0;
+  display: flex;
+  width: var(--nuvio-sidebar-width);
+  flex-direction: column;
+  border-right: 1px solid var(--nuvio-sidebar-border);
+  background: var(--nuvio-sidebar-surface);
+  color: var(--nuvio-sidebar-foreground);
+  font-size: 14px;
+  transition:
+    transform var(--nuvio-sidebar-duration) ease,
+    inset var(--nuvio-sidebar-duration) ease,
+    border-radius var(--nuvio-sidebar-duration) ease,
+    box-shadow var(--nuvio-sidebar-duration) ease;
+}
+
+.nuvio-sidebar__header {
+  display: flex;
+  flex: 0 0 101px;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 8px;
+}
+
+.nuvio-sidebar__brand-row {
+  display: flex;
+  height: 30px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nuvio-sidebar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--nuvio-sidebar-foreground);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 30px;
+  text-decoration: none;
+}
+
+.nuvio-sidebar__brand:hover {
+  color: var(--nuvio-sidebar-foreground);
+}
+
+.nuvio-sidebar__brand img {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.nuvio-icon-button {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  padding: 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--nuvio-sidebar-muted);
+  cursor: pointer;
+  place-items: center;
+  transition: color 100ms ease, background 100ms ease;
+}
+
+.nuvio-icon-button:hover {
+  background: var(--nuvio-sidebar-hover);
+  color: var(--nuvio-sidebar-foreground);
+}
+
+.nuvio-icon-button svg,
+.nuvio-sidebar__collapse svg,
+.nuvio-sidebar__rail svg,
+.nuvio-sidebar__theme svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.nuvio-icon-button svg.is-filled {
+  fill: currentColor;
+  stroke: none;
+}
+
+.nuvio-sidebar__search {
+  display: flex;
+  width: 100%;
+  height: 35px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 8px;
+  border: 1px solid var(--nuvio-sidebar-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--nuvio-sidebar-foreground) 4%, transparent);
+  color: var(--nuvio-sidebar-muted);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: background 100ms ease, color 100ms ease;
+}
+
+.nuvio-sidebar__search:hover {
+  background: var(--nuvio-sidebar-hover);
+  color: var(--nuvio-sidebar-foreground);
+}
+
+.nuvio-sidebar__ask-ai-button {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 20%, var(--nuvio-sidebar-border));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--vp-c-brand-1) 5%, transparent);
+  color: var(--vp-c-brand-1);
+  font: inherit;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: left;
+  cursor: pointer;
+  height: 36px;
+  margin-bottom: 18px;
+  padding: 8px;
+  transition: color 100ms ease, background 100ms ease, border-color 100ms ease;
+}
+
+.nuvio-sidebar__ask-ai-button:hover {
+  background: color-mix(in srgb, var(--vp-c-brand-1) 12%, transparent);
+  border-color: var(--vp-c-brand-1);
+}
+
+.nuvio-sidebar__ask-ai-button svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.nuvio-sidebar__ask-ai-button span {
+  flex: 1;
+}
+
+.nuvio-sidebar__search > svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+}
+
+.nuvio-sidebar__search > span {
+  flex: 1;
+}
+
+.nuvio-sidebar__search kbd {
+  min-width: 20px;
+  height: 21px;
+  padding: 0 5px;
+  border: 0;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--nuvio-sidebar-foreground) 7%, transparent);
+  box-shadow: none;
+  color: var(--nuvio-sidebar-foreground);
+  font-family: var(--vp-font-family-base);
+  font-size: 11px;
+  line-height: 21px;
+  text-align: center;
+}
+
+.nuvio-sidebar__search kbd + kbd {
+  margin-left: -6px;
+}
+
+.nuvio-sidebar__nav {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 16px;
+  mask-image: linear-gradient(to bottom, transparent, #000 12px, #000 calc(100% - 12px), transparent);
+  scrollbar-width: none;
+}
+
+.nuvio-sidebar__nav::-webkit-scrollbar {
+  display: none;
+}
+
+.nuvio-sidebar__product-link,
+.nuvio-sidebar__section-trigger,
+.nuvio-sidebar__link {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--nuvio-sidebar-muted);
+  font: inherit;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+  text-decoration: none;
+  transition: color 100ms ease, background 100ms ease;
+}
+
+.nuvio-sidebar__product-link:hover,
+.nuvio-sidebar__section-trigger:hover,
+.nuvio-sidebar__link:hover {
+  background: var(--nuvio-sidebar-hover);
+  color: color-mix(in srgb, var(--nuvio-sidebar-foreground) 84%, transparent);
+}
+
+.nuvio-sidebar__product-link {
+  height: 36px;
+  margin-bottom: 18px;
+  padding: 8px;
+}
+
+.nuvio-sidebar__product-link svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.nuvio-sidebar__section + .nuvio-sidebar__section {
+  margin-top: 8px;
+}
+
+.nuvio-sidebar__section-trigger {
+  height: 36px;
+  padding: 8px;
+  color: var(--nuvio-sidebar-foreground);
+  cursor: pointer;
+}
+
+.nuvio-sidebar__section-trigger > span {
+  overflow: hidden;
+  flex: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nuvio-sidebar__section-trigger > svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  transition: transform 150ms ease;
+}
+
+.nuvio-sidebar__section-trigger > svg.is-open {
+  transform: rotate(180deg);
+}
+
+.nuvio-sidebar__section-trigger.is-active {
+  background: var(--nuvio-sidebar-active);
+  color: var(--nuvio-sidebar-active-text);
+}
+
+a.nuvio-sidebar__section-trigger {
+  padding-left: 20px;
+}
+
+.nuvio-sidebar__section-items {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 2px;
+}
+
+.nuvio-sidebar__section-items::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto 0 10px;
+  width: 1px;
+  background: var(--nuvio-sidebar-border);
+  content: '';
+}
+
+.nuvio-sidebar__link {
+  min-height: 36px;
+  padding: 8px 8px 8px 20px;
+  overflow-wrap: anywhere;
+}
+
+.nuvio-sidebar__link--nested {
+  padding-left: 32px;
+}
+
+.nuvio-sidebar__link.is-active {
+  background: var(--nuvio-sidebar-active);
+  color: var(--nuvio-sidebar-active-text);
+}
+
+.nuvio-sidebar__link.is-active::before,
+.nuvio-sidebar__section-trigger.is-active::before {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: var(--nuvio-sidebar-active-text);
+  content: '';
+}
+
+.nuvio-sidebar__subheading {
+  min-height: 36px;
+  margin: 0;
+  padding: 8px 8px 8px 20px;
+  color: var(--nuvio-sidebar-foreground);
+  line-height: 20px;
+}
+
+.nuvio-sidebar__footer {
+  display: flex;
+  height: 36px;
+  align-items: center;
+  border: 1px solid var(--nuvio-sidebar-border);
+  border-radius: 8px;
+  background: var(--nuvio-footer-bg);
+  padding: 3px;
+  margin: 8px 16px 16px;
+  flex-shrink: 0;
+}
+
+.nuvio-sidebar__socials {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 4px;
+}
+
+.nuvio-sidebar__social-link {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+  border-radius: 6px;
+  color: var(--nuvio-sidebar-muted);
+  cursor: pointer;
+  place-items: center;
+  transition: color 100ms ease, background-color 100ms ease;
+}
+
+.nuvio-sidebar__social-link:hover {
+  background-color: var(--nuvio-sidebar-hover);
+  color: var(--nuvio-sidebar-foreground);
+}
+
+.nuvio-sidebar__social-link svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  stroke: none;
+}
+
+.nuvio-sidebar__theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 30px;
+  margin-left: auto;
+  padding: 0 2px 0 6px;
+  border: 0;
+  border-left: 1px solid var(--nuvio-sidebar-border);
+  background: transparent;
+  cursor: pointer;
+}
+
+.nuvio-sidebar__theme-icon {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  border-radius: 6px;
+  color: var(--nuvio-sidebar-muted);
+  place-items: center;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.nuvio-sidebar__theme-icon:hover {
+  color: var(--nuvio-sidebar-foreground);
+}
+
+.nuvio-sidebar__theme-icon.is-active {
+  background-color: var(--nuvio-theme-active-bg);
+  color: var(--nuvio-theme-active-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.nuvio-sidebar__rail,
+.nuvio-sidebar__edge {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-nav-height: 0px;
+    --vp-sidebar-width: var(--nuvio-sidebar-width);
+  }
+
+  .VPNav,
+  .VPSidebar {
+    display: none !important;
+  }
+
+  .VPContent,
+  .VPContent.has-sidebar {
+    padding-top: 0 !important;
+    padding-left: var(--nuvio-sidebar-width) !important;
+    transition: padding-left var(--nuvio-sidebar-duration) ease;
+  }
+
+  .VPDoc {
+    padding-top: 56px !important;
+  }
+
+  .VPDoc > .container > .content {
+    padding: 0 12px 128px 0 !important;
+  }
+
+  .VPDoc > .container > .aside {
+    padding-left: 20px !important;
+  }
+
+  .VPHome {
+    padding-top: 0 !important;
+  }
+
+  html.nuvio-sidebar-collapsed .nuvio-sidebar {
+    transform: translateX(-100%);
+  }
+
+  html.nuvio-sidebar-collapsed .VPContent,
+  html.nuvio-sidebar-collapsed .VPContent.has-sidebar {
+    padding-left: 0 !important;
+  }
+
+  html.nuvio-sidebar-collapsed:not(.nuvio-sidebar-hovered) .nuvio-sidebar__edge {
+    position: fixed;
+    z-index: 61;
+    inset: 0 auto 0 0;
+    display: block;
+    width: 16px;
+  }
+
+  html.nuvio-sidebar-collapsed:not(.nuvio-sidebar-hovered) .nuvio-sidebar__rail {
+    position: fixed;
+    z-index: 62;
+    top: 16px;
+    left: 16px;
+    display: flex;
+    gap: 2px;
+    width: 98px;
+    height: 36px;
+    padding: 2px;
+    border: 1px solid var(--nuvio-sidebar-border);
+    border-radius: 8px;
+    background: var(--nuvio-sidebar-surface);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+    color: var(--nuvio-sidebar-muted);
+  }
+
+  html.nuvio-sidebar-collapsed:not(.nuvio-sidebar-hovered) .nuvio-sidebar__rail .nuvio-sidebar__rail-ask-ai {
+    color: var(--vp-c-brand-1);
+  }
+
+  html.nuvio-sidebar-collapsed:not(.nuvio-sidebar-hovered) .nuvio-sidebar__rail .nuvio-sidebar__rail-ask-ai:hover {
+    background: color-mix(in srgb, var(--vp-c-brand-1) 12%, transparent);
+  }
+
+  html.nuvio-sidebar-collapsed.nuvio-sidebar-hovered .nuvio-sidebar {
+    inset: 8px auto 8px 8px;
+    border: 1px solid var(--nuvio-sidebar-border);
+    border-radius: 12px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 959.98px) {
+  .nuvio-sidebar,
+  .nuvio-sidebar__rail,
+  .nuvio-sidebar__edge {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nuvio-sidebar,
+  .VPContent {
+    transition: none !important;
+  }
+}

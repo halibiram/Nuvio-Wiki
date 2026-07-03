@@ -64,16 +64,21 @@ function cleanSidebarLinks(items: any[] | undefined) {
       item.text = item.text.replace(/\[[^\]]*\]/g, '').trim()
     }
     if (item.link) {
-      if (item.link.endsWith('/index.md')) {
-        item.link = item.link.slice(0, -'/index.md'.length)
-      } else if (item.link.endsWith('.md')) {
-        item.link = item.link.slice(0, -3)
-      } else if (item.link === 'index.md') {
-        item.link = '/'
+      let link = item.link
+      if (!link.startsWith('/')) {
+        link = '/' + link
       }
-      if (item.link.endsWith('/') && item.link.length > 1) {
-        item.link = item.link.slice(0, -1)
+      if (link.endsWith('/index.md')) {
+        link = link.slice(0, -'/index.md'.length)
+      } else if (link.endsWith('.md')) {
+        link = link.slice(0, -3)
+      } else if (link === 'index.md' || link === '/index.md') {
+        link = '/'
       }
+      if (link.endsWith('/') && link.length > 1) {
+        link = link.slice(0, -1)
+      }
+      item.link = link
     }
     if (item.items) {
       cleanSidebarLinks(item.items)
@@ -105,7 +110,6 @@ function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
       'features.md',
       'quick-start.md',
       'installation',
-      'addons',
       'integrations',
       'settings',
       'glossary.md',
@@ -116,6 +120,7 @@ function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
       'android-mobile.md',
       'ios.md',
       'webos.md',
+      'addons.md',
       'debrid.md',
       'tmdb-mdblist-trakt.md',
       'trakt.md',
@@ -173,7 +178,7 @@ export default defineConfig({
     await writeLegacyRedirects(siteConfig.outDir, base)
   },
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}favicon.svg` }],
+    ['link', { rel: 'icon', type: 'image/png', href: `${base}logo.png` }],
     ['script', { type: 'module', src: `${base}sidebar-scroll.js?v=20260617e` }],
     ['meta', { name: 'theme-color', content: '#0877f9' }],
     ['meta', { property: 'og:title', content: 'Nuvio Wiki' }],
@@ -185,8 +190,8 @@ export default defineConfig({
     i18nRouting: false,
     langMenuLabel: 'Change language',
     logo: {
-      light: '/logo.svg',
-      dark: '/logo.svg',
+      light: '/logo.png',
+      dark: '/logo.png',
       alt: 'Nuvio Wiki'
     },
     siteTitle: 'Nuvio Wiki',
@@ -253,6 +258,9 @@ export default defineConfig({
 
   markdown: {
     lineNumbers: true,
+    headers: {
+      level: [2, 3]
+    },
     config(md) {
       mermaidDiagrams(md)
       platformBadges(md)

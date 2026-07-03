@@ -47,7 +47,7 @@ function backToTop() {
       <div class="site-footer__grid">
         <section class="site-footer__brand" aria-labelledby="footer-brand-title">
           <a class="site-footer__wordmark" :href="withBase(siteRoutes.home)">
-            <img :src="withBase('/logo.svg')" alt="" width="38" height="38" />
+            <img :src="withBase('/logo.png')" alt="" width="38" height="38" />
             <span id="footer-brand-title">Nuvio <small>Wiki</small></span>
           </a>
           <p>

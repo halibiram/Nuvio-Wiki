@@ -1,6 +1,7 @@
 <template>
   <!-- Floating trigger button -->
   <button
+    v-if="!hideFab"
     class="ask-ai-fab"
     :class="{ 'ask-ai-fab--hidden': isOpen }"
     @click="open"
@@ -121,6 +122,13 @@
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vitepress'
+
+defineProps({
+  hideFab: {
+    type: Boolean,
+    default: false
+  }
+})
 
 // ── State ────────────────────────────────────────────────────────────────
 const isOpen = ref(false)
@@ -423,6 +431,11 @@ function renderMarkdown(text) {
 
   return assembledHtml
 }
+
+defineExpose({
+  open,
+  close
+})
 </script>
 
 <style scoped>
