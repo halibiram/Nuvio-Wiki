@@ -73,6 +73,9 @@ There's no in-app plugin store in the app-store sense — a plugin repository is
 
 ## Installing a Plugin
 
+### Finding Plugins
+The best way to find plugins is joining the Nuvio streams discord.
+
 ### Prerequisites
 
 - Nuvio installed and updated to a current release
@@ -102,8 +105,4 @@ This is the easier path for typing or pasting a long URL.
 - Open any title and check its source list — a working provider shows up by name alongside your addon sources.
 - In Settings, the repository should show as enabled with a recent fetch/update timestamp rather than an error state.
 - If no providers appear after adding a repository, re-check that you enabled at least one provider inside it — the repository and its providers are toggled separately.
-
-### Finding Plugins
-
-The best way to find plugins is [joining the Nuvio streams discord](https://discord.gg/7C994hfSy).
 
