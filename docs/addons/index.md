@@ -93,7 +93,7 @@ AIOStreams is the most popular "super-addon" — it aggregates results from mult
   - [Wizaarrd's Instance](https://aiostreams.forthewizards.uk/configure)
   - [Kuu's Instance](https://aiostreams.stremio.ru/configure)
   - [Midnight's Instance](https://aiostreamsfortheweebsstable.midnightignite.me/configure)
-  - [ElfHosted](https://aiostreams.elfhosted.com/configure) - ElfHosted **Disables P2P and HTTP streams**.
+  - [ElfHosted](https://aiostreams.elfhosted.com/configure) - ElfHosted **Disables P2P**.
 
 > [!TIP]
 > Many users use pre-made configuration templates (like the **Tamtaro / TAMS** templates) to quickly set up filtering, sorting, and scraper selection within their chosen AIOStreams instance. You can typically import these from the configuration page.
