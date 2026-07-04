@@ -3,7 +3,7 @@
 Nuvio relies on two independent systems to find something for you to watch: add-ons and plugins. They solve overlapping problems — both can hand Nuvio a stream link for a title — but they're built differently, run in different places, and come from different ecosystems. This guide covers what a plugin actually is, how Nuvio loads and runs one, where people find them, and how to install one yourself.
 
 > [!NOTE]
-> This guide describes Nuvio's current Kotlin Multiplatform build. The plugin system was rewritten alongside that migration, replacing the runtime used by the earlier React Native app. If you run into a plugin repository that won't load, see [Troubleshooting](#troubleshooting) before assuming your setup is broken.
+> It is important to note installing a plugin into the addons section in Nuvio will result in an error. Install plugins in the plugins section of Nuvio.
 
 ---
 
