@@ -92,7 +92,7 @@ This is the easier path for typing or pasting a long URL.
 ### Directly in the App
 
 1. Open **Settings** on your device.
-2. Find the plugin/repository management section. Labeling varies a bit across the mobile, TV, and desktop builds — look for **Plugins**, or a **Repositories** entry under content/discovery settings.
+2. Find the plugins section under **Settings > Content & Discovery > Plugins
 3. Choose **Add Repository** and paste the manifest URL.
 4. Refresh to fetch the provider list from that manifest.
 5. Enable the individual providers you want — adding the repository alone doesn't turn any of them on.
