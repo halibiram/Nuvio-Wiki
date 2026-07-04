@@ -11,8 +11,8 @@ hero:
       text: Quick Start Guide
       link: /nl/quick-start
     - theme: alt
-      text: Player settings
-      link: /nl/settings/player
+      text: Tools
+      link: /tools
     - theme: alt
       text: Links & Bronnen
       link: /nl/official-links

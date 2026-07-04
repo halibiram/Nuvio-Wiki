@@ -112,6 +112,7 @@ function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
       'installation',
       'integrations',
       'settings',
+      'tools.md',
       'glossary.md',
       'troubleshooting.md',
       'faq.md',
@@ -280,6 +281,10 @@ export default defineConfig({
           rewrite: (path) => path.replace(/^\/api\/aiostreams/, '/api/v1')
         },
         '/api/ai': {
+          target: 'http://localhost:3001',
+          changeOrigin: true
+        },
+        '/api/trakt': {
           target: 'http://localhost:3001',
           changeOrigin: true
         }

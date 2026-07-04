@@ -20,8 +20,8 @@ import { siteRoutes } from '../../routes.mts'
               <path d="M4 10h11M11 6l4 4-4 4" />
             </svg>
           </a>
-          <a class="welcome-button welcome-button--secondary" :href="withBase(siteRoutes.player)">
-            Player Settings
+          <a class="welcome-button welcome-button--secondary" :href="withBase(siteRoutes.tools)">
+            Tools
           </a>
           <a class="welcome-button welcome-button--secondary" :href="withBase(siteRoutes.officialLinks)">
             Links &amp; Resources

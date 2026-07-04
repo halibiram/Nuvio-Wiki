@@ -263,6 +263,150 @@ app.post('/api/ai/setup', setupLimiter, async (req, res) => {
   }
 });
 
+app.post('/api/trakt/login-url', async (req, res) => {
+  try {
+    const clientId = process.env.TRAKT_CLIENT_ID;
+    if (!clientId) {
+      return res.status(500).json({ error: 'TRAKT_CLIENT_ID is not configured on the server.' });
+    }
+
+    const stateValue = Math.random().toString(36).substring(2, 15);
+    const returnOrigin = req.body.return_origin || req.get('origin') || 'http://localhost:5173';
+    const stateParam = `${stateValue}:${Buffer.from(returnOrigin).toString('base64')}`;
+    
+    // We construct the redirect_uri dynamically based on the current host
+    const redirectUri = `${req.protocol}://${req.get('host')}/api/trakt/callback`;
+    const url = `https://trakt.tv/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(stateParam)}`;
+
+    res.json({ url, state: stateParam, client_id: clientId });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/trakt/callback', async (req, res) => {
+  try {
+    const clientId = process.env.TRAKT_CLIENT_ID;
+    const clientSecret = process.env.TRAKT_CLIENT_SECRET;
+    if (!clientId || !clientSecret) {
+      return res.status(500).send('TRAKT_CLIENT_ID or TRAKT_CLIENT_SECRET is not configured on the server.');
+    }
+
+    const { code, state } = req.query;
+    if (!code || !state) {
+      return res.status(400).send('Missing code or state parameter.');
+    }
+
+    const stateStr = String(state);
+    const colonIdx = stateStr.indexOf(':');
+    if (colonIdx === -1) {
+      return res.status(400).send('Invalid state parameter.');
+    }
+    const returnOriginBase64 = stateStr.substring(colonIdx + 1);
+    let returnOrigin = 'http://localhost:5173';
+    try {
+      returnOrigin = Buffer.from(returnOriginBase64, 'base64').toString('utf8');
+    } catch (e) {
+      console.error('Failed to decode return_origin:', e);
+    }
+
+    const redirectUri = `${req.protocol}://${req.get('host')}/api/trakt/callback`;
+    const response = await fetch('https://api.trakt.tv/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code'
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      return res.status(500).send(`Trakt token exchange failed: ${errText}`);
+    }
+
+    const tokens = await response.json();
+
+    res.setHeader('Content-Type', 'text/html');
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Trakt Auth Callback</title>
+      </head>
+      <body style="background: #0d0e12; color: #ffffff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+        <div style="text-align: center; border: 1px solid #1c1e24; border-radius: 12px; padding: 24px; background: #07080a;">
+          <p style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">Authentication successful!</p>
+          <p style="margin: 0; font-size: 14px; color: #9ca3af;">Returning to the wiki...</p>
+        </div>
+        <script>
+          try {
+            if (window.opener) {
+              window.opener.postMessage({
+                source: 'trakt-oauth',
+                status: 'success',
+                state: ${JSON.stringify(state)},
+                client_id: ${JSON.stringify(clientId)},
+                tokens: ${JSON.stringify(tokens)}
+              }, ${JSON.stringify(returnOrigin)});
+              window.close();
+            } else {
+              document.querySelector('div').innerHTML = '<p style="margin: 0; font-size: 16px;">Authentication successful! You can close this window now.</p>';
+            }
+          } catch (err) {
+            console.error('Error posting message back:', err);
+            document.querySelector('div').innerHTML = '<p style="margin: 0; color: #ef4444;">Failed to communicate with main window. Please close this window and try again.</p>';
+          }
+        </script>
+      </body>
+      </html>
+    `);
+  } catch (error) {
+    res.status(500).send(`Server error: ${error.message}`);
+  }
+});
+
+app.post('/api/trakt/refresh', async (req, res) => {
+  try {
+    const clientId = process.env.TRAKT_CLIENT_ID;
+    const clientSecret = process.env.TRAKT_CLIENT_SECRET;
+    if (!clientId || !clientSecret) {
+      return res.status(500).json({ error: 'TRAKT_CLIENT_ID or TRAKT_CLIENT_SECRET is not configured on the server.' });
+    }
+
+    const { refresh_token } = req.body;
+    if (!refresh_token) {
+      return res.status(400).json({ error: 'Missing refresh_token.' });
+    }
+
+    const redirectUri = `${req.protocol}://${req.get('host')}/api/trakt/callback`;
+    const response = await fetch('https://api.trakt.tv/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        refresh_token,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        grant_type: 'refresh_token'
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      return res.status(response.status).json({ error: `Trakt token refresh failed: ${errText}` });
+    }
+
+    const tokens = await response.json();
+    res.json(tokens);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/api/ai/chat', perMinute, perHour, async (req, res) => {
   try {
     const { messages } = req.body;

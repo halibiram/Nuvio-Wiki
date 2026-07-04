@@ -21,7 +21,8 @@ export const siteRoutes = {
   trakt: '/integrations/trakt',
   troubleshooting: '/troubleshooting',
   faq: '/faq',
-  officialLinks: '/official-links'
+  officialLinks: '/official-links',
+  tools: '/tools'
 } as const
 
 export type SiteRoute = (typeof siteRoutes)[keyof typeof siteRoutes]

@@ -687,7 +687,7 @@ onMounted(async () => {
 
       <!-- Install result -->
       <div v-if="installResult" class="install-success">
-        <p><span v-html="getIconHtml('checkCircle', 18)" class="success-icon"></span> <strong>Your manifest is ready!</strong> Copy the URL below and paste it into <strong>Nuvio → Addons → Add addon</strong>.</p>
+        <p><span v-html="getIconHtml('checkCircle', 18)" class="success-icon"></span> <strong>Your manifest is ready!</strong> Copy the URL below and paste it into <strong>Nuvio → Content & Discovery → Addons → Add addon</strong>.</p>
         <div class="copy-field">
           <label>Manifest URL → paste into Nuvio</label>
           <div class="copy-row">
