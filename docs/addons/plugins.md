@@ -5,7 +5,7 @@ Nuvio relies on two independent systems to find something for you to watch: addo
 > [!NOTE]
 > It is important to note installing a plugin into the addons section in Nuvio will result in an error. Install plugins in the plugins section of Nuvio.
 >
-> Not all Nuvio versions support plugins. Due to platform store rules, the Nuvio versions downloaded from an app store do not support Plugins. Only the sideloaded versions support plugins.
+> Not all Nuvio versions support plugins. Due to platform store rules, the Nuvio versions downloaded from an app store do not support Plugins. **Only the sideloaded versions support plugins.**
 
 ---
 
