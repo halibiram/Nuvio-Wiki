@@ -120,14 +120,11 @@ These addons provide rich metadata (posters, descriptions, ratings, cast informa
 #### AIOMetadata
 
 AIOMetadata is the recommended metadata addon. It aggregates data from TMDB, TheTVDB, and MyAnimeList into a single addon, letting you pick which source provides metadata for movies, series, and anime separately. Like AIOStreams, it is self-hostable and has multiple community instances:
-
-| Instance | Hosted By |
-|---|---|
-| [Yeb's Instance](https://aiometadata.fortheweak.cloud/configure) | Yeb |
-| [Wizaarrd's Instance](https://aiometadata.forthewizards.uk/configure) | Wizaarrd |
-| [Kuu's Instance](https://aiometadata.stremio.ru/configure) | Kuu |
-| [Midnight's Instance](https://aiometadatafortheweebs.midnightignite.me/configure) | Midnight |
-| [ElfHosted](https://aiometadata.elfhosted.com/configure) | ElfHosted |
+  - [Yeb's Instance](https://aiometadata.fortheweak.cloud/configure)
+  - [Wizaarrd's Instance](https://aiometadata.forthewizards.uk/configure)
+  - [Kuu's Instance](https://aiometadata.stremio.ru/configure)
+  - [Midnight's Instance](https://aiometadatafortheweebs.midnightignite.me/configure)
+  - [ElfHosted](https://aiometadata.elfhosted.com/configure)
 
 **Configuration tips:**
 - Provide your own TMDB and TheTVDB API keys for best results and to avoid shared rate limits.
