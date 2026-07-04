@@ -10,37 +10,37 @@ Addons are the heart of the Nuvio experience. They provide the content, metadata
 
 ---
 
-## Add-ons vs. Plugins
+## addons vs. Plugins
 
 On the surface, both give you streams. Underneath, they operate entirely differently:
 
-| | Add-ons | Plugins |
+| | addons | Plugins |
 |---|---|---|
 | **Protocol** | Stremio's addon protocol (`catalog`/`meta`/`stream` HTTP endpoints) | Nuvio's own plugin repository format |
-| **Where the logic runs** | On the add-on developer's remote server | Inside Nuvio, locally on your device |
+| **Where the logic runs** | On the addon developer's remote server | Inside Nuvio, locally on your device |
 | **What Nuvio actually does** | Sends an HTTP request, parses the JSON response | Downloads the plugin's code and executes it in a sandboxed QuickJS runtime |
 | **Hosting** | Developer's infrastructure (Beamup, a VPS, Cloudflare Workers, ElfHosted) | A manifest file, typically hosted on GitHub |
 | **Scope** | Catalogs, metadata, subtitles, live TV, and streams | Streams only |
 | **Portability** | Works in any Stremio-protocol client (Stremio, Nuvio, others) | Nuvio-specific |
 
-The key difference is the trust boundary: an add-on is just a remote API — it can never run code on your device, it can only return data. A plugin executes JavaScript locally inside Nuvio's embedded QuickJS engine.
+Addons are recommened to use over plugins.
 
 [Back to top](#addons)
 
 ---
 
-## How Add-ons Work
+## How addons Work
 
-An add-on is a web server that responds to HTTP requests defined by the Stremio Addon Protocol.
+An addon is a web server that responds to HTTP requests defined by the Stremio Addon Protocol.
 
 ### The Manifest
-Every add-on has a `manifest.json` that declares its `id`, `name`, `version`, supported `resources` (e.g., `catalog`, `meta`, `stream`, `subtitles`), and the content `types` it handles (e.g., `movie`, `series`). Nuvio fetches and stores this manifest when you install an addon. Nuvio parses this using its `AddonManifestDto` → `Addon` domain model pipeline, extracting fields like `catalogs`, `resources`, `types`, `idPrefixes`, `behaviorHints`, and an optional `stremioAddonsConfig` block.
+Every addon has a `manifest.json` that declares its `id`, `name`, `version`, supported `resources` (e.g., `catalog`, `meta`, `stream`, `subtitles`), and the content `types` it handles (e.g., `movie`, `series`). Nuvio fetches and stores this manifest when you install an addon. Nuvio parses this using its `AddonManifestDto` → `Addon` domain model pipeline, extracting fields like `catalogs`, `resources`, `types`, `idPrefixes`, `behaviorHints`, and an optional `stremioAddonsConfig` block.
 
 ### Request Flow
 1. You browse to a catalog or open a specific movie/series.
-2. Nuvio checks which of your installed add-ons declared they support that content type and resource.
-3. Nuvio makes an HTTP `GET` request to the remote add-on server (e.g., `/stream/movie/tt1234567.json`).
-4. The add-on server performs its own logic (scraping, database lookups, debrid resolution) and returns a JSON response.
+2. Nuvio checks which of your installed addons declared they support that content type and resource.
+3. Nuvio makes an HTTP `GET` request to the remote addon server (e.g., `/stream/movie/tt1234567.json`).
+4. The addon server performs its own logic (scraping, database lookups, debrid resolution) and returns a JSON response.
 5. Nuvio parses the response and merges the results with any plugin-sourced streams into a unified source-selection list.
 
 [Back to top](#addons)
@@ -185,7 +185,7 @@ These addons fetch subtitles for your content from various providers.
 
 ---
 
-## Installing an Add-on
+## Installing an addon
 
 To install an addon, you need its manifest URL — obtained from the addon's configuration website by picking your settings and clicking "Install" or "Copy Link."
 
@@ -194,7 +194,7 @@ To install an addon, you need its manifest URL — obtained from the addon's con
 2. Navigate to the **Addons** management section.
 3. Select **Add Addon** and paste the manifest URL into the **Addon URL** field.
 4. Select **Install Addon** to fetch the manifest and add it to your installed list.
-5. Nuvio will immediately begin querying this add-on for relevant content based on its declared capabilities.
+5. Nuvio will immediately begin querying this addon for relevant content based on its declared capabilities.
 
 ### Managing Installed Addons
 
