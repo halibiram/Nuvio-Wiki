@@ -204,7 +204,7 @@ To install an addon, you need its manifest URL — obtained from the addon's con
 
 ---
 
-## Configuring Addons for P2P (Nuvio Debrid Mode)
+## Configuring Addons for P2P (Nuvio Debrid Integration)
 
 If you are using Nuvio's native debrid integration (Torbox or Premiumize linked in **Settings > Debrid**), your scraper addons must be configured to return raw P2P/torrent hashes instead of pre-resolved debrid links. If a scraper addon resolves links itself (because a debrid API key was entered into it), Nuvio never sees a hash to wrap, and your native integration is bypassed.
 
