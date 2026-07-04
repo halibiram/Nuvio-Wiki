@@ -275,6 +275,8 @@ import { siteRoutes } from '../../routes.mts'
   font-weight: 760;
   letter-spacing: -0.075em;
   line-height: 0.9;
+  opacity: 0;
+  animation: nuvioFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .welcome-hero__headline {
@@ -284,6 +286,8 @@ import { siteRoutes } from '../../routes.mts'
   font-weight: 650;
   letter-spacing: -0.052em;
   line-height: 1.02;
+  opacity: 0;
+  animation: nuvioFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.08s forwards;
 }
 
 .welcome-hero__intro {
@@ -292,6 +296,8 @@ import { siteRoutes } from '../../routes.mts'
   color: var(--vp-c-text-2);
   font-size: clamp(16px, 1.6vw, 20px);
   line-height: 1.65;
+  opacity: 0;
+  animation: nuvioFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.16s forwards;
 }
 
 .welcome-actions {
@@ -299,6 +305,8 @@ import { siteRoutes } from '../../routes.mts'
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 32px;
+  opacity: 0;
+  animation: nuvioFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.24s forwards;
 }
 
 .welcome-button {
@@ -357,6 +365,8 @@ import { siteRoutes } from '../../routes.mts'
   border-radius: 11px;
   background: color-mix(in srgb, var(--vp-c-bg-alt) 78%, var(--vp-c-bg));
   box-shadow: 0 18px 50px rgba(10, 24, 43, 0.08);
+  opacity: 0;
+  animation: nuvioFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.32s forwards;
 }
 
 .dark .start-panel {
@@ -827,5 +837,28 @@ import { siteRoutes } from '../../routes.mts'
 .enjoyment-note a:hover {
   color: var(--vp-c-brand-2);
   text-decoration: underline;
+}
+
+@keyframes nuvioFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-hero h1,
+  .welcome-hero__headline,
+  .welcome-hero__intro,
+  .welcome-actions,
+  .start-panel {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
 }
 </style>

@@ -13,8 +13,7 @@ Wil je Nuvio binnen 10 minuten werkend hebben? Volg deze stappen:
 
 ## 2. Voeg je eerste addon toe
 
-> [!TIP]
-> Voor een eenvoudigere installatie kun je de [Nuvio Quickstart Tool](https://nuvio-quickstart.duckdns.org/) gebruiken om Nuvio addons voor je in te stellen. Dit installeert *AIOStreams* met behulp van het sjabloon van Tam-Taro en *Cinemeta*.
+<NuvioQuickstart />
 
 Nuvio is standaard leeg. Je hebt een addon nodig om inhoud te zien. Zie [Addons](/nl/integrations/addons).
 - [Android Mobile Only] Open Nuvio > **Instellingen** > **Content and Discovery** > **Addons**.

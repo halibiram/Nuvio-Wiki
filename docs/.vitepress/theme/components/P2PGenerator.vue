@@ -315,6 +315,66 @@ const form = reactive({
   timeout: 15000,
 })
 
+const ICONS = {
+  sparkles: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/><path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5Z"/><path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z"/></svg>`,
+  settings: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  shield: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6Z"/></svg>`,
+  shieldCheck: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 9.7a1 1 0 0 1-.68 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .76-.97l8-2a1 1 0 0 1 .48 0l8 2A1 1 0 0 1 20 6Z"/><path d="m9 12 2 2 4-4"/></svg>`,
+  zapOff: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.43 6.9 15 2h-4l-5 6h4.37M6 14l-2 8 8-8h-3l2.84-3.41"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`,
+  globeOff: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`,
+  globe: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`,
+  package: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`,
+  target: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+  feather: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>`,
+  tv: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>`,
+  flower: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5a4.5 4.5 0 1 1 4.5 4.5M12 7.5A4.5 4.5 0 1 0 7.5 12M12 7.5V12m4.5 0a4.5 4.5 0 1 1-4.5 4.5M16.5 12H12m-4.5 0A4.5 4.5 0 1 0 12 16.5M7.5 12H12m0 4.5V12"/></svg>`,
+  messageSquare: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+  server: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>`,
+  sliders: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="2" y1="14" x2="6" y2="14"/><line x1="10" y1="8" x2="14" y2="8"/><line x1="18" y1="16" x2="22" y2="16"/></svg>`,
+  key: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 1.5 1.5M15.5 7.5 14 6"/></svg>`,
+  fileText: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`,
+  rocket: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>`,
+  checkCircle: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>`,
+  loader: `<svg class="spin-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`,
+  sync: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`,
+  copy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`,
+  download: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+}
+
+function getIconHtml(name, size = 16) {
+  const raw = ICONS[name]
+  if (!raw) return ''
+  return raw.replace(/<svg /, `<svg width="${size}" height="${size}" `)
+}
+
+function highlightJson(jsonStr) {
+  if (!jsonStr) return ''
+  let html = jsonStr
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+  
+  return html.replace(
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
+    (match) => {
+      let cls = 'json-number'
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'json-key'
+          return `<span class="${cls}">${match.replace(/:$/, '')}</span>:`
+        } else {
+          cls = 'json-string'
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'json-boolean'
+      } else if (/null/.test(match)) {
+        cls = 'json-null'
+      }
+      return `<span class="${cls}">${match}</span>`
+    }
+  )
+}
+
 const config = ref(null)
 const configJson = ref('')
 const generating = ref(false)
@@ -523,7 +583,8 @@ onMounted(async () => {
         :class="['mode-btn', { active: mode === 'simple' }]"
         @click="mode = 'simple'"
       >
-        ✨ Simple
+        <span v-html="getIconHtml('sparkles', 16)"></span>
+        Simple
       </button>
       <button
         role="tab"
@@ -531,7 +592,8 @@ onMounted(async () => {
         :class="['mode-btn', { active: mode === 'advanced' }]"
         @click="mode = 'advanced'"
       >
-        ⚙️ Advanced
+        <span v-html="getIconHtml('settings', 16)"></span>
+        Advanced
       </button>
     </div>
 
@@ -549,13 +611,13 @@ onMounted(async () => {
           push it to your instance in one step.
         </p>
         <div class="default-badges">
-          <span class="badge badge-p2p">🛡️ P2P Required</span>
-          <span class="badge">⚡ No debrid keys</span>
-          <span class="badge">🚫 HTTP off</span>
-          <span class="badge">📦 {{ enabledCount }} scrapers</span>
+          <span class="badge badge-p2p"><span v-html="getIconHtml('shieldCheck', 14)"></span> P2P Required</span>
+          <span class="badge"><span v-html="getIconHtml('zapOff', 14)"></span> No debrid keys</span>
+          <span class="badge"><span v-html="getIconHtml('globeOff', 14)"></span> HTTP off</span>
+          <span class="badge"><span v-html="getIconHtml('package', 14)"></span> {{ enabledCount }} scrapers</span>
           <span class="badge">Standard SEL</span>
           <span class="badge">15s timeout</span>
-          <span class="badge">English subs</span>
+          <span class="badge"><span v-html="getIconHtml('messageSquare', 14)"></span> English subs</span>
         </div>
       </div>
 
@@ -605,8 +667,8 @@ onMounted(async () => {
           :disabled="!canInstall"
           @click="handleInstall"
         >
-          <span v-if="installing">⏳ Pushing to your instance…</span>
-          <span v-else>🚀 Create protected manifest →</span>
+          <span v-if="installing" class="btn-content"><span v-html="getIconHtml('loader', 18)"></span> Pushing to your instance…</span>
+          <span v-else class="btn-content"><span v-html="getIconHtml('rocket', 18)"></span> Create protected manifest →</span>
         </button>
         <p v-if="!instanceValid" class="hint center">
           Enter your instance URL above to enable this.
@@ -625,26 +687,32 @@ onMounted(async () => {
 
       <!-- Install result -->
       <div v-if="installResult" class="install-success">
-        <p>✅ <strong>Your manifest is ready!</strong> Copy the URL below and paste it into <strong>Nuvio → Addons → Add addon</strong>.</p>
+        <p><span v-html="getIconHtml('checkCircle', 18)" class="success-icon"></span> <strong>Your manifest is ready!</strong> Copy the URL below and paste it into <strong>Nuvio → Addons → Add addon</strong>.</p>
         <div class="copy-field">
           <label>Manifest URL → paste into Nuvio</label>
           <div class="copy-row">
             <input :value="installResult.manifestUrl" readonly class="input mono" />
-            <button class="btn btn-sm" @click="copyToClipboard(installResult.manifestUrl, 'Manifest URL copied')">Copy</button>
+            <button class="btn btn-sm copy-btn" @click="copyToClipboard(installResult.manifestUrl, 'Manifest URL copied')">
+              <span v-html="getIconHtml('copy', 12)"></span> Copy
+            </button>
           </div>
         </div>
         <div class="copy-field">
           <label>Configure URL → edit later</label>
           <div class="copy-row">
             <input :value="installResult.configureUrl" readonly class="input mono" />
-            <button class="btn btn-sm" @click="copyToClipboard(installResult.configureUrl, 'Configure URL copied')">Copy</button>
+            <button class="btn btn-sm copy-btn" @click="copyToClipboard(installResult.configureUrl, 'Configure URL copied')">
+              <span v-html="getIconHtml('copy', 12)"></span> Copy
+            </button>
           </div>
         </div>
         <div v-if="installResult.password" class="copy-field">
           <label>Manifest password (keep safe)</label>
           <div class="copy-row">
             <input :value="installResult.password" readonly class="input mono" />
-            <button class="btn btn-sm" @click="copyToClipboard(installResult.password, 'Password copied')">Copy</button>
+            <button class="btn btn-sm copy-btn" @click="copyToClipboard(installResult.password, 'Password copied')">
+              <span v-html="getIconHtml('copy', 12)"></span> Copy
+            </button>
           </div>
         </div>
       </div>
@@ -655,11 +723,11 @@ onMounted(async () => {
 
       <div class="simple-footer">
         <button class="link-btn" @click="mode = 'advanced'">
-          🛠️ Need more control? Switch to Advanced mode →
+          <span v-html="getIconHtml('settings', 14)"></span> Switch to Advanced mode →
         </button>
         <details>
           <summary class="link-btn-sm">Show generated config JSON</summary>
-          <pre class="config-preview">{{ configJson }}</pre>
+          <pre class="config-preview" v-html="highlightJson(configJson)"></pre>
         </details>
       </div>
     </div>
@@ -671,17 +739,17 @@ onMounted(async () => {
         <div class="adv-form">
           <!-- Quick presets -->
           <div class="adv-card">
-            <h3>⚙️ Quick start presets</h3>
+            <h3><span v-html="getIconHtml('sliders', 18)"></span> Quick start presets</h3>
             <p class="muted">One-click setups for common use cases.</p>
             <div class="preset-grid">
               <button
                 v-for="p in [
-                  { id: 'balanced', name: 'Balanced', emoji: '🎯', blurb: 'Recommended mix of P2P scrapers.' },
-                  { id: 'lightweight', name: 'Lightweight', emoji: '🍃', blurb: 'Fewer scrapers for fast lists.' },
-                  { id: '4k-max', name: '4K / Max quality', emoji: '🎥', blurb: 'Extended SEL + more scrapers.' },
-                  { id: 'anime', name: 'Anime', emoji: '🌸', blurb: 'Japanese audio + English subs.' },
-                  { id: 'multilingual', name: 'Multilingual', emoji: '🌍', blurb: 'Broad language set.' },
-                  { id: 'subs-first', name: 'Subtitles-first', emoji: '💬', blurb: 'Multi-subtitle setup.' },
+                  { id: 'balanced', name: 'Balanced', icon: 'target', blurb: 'Recommended mix of P2P scrapers.' },
+                  { id: 'lightweight', name: 'Lightweight', icon: 'feather', blurb: 'Fewer scrapers for fast lists.' },
+                  { id: '4k-max', name: '4K / Max quality', icon: 'tv', blurb: 'Extended SEL + more scrapers.' },
+                  { id: 'anime', name: 'Anime', icon: 'flower', blurb: 'Japanese audio + English subs.' },
+                  { id: 'multilingual', name: 'Multilingual', icon: 'globe', blurb: 'Broad language set.' },
+                  { id: 'subs-first', name: 'Subtitles-first', icon: 'messageSquare', blurb: 'Multi-subtitle setup.' },
                 ]"
                 :key="p.id"
                 class="preset-card"
@@ -693,7 +761,7 @@ onMounted(async () => {
                   form.enabledAddons = p.id === 'lightweight' ? ['meteor', 'torrentio'] : p.id === '4k-max' ? ['meteor', 'comet', 'torrentio', 'torrents-db', 'peerflix', 'stremthruTorz'] : p.id === 'anime' ? ['mediafusion', 'meteor', 'comet', 'torrentio'] : ['meteor', 'comet', 'torrentio', 'torrents-db', 'peerflix'];
                 "
               >
-                <span class="preset-emoji">{{ p.emoji }}</span>
+                <span class="preset-icon" v-html="getIconHtml(p.icon, 20)"></span>
                 <span class="preset-name">{{ p.name }}</span>
                 <span class="preset-blurb">{{ p.blurb }}</span>
               </button>
@@ -702,7 +770,7 @@ onMounted(async () => {
 
           <!-- Instance -->
           <div class="adv-card">
-            <h3>🖥️ AIOStreams instance</h3>
+            <h3><span v-html="getIconHtml('server', 18)"></span> AIOStreams instance</h3>
             <label>Instance URL</label>
             <input v-model="form.instanceUrl" type="url" placeholder="https://…" class="input" list="recent-instances" />
             <datalist id="recent-instances-adv">
@@ -715,7 +783,7 @@ onMounted(async () => {
 
           <!-- Languages -->
           <div class="adv-card">
-            <h3>🌐 Language preferences</h3>
+            <h3><span v-html="getIconHtml('globe', 18)"></span> Language preferences</h3>
             <label>Preferred audio languages</label>
             <div class="lang-chips">
               <button
@@ -738,7 +806,7 @@ onMounted(async () => {
 
           <!-- Filtering -->
           <div class="adv-card">
-            <h3>🔧 Filtering & formatting</h3>
+            <h3><span v-html="getIconHtml('sliders', 18)"></span> Filtering & formatting</h3>
             <label>Core filter (SEL density)</label>
             <select v-model="form.coreFilter" class="input">
               <option value="standard">Standard SEL (~20 results/title)</option>
@@ -776,7 +844,7 @@ onMounted(async () => {
           <!-- Scrapers -->
           <div class="adv-card">
             <div class="card-header-row">
-              <h3>📦 P2P scraper addons</h3>
+              <h3><span v-html="getIconHtml('package', 18)"></span> P2P scraper addons</h3>
               <button class="btn btn-sm" @click="resetAddonsToDefault">Reset to defaults</button>
             </div>
             <div class="scraper-search-row">
@@ -816,7 +884,7 @@ onMounted(async () => {
           <!-- Advanced (collapsible) -->
           <details class="adv-card collapsible-card">
             <summary class="card-header-row">
-              <h3>🔑 Advanced — API keys, statistics, timeout</h3>
+              <h3><span v-html="getIconHtml('key', 18)"></span> Advanced — API keys, statistics, timeout</h3>
             </summary>
             <div style="padding-top: 12px">
               <label>TMDB API key (optional)</label>
@@ -835,64 +903,74 @@ onMounted(async () => {
         <!-- Preview column -->
         <div class="adv-preview">
           <div class="status-bar">
-            <span class="badge badge-p2p">🛡️ P2P mode</span>
+            <span class="badge badge-p2p"><span v-html="getIconHtml('shield', 14)"></span> P2P mode</span>
             <span class="badge">{{ form.p2pStrictness }}</span>
-            <span class="badge">📦 {{ enabledCount }} scrapers</span>
+            <span class="badge"><span v-html="getIconHtml('package', 14)"></span> {{ enabledCount }} scrapers</span>
             <span v-if="templateVersion" class="badge">TAMS v{{ templateVersion }}</span>
             <span class="auto-sync">
-              <span v-if="generating">⏳ Generating…</span>
-              <span v-else>🟢 Auto-syncing</span>
+              <span v-if="generating" class="sync-status"><span v-html="getIconHtml('loader', 14)"></span> Generating…</span>
+              <span v-else class="sync-status active"><span v-html="getIconHtml('checkCircle', 14)"></span> Auto-syncing</span>
             </span>
           </div>
 
           <!-- Config + actions -->
-          <div class="adv-card">
+          <div class="adv-card config-card">
             <div class="card-header-row">
-              <h3>📄 Config JSON</h3>
+              <h3><span v-html="getIconHtml('fileText', 18)"></span> Config JSON</h3>
               <div class="header-actions">
-                <button class="btn btn-sm" @click="copyToClipboard(configJson, 'Config copied')">Copy</button>
-                <button class="btn btn-sm" @click="downloadConfig">Download</button>
+                <button class="btn btn-sm copy-btn" @click="copyToClipboard(configJson, 'Config copied')">
+                  <span v-html="getIconHtml('copy', 12)"></span> Copy
+                </button>
+                <button class="btn btn-sm copy-btn" @click="downloadConfig">
+                  <span v-html="getIconHtml('download', 12)"></span> Download
+                </button>
               </div>
             </div>
-            <pre v-if="configJson" class="config-block">{{ configJson }}</pre>
+            <pre v-if="configJson" class="config-block" v-html="highlightJson(configJson)"></pre>
             <div v-else class="loading-skeleton" />
           </div>
 
           <!-- Install -->
           <div class="adv-card">
-            <h3>🚀 Create protected manifest</h3>
+            <h3><span v-html="getIconHtml('rocket', 18)"></span> Create protected manifest</h3>
             <p class="muted">Push this config to your instance and get a ready-to-paste manifest URL.</p>
             <label>Manifest password (optional)</label>
             <input v-model="installPassword" type="text" placeholder="Auto-generated if blank" class="input" />
             <button class="btn btn-primary" :disabled="!canInstall" @click="handleInstall" style="margin-top: 12px; width: 100%">
-              <span v-if="installing">⏳ Creating…</span>
-              <span v-else>🚀 Create protected manifest</span>
+              <span v-if="installing" class="btn-content"><span v-html="getIconHtml('loader', 16)"></span> Creating…</span>
+              <span v-else class="btn-content"><span v-html="getIconHtml('rocket', 16)"></span> Create protected manifest</span>
             </button>
             <p v-if="!instanceValid" class="muted small">Enter a valid instance URL to enable this.</p>
           </div>
 
           <!-- Install result -->
           <div v-if="installResult" class="install-success">
-            <p>✅ <strong>Manifest created!</strong></p>
+            <p><span v-html="getIconHtml('checkCircle', 16)" class="success-icon"></span> <strong>Manifest created!</strong></p>
             <div class="copy-field">
               <label>Manifest URL</label>
               <div class="copy-row">
                 <input :value="installResult.manifestUrl" readonly class="input mono" />
-                <button class="btn btn-sm" @click="copyToClipboard(installResult.manifestUrl, 'Copied')">Copy</button>
+                <button class="btn btn-sm copy-btn" @click="copyToClipboard(installResult.manifestUrl, 'Copied')">
+                  <span v-html="getIconHtml('copy', 12)"></span> Copy
+                </button>
               </div>
             </div>
             <div class="copy-field">
               <label>Configure URL</label>
               <div class="copy-row">
                 <input :value="installResult.configureUrl" readonly class="input mono" />
-                <button class="btn btn-sm" @click="copyToClipboard(installResult.configureUrl, 'Copied')">Copy</button>
+                <button class="btn btn-sm copy-btn" @click="copyToClipboard(installResult.configureUrl, 'Copied')">
+                  <span v-html="getIconHtml('copy', 12)"></span> Copy
+                </button>
               </div>
             </div>
             <div class="copy-field">
               <label>Manifest password (keep safe)</label>
               <div class="copy-row">
                 <input :value="installResult.password" readonly class="input mono" />
-                <button class="btn btn-sm" @click="copyToClipboard(installResult.password, 'Copied')">Copy</button>
+                <button class="btn btn-sm copy-btn" @click="copyToClipboard(installResult.password, 'Copied')">
+                  <span v-html="getIconHtml('copy', 12)"></span> Copy
+                </button>
               </div>
             </div>
           </div>
@@ -905,7 +983,7 @@ onMounted(async () => {
     </div>
 
     <div v-if="!template && !templateError" class="loading">
-      <p>⏳ Loading the TAMS template…</p>
+      <p><span v-html="getIconHtml('loader', 24)" class="loading-spinner"></span> Loading the TAMS template…</p>
     </div>
   </div>
 </template>
@@ -916,34 +994,47 @@ onMounted(async () => {
   font-family: inherit;
 }
 
-/* Mode toggle */
+/* Mode toggle tabs */
 .mode-toggle {
-  display: inline-flex;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 12px;
-  padding: 4px;
-  background: var(--vp-c-bg-soft);
-  margin-bottom: 20px;
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: transparent;
+  padding: 0 0 8px 0;
+  margin-bottom: 24px;
 }
 .mode-btn {
-  padding: 8px 16px;
+  padding: 8px 0;
   border: none;
   background: transparent;
   color: var(--vp-c-text-2);
-  font-size: 14px;
-  font-weight: 500;
-  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.2s;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
 }
 .mode-btn.active {
+  color: var(--vp-c-brand);
+  background: transparent;
+  box-shadow: none;
+}
+.mode-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  left: 0;
+  right: 0;
+  height: 2px;
   background: var(--vp-c-brand);
-  color: var(--vp-c-white);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 .mode-btn:not(.active):hover {
   color: var(--vp-c-text-1);
-  background: var(--vp-c-bg);
+  background: transparent;
 }
 
 /* Simple mode */
@@ -957,6 +1048,9 @@ onMounted(async () => {
 .simple-header h3 {
   margin: 0 0 8px 0;
   font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .simple-header p {
   margin: 0 0 12px 0;
@@ -972,17 +1066,25 @@ onMounted(async () => {
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
+  gap: 6px;
+  padding: 4px 12px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 999px;
   font-size: 12px;
   font-weight: 500;
   background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+}
+.badge svg {
+  color: var(--vp-c-text-3);
+  opacity: 0.85;
 }
 .badge-p2p {
   border-color: rgba(16, 185, 129, 0.4);
   background: rgba(16, 185, 129, 0.1);
+  color: rgb(16, 185, 129);
+}
+.badge-p2p svg {
   color: rgb(16, 185, 129);
 }
 
@@ -1027,10 +1129,12 @@ onMounted(async () => {
   color: var(--vp-c-text-1);
   font-size: 14px;
   font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 .input:focus {
-  outline: 2px solid var(--vp-c-brand);
-  outline-offset: -1px;
+  border-color: var(--vp-c-brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vp-c-brand) 15%, transparent);
+  outline: none;
 }
 .input.mono { font-family: var(--vp-font-family-mono); font-size: 12px; }
 .hint { font-size: 12px; color: var(--vp-c-text-3); margin: 4px 0 0 0; }
@@ -1047,6 +1151,10 @@ onMounted(async () => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 .btn:hover { border-color: var(--vp-c-brand); }
 .btn-sm { padding: 4px 10px; font-size: 12px; }
@@ -1063,6 +1171,17 @@ onMounted(async () => {
   font-size: 16px;
   font-weight: 600;
   margin-top: 8px;
+}
+.btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .collapsible {
@@ -1085,6 +1204,15 @@ onMounted(async () => {
   padding: 16px 20px;
   background: rgba(16, 185, 129, 0.05);
   margin: 16px 0;
+}
+.install-success p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.success-icon {
+  color: rgb(16, 185, 129);
 }
 .copy-field { margin-top: 12px; }
 .copy-field label {
@@ -1115,6 +1243,9 @@ onMounted(async () => {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 .link-btn:hover { text-decoration: underline; }
 .link-btn-sm {
@@ -1131,10 +1262,11 @@ onMounted(async () => {
   overflow: auto;
   font-size: 11px;
   font-family: var(--vp-font-family-mono);
-  background: var(--vp-c-bg-soft);
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--vp-c-divider);
+  background: #0d0e12 !important;
+  color: #abb2bf;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #1e1e24 !important;
   white-space: pre-wrap;
   word-break: break-all;
 }
@@ -1145,6 +1277,11 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
+}
+@media (min-width: 960px) {
+  .adv-grid {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
 }
 .adv-form { display: flex; flex-direction: column; gap: 16px; }
 .adv-preview { display: flex; flex-direction: column; gap: 16px; }
@@ -1158,6 +1295,13 @@ onMounted(async () => {
 .adv-card h3 {
   margin: 0 0 8px 0;
   font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+.adv-card h3 svg {
+  color: var(--vp-c-brand);
 }
 .adv-card label {
   display: block;
@@ -1175,32 +1319,43 @@ onMounted(async () => {
   align-items: center;
   gap: 8px;
 }
-.header-actions { display: flex; gap: 4px; }
+.header-actions { display: flex; gap: 6px; }
 
 .preset-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 8px;
+  gap: 12px;
   margin-top: 12px;
 }
 .preset-card {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 12px;
+  padding: 16px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
-  background: var(--vp-c-bg);
+  border-radius: 12px;
+  background: var(--vp-c-bg-soft);
   cursor: pointer;
   text-align: left;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .preset-card:hover {
   border-color: var(--vp-c-brand);
+  background: var(--vp-c-bg-alt);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-.preset-emoji { font-size: 20px; }
+.preset-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--vp-c-brand) 10%, transparent);
+  color: var(--vp-c-brand);
+  margin-bottom: 8px;
+}
 .preset-name { font-weight: 600; font-size: 13px; }
 .preset-blurb { font-size: 11px; color: var(--vp-c-text-3); }
 
@@ -1319,25 +1474,63 @@ onMounted(async () => {
   font-size: 12px;
   color: var(--vp-c-text-3);
 }
+.sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+}
+.sync-status.active {
+  color: rgb(16, 185, 129);
+}
+.sync-status svg {
+  color: currentColor;
+}
 
+.config-card {
+  padding: 0;
+}
+.config-card .card-header-row {
+  padding: 16px 20px 0 20px;
+}
 .config-block {
   max-height: 400px;
   overflow: auto;
   font-size: 11px;
   font-family: var(--vp-font-family-mono);
-  background: var(--vp-c-bg-soft);
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--vp-c-divider);
+  background: #0d0e12 !important;
+  color: #abb2bf;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
   white-space: pre-wrap;
   word-break: break-all;
-  margin-top: 8px;
+  margin: 12px 16px 16px 16px;
 }
+.config-block :deep(.json-key), .config-preview :deep(.json-key) {
+  color: #e06c75;
+  font-weight: 600;
+}
+.config-block :deep(.json-string), .config-preview :deep(.json-string) {
+  color: #98c379;
+}
+.config-block :deep(.json-number), .config-preview :deep(.json-number) {
+  color: #d19a66;
+}
+.config-block :deep(.json-boolean), .config-preview :deep(.json-boolean) {
+  color: #56b6c2;
+}
+.config-block :deep(.json-null), .config-preview :deep(.json-null) {
+  color: #abb2bf;
+}
+
 .loading-skeleton {
   height: 200px;
   background: var(--vp-c-bg-soft);
   border-radius: 8px;
   animation: pulse 2s infinite;
+  margin: 12px 16px 16px 16px;
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -1360,6 +1553,20 @@ onMounted(async () => {
   text-align: center;
   padding: 40px;
   color: var(--vp-c-text-2);
+}
+.loading-spinner {
+  color: var(--vp-c-brand);
+  margin-right: 8px;
+}
+
+/* Spinner animation */
+.spin-icon {
+  animation: spin 1s linear infinite;
+  transform-origin: center;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {

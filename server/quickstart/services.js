@@ -1,0 +1,571 @@
+import { Buffer } from 'node:buffer';
+import { buildTamConfig } from './template.js';
+
+const TORBOX_API = 'https://api.torbox.app/v1';
+const NUVIO_BASE = 'https://api.nuvio.tv';
+const NUVIO_KEY = 'sb_publishable_1Clq8rlTVACkdcZuqr6_AD__xUUC_EN';
+const AIOSTREAMS_BASE =
+  'https://aiostreamsfortheweebs.midnightignite.me';
+const CINEMETA_MANIFEST = 'https://v3-cinemeta.strem.io/manifest.json';
+
+export class SetupError extends Error {
+  constructor(message, step = 'setup', status = 500) {
+    super(message);
+    this.name = 'SetupError';
+    this.step = step;
+    this.status = status;
+  }
+}
+
+class RemoteError extends Error {
+  constructor(message, status, body) {
+    super(message);
+    this.name = 'RemoteError';
+    this.status = status;
+    this.body = body;
+  }
+}
+
+function remoteMessage(body, fallback) {
+  return (
+    body?.error?.message ||
+    body?.error_description ||
+    body?.message ||
+    body?.msg ||
+    body?.detail ||
+    body?.error ||
+    fallback
+  );
+}
+
+async function requestJson(url, options = {}, timeoutMs = 30000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const headers = {
+    Accept: 'application/json',
+    'User-Agent': 'NuvioQuickstart/1.0',
+    ...options.headers,
+  };
+  if (options.body !== undefined && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers,
+    });
+
+    if (response.status === 204) return null;
+
+    const text = await response.text();
+    let body;
+    try {
+      body = text ? JSON.parse(text) : null;
+    } catch {
+      body = null;
+    }
+
+    if (!response.ok) {
+      throw new RemoteError(
+        remoteMessage(body, `Remote service returned ${response.status}.`),
+        response.status,
+        body
+      );
+    }
+
+    if (body?.success === false) {
+      throw new RemoteError(
+        remoteMessage(body, 'The remote service rejected the request.'),
+        response.status,
+        body
+      );
+    }
+
+    return body;
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      throw new RemoteError('The remote service timed out.', 504, null);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function jsonBody(value) {
+  return {
+    body: JSON.stringify(value),
+  };
+}
+
+export function formatTorBoxError(message, status) {
+  const detail = String(message || 'TorBox rejected the API key.')
+    .replace(/\btokens\b/gi, 'API keys')
+    .replace(/\btoken\b/gi, 'API key');
+  const authenticationFailure =
+    [401, 403].includes(status) ||
+    /(api key).*(invalid|expired)|(?:invalid|expired).*(api key)|unauthori[sz]ed/i.test(
+      detail
+    );
+
+  return authenticationFailure
+    ? 'That TorBox API key is invalid or has expired. Check it in TorBox settings and try again.'
+    : `TorBox validation failed: ${detail}`;
+}
+
+export async function validateTorBox(apiKey) {
+  try {
+    const response = await requestJson(
+      `${TORBOX_API}/api/user/me?settings=true`,
+      {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      },
+      10000
+    );
+    const data = response?.data;
+    if (!data) throw new Error('TorBox returned no account data.');
+    return data;
+  } catch (error) {
+    const message = formatTorBoxError(error.message, error.status);
+    throw new SetupError(
+      message,
+      'torbox',
+      message.startsWith('That TorBox API key') ? 400 : 502
+    );
+  }
+}
+
+function nuvioHeaders(token) {
+  return {
+    apikey: NUVIO_KEY,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+async function nuvioAuth(path, body) {
+  return requestJson(`${NUVIO_BASE}/auth/v1${path}`, {
+    method: 'POST',
+    headers: nuvioHeaders(),
+    ...jsonBody(body),
+  });
+}
+
+async function nuvioRest(path, token, options = {}) {
+  return requestJson(`${NUVIO_BASE}/rest/v1${path}`, {
+    ...options,
+    headers: {
+      ...nuvioHeaders(token),
+      ...options.headers,
+    },
+  });
+}
+
+export async function createOrLoginNuvio(email, password) {
+  let created = false;
+  let signupResponse;
+
+  try {
+    signupResponse = await nuvioAuth('/signup', { email, password });
+    created = Boolean(signupResponse?.user);
+  } catch (error) {
+    const alreadyExists =
+      [400, 409, 422].includes(error.status) &&
+      /already|registered|exists/i.test(error.message);
+    if (!alreadyExists) {
+      throw new SetupError(
+        `Nuvio account creation failed: ${error.message}`,
+        'nuvio',
+        502
+      );
+    }
+  }
+
+  if (signupResponse?.access_token) {
+    return {
+      token: signupResponse.access_token,
+      created,
+    };
+  }
+
+  try {
+    const login = await nuvioAuth('/token?grant_type=password', {
+      email,
+      password,
+    });
+    if (!login?.access_token) {
+      throw new Error('No access token was returned.');
+    }
+    return { token: login.access_token, created };
+  } catch (error) {
+    throw new SetupError(
+      `Nuvio sign-in failed: ${error.message}`,
+      'nuvio',
+      error.status === 400 ? 400 : 502
+    );
+  }
+}
+
+export async function getNuvioProfiles(token) {
+  const profiles = await nuvioRest('/rpc/sync_pull_profiles', token, {
+    method: 'POST',
+    ...jsonBody({}),
+  });
+  return Array.isArray(profiles) ? profiles : [];
+}
+
+async function createDefaultNuvioProfile(token) {
+  await nuvioRest('/rpc/sync_push_profiles', token, {
+    method: 'POST',
+    ...jsonBody({
+      p_client_max_profiles: 6,
+      p_profiles: [
+        {
+          profile_index: 1,
+          name: 'Main',
+          avatar_color_hex: '#7C5CFC',
+          uses_primary_addons: false,
+          uses_primary_plugins: false,
+          avatar_id: null,
+          avatar_url: null,
+        },
+      ],
+    }),
+  });
+}
+
+export async function ensureNuvioProfiles(token) {
+  let profiles = await getNuvioProfiles(token);
+  if (profiles.length === 0) {
+    await createDefaultNuvioProfile(token);
+    profiles = await getNuvioProfiles(token);
+  }
+  if (profiles.length === 0) {
+    throw new SetupError(
+      'Nuvio did not create a usable profile.',
+      'nuvio',
+      502
+    );
+  }
+  return profiles;
+}
+
+function profileIndex(profile) {
+  return Number(profile.profile_index ?? profile.id);
+}
+
+export async function getNuvioAddons(token, profileId) {
+  const addons = await nuvioRest(
+    `/addons?select=*&profile_id=eq.${profileId}&order=sort_order`,
+    token
+  );
+  return Array.isArray(addons) ? addons : [];
+}
+
+export async function setNuvioAddons(token, profileId, addons) {
+  await nuvioRest('/rpc/sync_push_addons', token, {
+    method: 'POST',
+    ...jsonBody({
+      p_profile_id: profileId,
+      p_addons: addons.map((addon, index) => ({
+        url: addon.url,
+        name: addon.name,
+        enabled: addon.enabled !== false,
+        sort_order: index,
+      })),
+    }),
+  });
+}
+
+function normalizeAddonUrl(url) {
+  return String(url ?? '')
+    .trim()
+    .replace(/\/manifest\.json\/?$/i, '')
+    .replace(/\/+$/, '')
+    .toLowerCase();
+}
+
+function mergeAddons(existing, requested) {
+  const requestedUrls = new Set(
+    requested.map((addon) => normalizeAddonUrl(addon.url))
+  );
+  const preserved = existing
+    .filter((addon) => !requestedUrls.has(normalizeAddonUrl(addon.url)))
+    .map((addon) => ({
+      url: addon.url,
+      name: addon.name || 'Addon',
+      enabled: addon.enabled !== false,
+    }));
+  return [...requested, ...preserved];
+}
+
+export async function installNuvioAddons(
+  token,
+  profiles,
+  aiostreamsManifest,
+  aiostreamsName
+) {
+  const targets = profiles.filter((profile) => {
+    const id = profileIndex(profile);
+    return id === 1 || profile.uses_primary_addons !== true;
+  });
+  const snapshots = [];
+  const requested = [
+    {
+      url: CINEMETA_MANIFEST,
+      name: 'Cinemeta',
+      enabled: true,
+    },
+    {
+      url: aiostreamsManifest,
+      name: aiostreamsName || 'AIOStreams',
+      enabled: true,
+    },
+  ];
+
+  try {
+    for (const profile of targets) {
+      const id = profileIndex(profile);
+      const current = await getNuvioAddons(token, id);
+      snapshots.push({ id, addons: current });
+      await setNuvioAddons(token, id, mergeAddons(current, requested));
+    }
+
+    for (const profile of targets) {
+      const installed = await getNuvioAddons(token, profileIndex(profile));
+      const installedUrls = new Set(
+        installed.map((addon) => normalizeAddonUrl(addon.url))
+      );
+      const missing = requested.filter(
+        (addon) => !installedUrls.has(normalizeAddonUrl(addon.url))
+      );
+      if (missing.length) {
+        throw new Error(
+          `Nuvio did not retain ${missing.map((addon) => addon.name).join(' and ')}.`
+        );
+      }
+    }
+  } catch (error) {
+    for (const snapshot of snapshots.reverse()) {
+      try {
+        await setNuvioAddons(token, snapshot.id, snapshot.addons);
+      } catch {
+        // Best-effort restore. The original failure is more useful to the user.
+      }
+    }
+    throw new SetupError(
+      `Nuvio addon installation failed: ${error.message}`,
+      'addons',
+      502
+    );
+  }
+
+  return targets.length;
+}
+
+export async function getAiostreamsStatus() {
+  try {
+    const response = await requestJson(
+      `${AIOSTREAMS_BASE}/api/v1/status`,
+      {},
+      45000
+    );
+    if (!response?.data?.settings) {
+      throw new Error('The instance returned an incomplete status response.');
+    }
+    return response.data;
+  } catch (error) {
+    throw new SetupError(
+      `Midnight's AIOStreams instance is unavailable: ${error.message}`,
+      'aiostreams',
+      502
+    );
+  }
+}
+
+export async function createAiostreamsConfig({
+  password,
+  torboxApiKey,
+  torboxUser,
+  tmdbApiKey,
+  tvdbApiKey,
+}) {
+  const status = await getAiostreamsStatus();
+  const availablePresetIds = new Set(
+    status.settings.presets
+      .filter((preset) => !preset.DISABLED?.disabled)
+      .map((preset) => preset.ID)
+  );
+
+  const built = buildTamConfig({
+    torboxApiKey,
+    torboxPlan: Number(torboxUser.plan),
+    tmdbApiKey,
+    tvdbApiKey,
+    availablePresetIds,
+  });
+
+  let response;
+  try {
+    response = await requestJson(
+      `${AIOSTREAMS_BASE}/api/v1/user`,
+      {
+        method: 'POST',
+        ...jsonBody({ config: built.config, password }),
+      },
+      120000
+    );
+  } catch (error) {
+    const detail = error.body?.detail || error.body?.error?.message;
+    throw new SetupError(
+      `AIOStreams setup failed: ${detail || error.message}`,
+      'aiostreams',
+      error.status === 400 ? 400 : 502
+    );
+  }
+
+  const data = response?.data;
+  if (!data?.uuid || !data?.encryptedPassword) {
+    throw new SetupError(
+      'AIOStreams did not return a manifest identifier.',
+      'aiostreams',
+      502
+    );
+  }
+
+  const manifestUrl = `${AIOSTREAMS_BASE}/stremio/${data.uuid}/${data.encryptedPassword}/manifest.json`;
+  let manifest;
+  try {
+    manifest = await requestJson(manifestUrl, {}, 45000);
+  } catch (error) {
+    await deleteAiostreamsConfig(data.uuid, password);
+    throw new SetupError(
+      `The generated AIOStreams manifest could not be verified: ${error.message}`,
+      'aiostreams',
+      502
+    );
+  }
+
+  return {
+    uuid: data.uuid,
+    password,
+    manifestUrl,
+    manifestName: manifest?.name || 'AIOStreams',
+    configureUrl: `${AIOSTREAMS_BASE}/stremio/${data.uuid}/${data.encryptedPassword}/configure`,
+    templateVersion: built.templateVersion,
+    metadataMatchingEnabled: built.metadataMatchingEnabled,
+  };
+}
+
+export async function deleteAiostreamsConfig(uuid, password) {
+  try {
+    await requestJson(`${AIOSTREAMS_BASE}/api/v1/user`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${uuid}:${password}`, 'utf8').toString('base64')}`,
+      },
+    });
+  } catch {
+    // Best-effort cleanup only.
+  }
+}
+
+export async function logoutNuvio(token) {
+  try {
+    await requestJson(`${NUVIO_BASE}/auth/v1/logout`, {
+      method: 'POST',
+      headers: nuvioHeaders(token),
+    });
+  } catch {
+    // Session expiry is sufficient if logout is unavailable.
+  }
+}
+
+export async function runSetup(input, progress = () => {}) {
+  const email = String(input.email ?? '').trim().toLowerCase();
+  const nuvioPassword = String(input.nuvioPassword ?? '');
+  const torboxApiKey = String(input.torboxApiKey ?? '').trim();
+  const aiostreamsPassword = String(input.aiostreamsPassword ?? '');
+  const tmdbApiKey = String(input.tmdbApiKey ?? '').trim();
+  const tvdbApiKey = String(input.tvdbApiKey ?? '').trim();
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new SetupError('Enter a valid email address.', 'details', 400);
+  }
+  if (nuvioPassword.length < 6) {
+    throw new SetupError(
+      'The Nuvio password must be at least 6 characters.',
+      'details',
+      400
+    );
+  }
+  if (!torboxApiKey || /[\r\n\t]/.test(torboxApiKey)) {
+    throw new SetupError('Enter a valid TorBox API key.', 'details', 400);
+  }
+  if (aiostreamsPassword.length < 6) {
+    throw new SetupError(
+      'The AIOStreams password must be at least 6 characters.',
+      'details',
+      400
+    );
+  }
+
+  progress('torbox', 'Checking your TorBox account');
+  const torboxUser = await validateTorBox(torboxApiKey);
+
+  progress('nuvio', 'Creating or signing in to Nuvio');
+  const nuvio = await createOrLoginNuvio(email, nuvioPassword);
+  const profiles = await ensureNuvioProfiles(nuvio.token);
+
+  let aiostreams;
+  try {
+    progress('aiostreams', 'Building Tam-Taro SEL configuration');
+    aiostreams = await createAiostreamsConfig({
+      password: aiostreamsPassword,
+      torboxApiKey,
+      torboxUser,
+      tmdbApiKey,
+      tvdbApiKey,
+    });
+
+    progress('addons', 'Installing AIOStreams and Cinemeta in Nuvio');
+    const installedProfiles = await installNuvioAddons(
+      nuvio.token,
+      profiles,
+      aiostreams.manifestUrl,
+      aiostreams.manifestName
+    );
+
+    progress('complete', 'Setup complete');
+    return {
+      email,
+      nuvioAccountCreated: nuvio.created,
+      ...(nuvio.created ? { nuvioPassword } : {}),
+      aiostreamsPassword,
+      installedProfiles,
+      aiostreamsManifest: aiostreams.manifestUrl,
+      aiostreamsConfigureUrl: aiostreams.configureUrl,
+      aiostreamsName: aiostreams.manifestName,
+      tamTemplateVersion: aiostreams.templateVersion,
+      metadataMatchingEnabled: aiostreams.metadataMatchingEnabled,
+      torboxPlan: torboxUser.plan,
+      addons: ['Cinemeta', aiostreams.manifestName],
+    };
+  } catch (error) {
+    if (aiostreams?.uuid) {
+      await deleteAiostreamsConfig(
+        aiostreams.uuid,
+        aiostreams.password
+      );
+    }
+    throw error;
+  } finally {
+    await logoutNuvio(nuvio.token);
+  }
+}
+
+export const serviceConstants = {
+  aiostreamsBase: AIOSTREAMS_BASE,
+  cinemetaManifest: CINEMETA_MANIFEST,
+};

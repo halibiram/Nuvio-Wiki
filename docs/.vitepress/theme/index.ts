@@ -5,6 +5,7 @@ import P2PGenerator from './components/P2PGenerator.vue'
 import WelcomePage from './components/WelcomePage.vue'
 import NuvioSidebar from './components/NuvioSidebar.vue'
 import MobileNavigation from './components/MobileNavigation.vue'
+import NuvioQuickstart from './components/NuvioQuickstart.vue'
 import './custom.css'
 import './nuvio-shell.css'
 import './mobile-shell.css'
@@ -18,5 +19,6 @@ export default {
     app.component('MermaidDiagram', MermaidDiagram)
     app.component('P2PGenerator', P2PGenerator)
     app.component('WelcomePage', WelcomePage)
+    app.component('NuvioQuickstart', NuvioQuickstart)
   }
 }

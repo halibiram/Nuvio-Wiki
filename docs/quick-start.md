@@ -13,8 +13,7 @@ Want to get Nuvio up and running in 10 minutes? Follow this sequence:
 
 ## 2. Add Your First Addon
 
-> [!TIP]
-> For an easier setup, use the [Nuvio Quickstart Tool](https://nuvio-quickstart.duckdns.org/) to set up Nuvio addons for you. This will install *AIOStreams* using Tam-Taro's template and *Cinemeta*.
+<NuvioQuickstart />
 
 Nuvio is empty by default. You need an addon to see content. See [Addons](/integrations/addons).
 - [Android Mobile Only] Open Nuvio > **Settings** > **Content and Discovery** > **Addons**.

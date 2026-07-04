@@ -12,6 +12,7 @@ import {
   isFileSearchDataFresh,
   readFileSearchData
 } from './refresh-file-search.js';
+import { runSetup, SetupError } from './quickstart/services.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -192,6 +193,15 @@ const perHour = rateLimit({
   keyGenerator: (req) => req.ip
 });
 
+const setupLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many setup attempts. Please wait a few minutes.' },
+  keyGenerator: (req) => req.ip
+});
+
 // ── Routes ──────────────────────────────────────────────────────────────
 
 app.get('/api/ai/health', (_req, res) => {
@@ -215,6 +225,42 @@ app.get('/api/ai/health', (_req, res) => {
     cacheName: KNOWLEDGE_MODE === 'cache' && cacheValid ? cacheData.name : null,
     cacheExpiresAt: cacheData?.expiresAt || null
   });
+});
+
+app.post('/api/ai/setup', setupLimiter, async (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'application/x-ndjson; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+  });
+
+  try {
+    const input = req.body;
+    res.write(`${JSON.stringify({
+      type: 'progress',
+      step: 'details',
+      message: 'Details validated'
+    })}\n`);
+
+    const result = await runSetup(input, (step, message) => {
+      res.write(`${JSON.stringify({ type: 'progress', step, message })}\n`);
+    });
+
+    res.write(`${JSON.stringify({ type: 'result', data: result })}\n`);
+  } catch (error) {
+    const setupError =
+      error instanceof SetupError
+        ? error
+        : new SetupError('Setup failed unexpectedly. Please try again.');
+    res.write(`${JSON.stringify({
+      type: 'error',
+      step: setupError.step,
+      message: setupError.message,
+      status: setupError.status
+    })}\n`);
+  } finally {
+    res.end();
+  }
 });
 
 app.post('/api/ai/chat', perMinute, perHour, async (req, res) => {

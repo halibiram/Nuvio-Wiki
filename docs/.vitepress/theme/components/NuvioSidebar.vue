@@ -19,7 +19,7 @@ type SidebarSection = {
 
 const route = useRoute()
 const { isDark, site, theme, frontmatter } = useData()
-const collapsed = ref(false)
+const collapsed = ref(frontmatter.value?.layout === 'home')
 const hovered = ref(false)
 const expanded = reactive(new Set<string>())
 let leaveTimer: number | undefined
