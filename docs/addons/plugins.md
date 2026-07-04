@@ -103,3 +103,7 @@ This is the easier path for typing or pasting a long URL.
 - In Settings, the repository should show as enabled with a recent fetch/update timestamp rather than an error state.
 - If no providers appear after adding a repository, re-check that you enabled at least one provider inside it — the repository and its providers are toggled separately.
 
+### Finding Plugins
+
+The best way to find plugins is [joining the Nuvio streams discord](https://discord.gg/7C994hfSy).
+
