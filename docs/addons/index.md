@@ -89,14 +89,11 @@ These addons find streaming sources for your movies and shows.
 #### AIOStreams
 
 AIOStreams is the most popular "super-addon" — it aggregates results from multiple underlying scrapers (Meteor, Comet, Stremthru, and others) into a single, highly customizable feed. Because it is self-hostable, community members run their own instances:
-
-| Instance | Hosted By |
-|---|---|
-| [Yeb's Instance](https://aiostreams.fortheweak.cloud/stremio/configure) | Yeb |
-| [Wizaarrd's Instance](https://aiostreams.forthewizards.uk/configure) | Wizaarrd |
-| [Kuu's Instance](https://aiostreams.stremio.ru/configure) | Kuu |
-| [Midnight's Instance](https://aiostreamsfortheweebsstable.midnightignite.me/configure) | Midnight |
-| [ElfHosted](https://aiostreams.elfhosted.com/configure) | ElfHosted — **Disables P2P and HTTP streams** by default. |
+  - [Yeb's Instance](https://aiostreams.fortheweak.cloud/stremio/configure)
+  - [Wizaarrd's Instance](https://aiostreams.forthewizards.uk/configure)|
+  - [Kuu's Instance](https://aiostreams.stremio.ru/configure)
+  - [Midnight's Instance](https://aiostreamsfortheweebsstable.midnightignite.me/configure) | Midnight |
+  - [ElfHosted](https://aiostreams.elfhosted.com/configure) ElfHosted — **Disables P2P and HTTP streams**.
 
 > [!TIP]
 > Many users use pre-made configuration templates (like the **Tamtaro / TAMS** templates) to quickly set up filtering, sorting, and scraper selection within their chosen AIOStreams instance. You can typically import these from the configuration page.
