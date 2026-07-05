@@ -406,6 +406,11 @@ async function traktRequestAll(path: string, params: Record<string, any> = {}, f
   const allData: any[] = []
 
   while (true) {
+    if (page > 200) {
+      logLine('Warning: Trakt pagination safety limit reached (200 pages).')
+      break
+    }
+
     const res = await traktRequest(path, { ...params, page, limit }, fetchOptions)
     if (!res || !res.data) {
       break
@@ -413,16 +418,22 @@ async function traktRequestAll(path: string, params: Record<string, any> = {}, f
 
     if (Array.isArray(res.data)) {
       allData.push(...res.data)
+      
+      // If we received fewer items than the page limit, we have reached the end.
+      if (res.data.length < limit) {
+        break
+      }
+
+      // Check pagination headers if they are exposed by CORS
       const pageCountHeader = res.headers.get('X-Pagination-Page-Count') || res.headers.get('x-pagination-page-count')
       if (pageCountHeader) {
         const totalPages = parseInt(pageCountHeader, 10)
-        if (isNaN(totalPages) || page >= totalPages) {
+        if (!isNaN(totalPages) && page >= totalPages) {
           break
         }
-        page++
-      } else {
-        break
       }
+      
+      page++
     } else {
       return res
     }
