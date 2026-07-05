@@ -1453,20 +1453,37 @@ function stripDisplayFields(item: any) {
 }
 
 function cleanNuvioLibraryItem(item: any) {
-  return {
+  const cleaned: any = {
     content_id: item.content_id,
     content_type: item.content_type,
     name: item.name,
-    poster: item.poster,
-    poster_shape: item.poster_shape || 'POSTER',
-    background: item.background,
-    description: item.description,
-    release_info: item.release_info,
-    imdb_rating: item.imdb_rating,
-    genres: Array.isArray(item.genres) ? item.genres : [],
-    addon_base_url: item.addon_base_url,
     added_at: Number(item.added_at || Date.now()),
   }
+
+  if (item.poster) {
+    cleaned.poster = item.poster
+    cleaned.poster_shape = item.poster_shape || 'POSTER'
+  }
+  if (item.background) {
+    cleaned.background = item.background
+  }
+  if (item.description) {
+    cleaned.description = item.description
+  }
+  if (item.release_info) {
+    cleaned.release_info = item.release_info
+  }
+  if (item.imdb_rating !== undefined && item.imdb_rating !== null) {
+    cleaned.imdb_rating = item.imdb_rating
+  }
+  if (Array.isArray(item.genres)) {
+    cleaned.genres = item.genres
+  }
+  if (item.addon_base_url && item.addon_base_url !== 'https://trakt.tv') {
+    cleaned.addon_base_url = item.addon_base_url
+  }
+
+  return cleaned
 }
 
 // --- Preview Paging ---
