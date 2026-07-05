@@ -404,6 +404,7 @@ async function traktRequestAll(path: string, params: Record<string, any> = {}, f
   let page = 1
   const limit = 250
   const allData: any[] = []
+  let detectedLimit = limit
 
   while (true) {
     if (page > 200) {
@@ -417,10 +418,27 @@ async function traktRequestAll(path: string, params: Record<string, any> = {}, f
     }
 
     if (Array.isArray(res.data)) {
+      if (res.data.length === 0) {
+        break
+      }
+
       allData.push(...res.data)
       
-      // If we received fewer items than the page limit, we have reached the end.
-      if (res.data.length < limit) {
+      // On the first page, detect the actual page size limit applied by the server
+      if (page === 1) {
+        const limitHeader = res.headers.get('X-Pagination-Limit') || res.headers.get('x-pagination-limit')
+        if (limitHeader) {
+          const parsedLimit = parseInt(limitHeader, 10)
+          if (!isNaN(parsedLimit) && parsedLimit > 0) {
+            detectedLimit = parsedLimit
+          }
+        } else {
+          detectedLimit = res.data.length
+        }
+      }
+
+      // If we received fewer items than the detected limit, we have reached the end.
+      if (res.data.length < detectedLimit) {
         break
       }
 
