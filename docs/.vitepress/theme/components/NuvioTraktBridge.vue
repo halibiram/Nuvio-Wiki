@@ -981,14 +981,6 @@ async function buildSyncPlan(isPreviewOnly = false) {
           content_id: id,
           content_type: kind,
           name: media?.title || 'Untitled',
-          poster: null,
-          poster_shape: 'POSTER',
-          background: null,
-          description: media?.overview || null,
-          release_info: media?.year ? String(media.year) : null,
-          imdb_rating: typeof media?.rating === 'number' ? media.rating : null,
-          genres: Array.isArray(media?.genres) ? media.genres : [],
-          addon_base_url: 'https://trakt.tv',
           added_at: new Date(item.listed_at || item.collected_at || Date.now()).getTime(),
           _display_type: `${item._src} item`
         })
@@ -1240,12 +1232,8 @@ async function executeSync() {
           const existing = mergedMap.get(item.content_id)
           if (!existing || item.added_at > existing.added_at) {
             // Keep existing metadata if available
-            if (existing) {
-              item.poster = item.poster || existing.poster
-              item.background = item.background || existing.background
-              item.description = item.description || existing.description
-            }
-            mergedMap.set(item.content_id, item)
+            const merged = existing ? { ...existing, ...item } : item
+            mergedMap.set(item.content_id, merged)
           }
         })
 
