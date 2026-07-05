@@ -325,7 +325,11 @@ app.get('/api/trakt/callback', async (req, res) => {
     const redirectUri = getRedirectUri(req);
     const response = await fetch('https://api.trakt.tv/oauth/token', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Nuvio-Trakt-Bridge/1.0'
+      },
       body: JSON.stringify({
         code,
         client_id: clientId,
@@ -397,7 +401,11 @@ app.post('/api/trakt/refresh', async (req, res) => {
     const redirectUri = getRedirectUri(req);
     const response = await fetch('https://api.trakt.tv/oauth/token', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'Nuvio-Trakt-Bridge/1.0'
+      },
       body: JSON.stringify({
         refresh_token,
         client_id: clientId,
