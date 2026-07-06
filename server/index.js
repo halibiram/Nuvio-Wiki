@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { GoogleGenAI } from '@google/genai';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
 import { buildAndSaveCache } from './refresh-cache.js';
@@ -524,6 +524,251 @@ app.post('/api/ai/chat', perMinute, perHour, async (req, res) => {
     res.end();
   }
 });
+
+// ── Metadata Enrichment for Trakt Bridge ──────────────────────────────────
+app.get('/api/trakt/tmdb-config', (req, res) => {
+  res.json({ hasKey: !!process.env.TMDB_API_KEY });
+});
+
+const METADATA_CACHE_FILE = join(__dirname, 'metadata-cache.json');
+
+function readMetadataCache() {
+  if (!existsSync(METADATA_CACHE_FILE)) return {};
+  try {
+    return JSON.parse(readFileSync(METADATA_CACHE_FILE, 'utf-8'));
+  } catch (e) {
+    console.error('Failed to read metadata cache:', e);
+    return {};
+  }
+}
+
+function writeMetadataCache(cache) {
+  try {
+    writeFileSync(METADATA_CACHE_FILE, JSON.stringify(cache, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Failed to write metadata cache:', e);
+  }
+}
+
+async function fetchTmdb(path, queryParams = {}) {
+  const apiKey = process.env.TMDB_API_KEY;
+  if (!apiKey) {
+    throw new Error('TMDB_API_KEY is not configured on the server.');
+  }
+  const url = new URL(`https://api.themoviedb.org${path}`);
+  url.searchParams.set('api_key', apiKey);
+  Object.entries(queryParams).forEach(([key, val]) => {
+    url.searchParams.set(key, String(val));
+  });
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      'Accept': 'application/json',
+      'User-Agent': 'Nuvio-Trakt-Bridge/1.0'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`TMDB API HTTP error ${response.status}`);
+  }
+  return response.json();
+}
+
+async function fetchCinemeta(type, imdbId) {
+  const cinemetaType = type === 'movie' ? 'movie' : 'series';
+  const url = `https://v3-cinemeta.strem.io/meta/${cinemetaType}/${imdbId}.json`;
+  const response = await fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'User-Agent': 'Nuvio-Trakt-Bridge/1.0'
+    }
+  });
+  if (!response.ok) {
+    throw new Error(`Cinemeta API HTTP error ${response.status}`);
+  }
+  const data = await response.json();
+  const meta = data?.meta;
+  return {
+    posterUrl: meta?.poster || null,
+    releaseDate: meta?.released || null,
+    source: 'cinemeta'
+  };
+}
+
+app.post('/api/trakt/enrich-metadata', express.json({ limit: '10mb' }), async (req, res) => {
+  try {
+    const { items } = req.body;
+    if (!items || !Array.isArray(items)) {
+      return res.status(400).json({ error: 'items array is required' });
+    }
+
+    const cache = readMetadataCache();
+    const results = [];
+
+    // Helper for concurrency limiting (max 5 parallel calls)
+    const limit = 5;
+    let index = 0;
+    
+    // Simple console tracking
+    let enrichedCount = 0;
+    let fallbackCount = 0;
+    let missingCount = 0;
+    let failedCount = 0;
+
+    async function worker() {
+      while (index < items.length) {
+        const currentIndex = index++;
+        const item = items[currentIndex];
+        const type = item.content_type === 'movie' ? 'movie' : 'series';
+        const name = item.name || 'Untitled';
+        const ids = item._ids || {};
+
+        const tmdbId = ids.tmdb;
+        const imdbId = ids.imdb;
+
+        if (!tmdbId && !imdbId) {
+          missingCount++;
+          console.log(`[Metadata] Missing IDs for "${name}" - cannot enrich.`);
+          results[currentIndex] = {
+            content_id: item.content_id,
+            posterUrl: null,
+            releaseDate: null,
+            source: 'missing'
+          };
+          continue;
+        }
+
+        const tmdbCacheKey = tmdbId ? `${type}:tmdb:${tmdbId}` : null;
+        const imdbCacheKey = imdbId ? `${type}:imdb:${imdbId}` : null;
+
+        // Cache lookup
+        let cachedVal = null;
+        if (tmdbCacheKey && cache[tmdbCacheKey]) {
+          cachedVal = cache[tmdbCacheKey];
+        } else if (imdbCacheKey && cache[imdbCacheKey]) {
+          cachedVal = cache[imdbCacheKey];
+        }
+
+        if (cachedVal) {
+          if (cachedVal.source === 'tmdb') enrichedCount++;
+          else if (cachedVal.source === 'cinemeta') fallbackCount++;
+          else if (cachedVal.source === 'failed') failedCount++;
+          
+          results[currentIndex] = {
+            content_id: item.content_id,
+            posterUrl: cachedVal.posterUrl,
+            releaseDate: cachedVal.releaseDate,
+            source: cachedVal.source,
+            fromCache: true
+          };
+          continue;
+        }
+
+        // Fetch
+        try {
+          const tmdbApiKey = process.env.TMDB_API_KEY;
+          let resolvedTmdbId = tmdbId;
+          let fetchSource = 'failed';
+          let posterUrl = null;
+          let releaseDate = null;
+
+          if (tmdbApiKey) {
+            if (!resolvedTmdbId && imdbId) {
+              const findRes = await fetchTmdb(`/3/find/${imdbId}`, { external_source: 'imdb_id' });
+              const resultsList = type === 'movie' ? findRes?.movie_results : findRes?.tv_results;
+              if (resultsList && resultsList.length > 0) {
+                resolvedTmdbId = resultsList[0].id;
+              }
+            }
+
+            if (resolvedTmdbId) {
+              if (type === 'movie') {
+                const detail = await fetchTmdb(`/3/movie/${resolvedTmdbId}`);
+                posterUrl = detail?.poster_path ? `https://image.tmdb.org/t/p/w500${detail.poster_path}` : null;
+                releaseDate = detail?.release_date || null;
+                fetchSource = 'tmdb';
+              } else {
+                const detail = await fetchTmdb(`/3/tv/${resolvedTmdbId}`);
+                posterUrl = detail?.poster_path ? `https://image.tmdb.org/t/p/w500${detail.poster_path}` : null;
+                releaseDate = detail?.first_air_date || null;
+                fetchSource = 'tmdb';
+              }
+            }
+          }
+
+          // Fallback to Cinemeta
+          if (fetchSource === 'failed' && imdbId) {
+            try {
+              const cinemeta = await fetchCinemeta(type, imdbId);
+              posterUrl = cinemeta.posterUrl;
+              releaseDate = cinemeta.releaseDate;
+              fetchSource = 'cinemeta';
+            } catch (e) {
+              // Ignore cinemeta fail
+            }
+          }
+
+          const cacheVal = {
+            posterUrl,
+            releaseDate,
+            source: fetchSource,
+            updatedAt: Date.now()
+          };
+
+          // Save to cache memory
+          if (tmdbCacheKey) cache[tmdbCacheKey] = cacheVal;
+          if (imdbCacheKey) cache[imdbCacheKey] = cacheVal;
+          if (resolvedTmdbId) {
+            cache[`${type}:tmdb:${resolvedTmdbId}`] = cacheVal;
+          }
+
+          // Logging
+          if (fetchSource === 'tmdb') {
+            enrichedCount++;
+            console.log(`[Metadata] Enriched item "${name}" (TMDB) - Poster: ${posterUrl}, Release: ${releaseDate}`);
+          } else if (fetchSource === 'cinemeta') {
+            fallbackCount++;
+            console.log(`[Metadata] Fallback Cinemeta item "${name}" - Poster: ${posterUrl}, Release: ${releaseDate}`);
+          } else {
+            failedCount++;
+            console.log(`[Metadata] Failed to enrich "${name}" (tried TMDB/Cinemeta)`);
+          }
+
+          results[currentIndex] = {
+            content_id: item.content_id,
+            posterUrl,
+            releaseDate,
+            source: fetchSource
+          };
+
+        } catch (err) {
+          failedCount++;
+          console.error(`[Metadata] Error enriching "${name}":`, err.message);
+          results[currentIndex] = {
+            content_id: item.content_id,
+            posterUrl: null,
+            releaseDate: null,
+            source: 'failed'
+          };
+        }
+      }
+    }
+
+    const workers = Array.from({ length: Math.min(limit, items.length) }, worker);
+    await Promise.all(workers);
+
+    // Save cache to file
+    writeMetadataCache(cache);
+
+    console.log(`[Metadata Sync] Completed enrichment batch: ${items.length} items. Enriched (TMDB): ${enrichedCount}, Fallback (Cinemeta): ${fallbackCount}, Missing: ${missingCount}, Failed: ${failedCount}`);
+
+    res.json({ results });
+  } catch (error) {
+    console.error('Enrichment batch endpoint error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 // ── Start ───────────────────────────────────────────────────────────────
 app.listen(PORT, () => {

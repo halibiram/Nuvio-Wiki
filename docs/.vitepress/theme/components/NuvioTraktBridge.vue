@@ -982,7 +982,8 @@ async function buildSyncPlan(isPreviewOnly = false) {
           content_type: kind,
           name: media?.title || 'Untitled',
           added_at: new Date(item.listed_at || item.collected_at || Date.now()).getTime(),
-          _display_type: `${item._src} item`
+          _display_type: `${item._src} item`,
+          _ids: media?.ids
         })
       }
     }
@@ -1208,6 +1209,37 @@ async function executeSync() {
 
       // 3. PUSH LIBRARY
       if (plan.library.length) {
+        logLine(`Enriching ${plan.library.length} imported library items with metadata...`)
+        try {
+          const enrichRes = await requestJson(window.location.origin + withBase('/api/trakt/enrich-metadata'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ items: plan.library })
+          })
+
+          const enrichedResults = enrichRes?.data?.results || []
+          const enrichMap = new Map()
+          enrichedResults.forEach((r: any) => enrichMap.set(r.content_id, r))
+
+          plan.library.forEach((item: any) => {
+            const match = enrichMap.get(item.content_id)
+            if (match) {
+              if (match.posterUrl) {
+                item.poster = match.posterUrl
+                item.poster_shape = 'POSTER'
+              }
+              if (match.releaseDate) {
+                item.release_info = match.releaseDate
+              }
+            }
+          })
+          logLine('Metadata enrichment complete.')
+        } catch (e: any) {
+          logLine(`Warning: Metadata enrichment failed (${e.message || e}). Importing with existing metadata.`)
+        }
+
         logLine('Pulling current Nuvio library for deduplication/merge...')
         const existingRows = [] as any[]
         const limit = 500
@@ -1231,8 +1263,17 @@ async function executeSync() {
         newLibraryItems.forEach(item => {
           const existing = mergedMap.get(item.content_id)
           if (!existing || item.added_at > existing.added_at) {
-            // Keep existing metadata if available
-            const merged = existing ? { ...existing, ...item } : item
+            // Keep existing metadata if available, and don't overwrite good metadata with null/empty
+            const merged = { ...existing }
+            Object.entries(item).forEach(([key, val]) => {
+              if (val !== undefined && val !== null && val !== '') {
+                merged[key] = val;
+              } else if (existing && existing[key] !== undefined && existing[key] !== null) {
+                // Keep existing good value
+              } else {
+                merged[key] = val;
+              }
+            })
             mergedMap.set(item.content_id, merged)
           }
         })
