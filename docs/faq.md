@@ -12,7 +12,7 @@ Yes, Nuvio is free and open source software (FOSS). Nuvio runs on donations. Ple
 Visit the official Nuvio [website](https://nuvio.tv/).
 
 ### What does it support?
-Currently, Nuvio runs on Android mobile, Android TV, iOS, WebOS, and Tizen.
+Currently, Nuvio runs on Android mobile, Android TV, Windows, macOS, iOS, WebOS, and Tizen.
 
 ### Why is the TestFlight full? When will there be spots?
 Apple provides 10k spots to developers. These spots are often fully filled and rarely become available.
