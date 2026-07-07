@@ -218,7 +218,7 @@ import { siteRoutes } from '../../routes.mts'
         <a href="https://ko-fi.com/skoruppa" target="_blank" rel="noopener"><strong>skoruppa</strong><span>Support on Ko-fi</span></a>
         <a href="https://ko-fi.com/halibiram" target="_blank" rel="noopener"><strong>halibiram</strong><span>Support on Ko-fi</span></a>
         <a href="https://ko-fi.com/edoedac" target="_blank" rel="noopener"><strong>𝔈𝔡𝔬</strong><span>Support on Ko-fi</span></a>
-        <a href="https://torbox.app/subscription?referral=41d1ac85-ee5e-4699-9f0a-92e67cbc2fb2" target="_blank" rel="noopener"><strong>Hond</strong><span>TorBox referral</span></a>
+        <a href="https://ko-fi.com/haaihond" target="_blank" rel="noopener"><strong>Hond</strong><span>Support on Ko-fi</span></a>
       </div>
     </section>
 

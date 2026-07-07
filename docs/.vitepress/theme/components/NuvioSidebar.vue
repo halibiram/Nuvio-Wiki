@@ -2,7 +2,6 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useData, useRoute, withBase } from 'vitepress'
 import NuvioSearch from './NuvioSearch.vue'
-import AskAI from './AskAI.vue'
 
 type SidebarItem = {
   text: string
@@ -24,10 +23,15 @@ const hovered = ref(false)
 const expanded = reactive(new Set<string>())
 let leaveTimer: number | undefined
 const searchOpen = ref(false)
-const askAiEl = ref<any>(null)
+const searchInitialTab = ref<'search' | 'ai'>('search')
+
+function openSearch(tab: 'search' | 'ai' = 'search') {
+  searchInitialTab.value = tab
+  searchOpen.value = true
+}
 
 function openAI() {
-  askAiEl.value?.open()
+  openSearch('ai')
 }
 
 const isDutch = computed(() => route.path.startsWith('/nl/'))
@@ -172,10 +176,6 @@ function hideSidebar() {
   }, 350)
 }
 
-function openSearch() {
-  searchOpen.value = true
-}
-
 function closeSearch() {
   searchOpen.value = false
 }
@@ -184,7 +184,7 @@ function closeSearch() {
 function onGlobalKeydown(e: KeyboardEvent) {
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault()
-    searchOpen.value = true
+    openSearch('search')
   }
 }
 
@@ -236,23 +236,27 @@ onBeforeUnmount(() => {
         </button>
       </div>
 
-      <button class="nuvio-sidebar__search" type="button" @click="openSearch">
+      <button class="nuvio-sidebar__search" type="button" @click="openSearch('search')">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="11" cy="11" r="6.5" />
           <path d="m16 16 4 4" />
         </svg>
-        <span>{{ isDutch ? 'Zoeken' : 'Search' }}</span>
+        <span>Search or Ask AI</span>
         <kbd>Ctrl</kbd><kbd>K</kbd>
       </button>
     </header>
  
     <nav class="nuvio-sidebar__nav" aria-label="Documentation">
-      <button class="nuvio-sidebar__ask-ai-button" type="button" @click="openAI">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+      <a class="nuvio-sidebar__ask-ai-button" href="https://ko-fi.com/haaihond" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+          <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+          <line x1="6" y1="1" x2="6" y2="4" />
+          <line x1="10" y1="1" x2="10" y2="4" />
+          <line x1="14" y1="1" x2="14" y2="4" />
         </svg>
-        <span>{{ isDutch ? 'Vraag AI' : 'Ask AI' }}</span>
-      </button>
+        <span>Support me on Ko-fi</span>
+      </a>
 
       <section v-for="section in sections" :key="section.key" class="nuvio-sidebar__section">
         <a
@@ -378,19 +382,13 @@ onBeforeUnmount(() => {
         <path d="M9 4v16" />
       </svg>
     </button>
-    <button class="nuvio-icon-button" type="button" :aria-label="isDutch ? 'Zoeken' : 'Search'" @click="openSearch">
+    <button class="nuvio-icon-button" type="button" aria-label="Search or Ask AI" @click="openSearch('search')">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <circle cx="11" cy="11" r="6.5" />
         <path d="m16 16 4 4" />
       </svg>
     </button>
-    <button class="nuvio-icon-button" type="button" :aria-label="isDutch ? 'Vraag AI' : 'Ask AI'" @click="openAI">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-      </svg>
-    </button>
   </div>
 
-  <NuvioSearch v-if="searchOpen" :is-dutch="isDutch" @close="closeSearch" />
-  <AskAI ref="askAiEl" hide-fab />
+  <NuvioSearch v-if="searchOpen" :is-dutch="isDutch" :initial-tab="searchInitialTab" @close="closeSearch" />
 </template>

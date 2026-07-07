@@ -121,7 +121,14 @@ function pathToFile(path: string) {
 }
 
 /* ── Props / Emits ──────────────────────────────────────────────────────── */
-defineProps<{ isDutch?: boolean }>()
+interface SearchProps {
+  isDutch?: boolean
+  initialTab?: 'search' | 'ai'
+}
+const props = withDefaults(defineProps<SearchProps>(), {
+  isDutch: false,
+  initialTab: 'search'
+})
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 /* ── Refs ────────────────────────────────────────────────────────────────── */
@@ -167,11 +174,33 @@ const searchIndex = computedAsync(async () =>
 /* ── Filter text ────────────────────────────────────────────────────────── */
 const filterText = useSessionStorage('vitepress:local-search-filter', '')
 
+/* ── Tab & AI Assistant State ───────────────────────────────────────────── */
+const activeTab = ref<'search' | 'ai'>(props.initialTab)
+const messages = ref<{ role: 'user' | 'model'; content: string }[]>([])
+const isStreaming = ref(false)
+const streamingContent = ref('')
+const errorMsg = ref('')
+const chatContainer = ref<HTMLElement>()
+
+watch(() => props.initialTab, (newTab) => {
+  activeTab.value = newTab
+})
+
+function setTab(tab: 'search' | 'ai') {
+  activeTab.value = tab
+  nextTick(() => {
+    focusSearchInput(false)
+  })
+}
+
 /* ── Results ────────────────────────────────────────────────────────────── */
 const results: Ref<(SearchResult & Result)[]> = shallowRef([])
 const enableNoResults = ref(false)
 
-watch(filterText, () => { enableNoResults.value = false })
+watch(filterText, (newVal) => {
+  enableNoResults.value = false
+  selectedIndex.value = newVal.trim() || results.value.length ? 0 : -1
+})
 
 const mark = computedAsync(async () => {
   if (!resultsEl.value) return
@@ -292,8 +321,14 @@ onMounted(() => { focusSearchInput() })
 const selectedIndex = ref(-1)
 const disableMouseOver = ref(true)
 
+const totalItemsCount = computed(() => {
+  if (activeTab.value !== 'search') return 0
+  const hasAiItem = filterText.value.trim().length > 0 ? 1 : 0
+  return results.value.length + hasAiItem
+})
+
 watch(results, (r) => {
-  selectedIndex.value = r.length ? 0 : -1
+  selectedIndex.value = r.length || filterText.value.trim() ? 0 : -1
   scrollToSelectedResult()
 })
 
@@ -305,17 +340,21 @@ function scrollToSelectedResult() {
 }
 
 onKeyStroke('ArrowUp', (event) => {
+  if (activeTab.value !== 'search') return
   event.preventDefault()
+  if (totalItemsCount.value === 0) return
   selectedIndex.value--
-  if (selectedIndex.value < 0) selectedIndex.value = results.value.length - 1
+  if (selectedIndex.value < 0) selectedIndex.value = totalItemsCount.value - 1
   disableMouseOver.value = true
   scrollToSelectedResult()
 })
 
 onKeyStroke('ArrowDown', (event) => {
+  if (activeTab.value !== 'search') return
   event.preventDefault()
+  if (totalItemsCount.value === 0) return
   selectedIndex.value++
-  if (selectedIndex.value >= results.value.length) selectedIndex.value = 0
+  if (selectedIndex.value >= totalItemsCount.value) selectedIndex.value = 0
   disableMouseOver.value = true
   scrollToSelectedResult()
 })
@@ -327,10 +366,37 @@ function close() {
   visible.value = false
 }
 
+async function askAiAboutQuery(query: string) {
+  if (!query.trim()) return
+  setTab('ai')
+  filterText.value = ''
+  await sendAiMessage(query)
+}
+
 onKeyStroke('Enter', (e) => {
   if (e.isComposing) return
   if (e.target instanceof HTMLButtonElement && e.target.type !== 'submit') return
-  const selectedPackage = results.value[selectedIndex.value]
+
+  if (activeTab.value === 'ai') {
+    const text = filterText.value.trim()
+    if (text) {
+      filterText.value = ''
+      sendAiMessage(text)
+    }
+    e.preventDefault()
+    return
+  }
+
+  // Active tab is search:
+  const hasAiItem = filterText.value.trim().length > 0
+  if (hasAiItem && selectedIndex.value === 0) {
+    e.preventDefault()
+    askAiAboutQuery(filterText.value)
+    return
+  }
+
+  const resultIndex = hasAiItem ? selectedIndex.value - 1 : selectedIndex.value
+  const selectedPackage = results.value[resultIndex]
   if (e.target instanceof HTMLInputElement && !selectedPackage) {
     e.preventDefault()
     return
@@ -359,6 +425,244 @@ function onMouseMove(e: MouseEvent) {
   if (index >= 0 && index !== selectedIndex.value) selectedIndex.value = index
   disableMouseOver.value = false
 }
+
+/* ── AI Assistant Messaging & Streaming ─────────────────────────────────── */
+function scrollToChatBottom() {
+  nextTick(() => {
+    const container = chatContainer.value
+    if (container) container.scrollTop = container.scrollHeight
+  })
+}
+
+function clearChat() {
+  messages.value = []
+  streamingContent.value = ''
+  errorMsg.value = ''
+  filterText.value = ''
+  nextTick(() => searchInput.value?.focus())
+}
+
+function onMessageClick(event: MouseEvent) {
+  const link = event.target instanceof Element
+    ? event.target.closest('a.ask-ai-link')
+    : null
+
+  if (!link) return
+
+  const href = link.getAttribute('href')
+  if (href) {
+    const url = new URL(href, window.location.href)
+    if (url.origin === window.location.origin) {
+      event.preventDefault()
+      close()
+      router.go(`${url.pathname}${url.search}${url.hash}`)
+      return
+    }
+  }
+
+  close()
+}
+
+async function sendAiMessage(text: string) {
+  if (!text.trim() || isStreaming.value) return
+
+  errorMsg.value = ''
+  
+  // Add user message
+  messages.value.push({ role: 'user', content: text })
+  scrollToChatBottom()
+
+  // Start streaming
+  isStreaming.value = true
+  streamingContent.value = ''
+
+  // Add placeholder for AI response
+  const aiMsgIndex = messages.value.length
+  messages.value.push({ role: 'model', content: '' })
+
+  try {
+    const payload = messages.value
+      .slice(0, -1)
+      .map(m => ({ role: m.role, content: m.content }))
+
+    const response = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: payload })
+    })
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}))
+      throw new Error(err.error || `Server error (${response.status})`)
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ''
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue
+        const data = line.slice(6).trim()
+
+        if (data === '[DONE]') break
+
+        try {
+          const parsed = JSON.parse(data)
+          if (parsed.error) {
+            throw new Error(parsed.error)
+          }
+          if (parsed.text) {
+            streamingContent.value += parsed.text
+            messages.value[aiMsgIndex].content = streamingContent.value
+            scrollToChatBottom()
+          }
+        } catch (parseErr: any) {
+          if (parseErr.message !== 'Unexpected end of JSON input') {
+            if (data.includes('"error"')) throw parseErr
+          }
+        }
+      }
+    }
+  } catch (err: any) {
+    console.error('Ask AI error:', err)
+    errorMsg.value = err.message || 'Failed to get a response. Please try again.'
+
+    if (!messages.value[aiMsgIndex]?.content) {
+      messages.value.splice(aiMsgIndex, 1)
+    }
+  } finally {
+    isStreaming.value = false
+    streamingContent.value = ''
+    scrollToChatBottom()
+  }
+}
+
+/* ── Lightweight markdown rendering ─────────────────────────────────────── */
+function escapeHtml(str: string) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function renderMarkdown(text: string) {
+  if (!text) return ''
+
+  const codeBlocks: string[] = []
+  let html = text.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const id = `__CODE_BLOCK_${codeBlocks.length}__`
+    codeBlocks.push(`<pre class="ask-ai-code"><code>${escapeHtml(code.trim())}</code></pre>`)
+    return id
+  })
+
+  html = escapeHtml(html)
+
+  const lines = html.split('\n')
+  const result: string[] = []
+  let inUl = false
+  let inOl = false
+
+  for (let line of lines) {
+    const trimmed = line.trim()
+
+    const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/)
+    if (headingMatch) {
+      if (inUl) { result.push('</ul>'); inUl = false; }
+      if (inOl) { result.push('</ol>'); inOl = false; }
+      const level = headingMatch[1].length
+      result.push(`<h${level} class="ask-ai-h${level}">${headingMatch[2]}</h${level}>`)
+      continue
+    }
+
+    const ulMatch = line.match(/^(\s*)[-*]\s+(.+)$/)
+    if (ulMatch) {
+      if (inOl) { result.push('</ol>'); inOl = false; }
+      if (!inUl) { result.push('<ul class="ask-ai-ul">'); inUl = true; }
+      result.push(`<li>${ulMatch[2]}</li>`)
+      continue
+    }
+
+    const olMatch = line.match(/^(\s*)\d+\.\s+(.+)$/)
+    if (olMatch) {
+      if (inUl) { result.push('</ul>'); inUl = false; }
+      if (!inOl) { result.push('<ol class="ask-ai-ol">'); inOl = true; }
+      result.push(`<li>${olMatch[2]}</li>`)
+      continue
+    }
+
+    if (trimmed === '') {
+      if (inUl) { result.push('</ul>'); inUl = false; }
+      if (inOl) { result.push('</ol>'); inOl = false; }
+      result.push('')
+      continue
+    }
+
+    if ((inUl || inOl) && (line.startsWith('  ') || line.startsWith('\t'))) {
+      if (result.length > 0) {
+        const last = result[result.length - 1]
+        if (last.endsWith('</li>')) {
+          result[result.length - 1] = last.slice(0, -5) + '<br>' + trimmed + '</li>'
+          continue
+        }
+      }
+    }
+
+    if (inUl && !ulMatch) { result.push('</ul>'); inUl = false; }
+    if (inOl && !olMatch) { result.push('</ol>'); inOl = false; }
+
+    result.push(trimmed)
+  }
+
+  if (inUl) result.push('</ul>')
+  if (inOl) result.push('</ol>')
+
+  let assembledHtml = ''
+  let currentPara: string[] = []
+
+  const flushPara = () => {
+    if (currentPara.length > 0) {
+      assembledHtml += `<p>${currentPara.join('<br>')}</p>`
+      currentPara = []
+    }
+  }
+
+  for (let item of result) {
+    if (item === '') {
+      flushPara()
+      continue
+    }
+
+    const isBlock = item.startsWith('<h') || item.startsWith('<ul') || item.startsWith('</ul>') || item.startsWith('<ol') || item.startsWith('</ol>') || item.startsWith('<li>') || item.startsWith('__CODE_BLOCK_')
+
+    if (isBlock) {
+      flushPara()
+      assembledHtml += item
+    } else {
+      currentPara.push(item)
+    }
+  }
+  flushPara()
+
+  assembledHtml = assembledHtml.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  assembledHtml = assembledHtml.replace(/\*(.+?)\*/g, '<em>$1</em>')
+  assembledHtml = assembledHtml.replace(/`([^`]+)`/g, '<code class="ask-ai-inline-code">$1</code>')
+  assembledHtml = assembledHtml.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="ask-ai-link">$1</a>')
+
+  codeBlocks.forEach((codeHtml, idx) => {
+    assembledHtml = assembledHtml.replace(`__CODE_BLOCK_${idx}__`, codeHtml)
+  })
+
+  return assembledHtml
+}
 </script>
 
 <template>
@@ -380,33 +684,104 @@ function onMouseMove(e: MouseEvent) {
               ref="searchInput"
               v-model="filterText"
               class="nuvio-search-input"
-              :placeholder="isDutch ? 'Zoek in de wiki...' : 'Search the wiki...'"
+              :placeholder="activeTab === 'search' ? 'Search docs...' : 'Ask AI a question...'"
               type="search"
               autocomplete="off"
               autocorrect="off"
               autocapitalize="off"
               spellcheck="false"
               maxlength="64"
-              enterkeyhint="go"
+              :enterkeyhint="activeTab === 'search' ? 'go' : 'send'"
             />
             <kbd class="nuvio-search-esc" @click="close">ESC</kbd>
           </div>
 
+          <!-- Tabs -->
+          <div class="nuvio-search-tabs">
+            <button
+              type="button"
+              class="nuvio-search-tab"
+              :class="{ 'is-active': activeTab === 'search' }"
+              @click="setTab('search')"
+            >
+              <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" width="14" height="14">
+                <circle cx="11" cy="11" r="8" fill="none" stroke="currentColor" stroke-width="2" />
+                <path d="m21 21-4.34-4.34" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              <span>Search Docs</span>
+            </button>
+            <button
+              type="button"
+              class="nuvio-search-tab"
+              :class="{ 'is-active': activeTab === 'ai' }"
+              @click="setTab('ai')"
+            >
+              <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" width="14" height="14">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+              </svg>
+              <span>Ask AI</span>
+            </button>
+
+            <!-- Actions like clear chat -->
+            <button
+              v-if="activeTab === 'ai' && (messages.length > 0 || isStreaming)"
+              type="button"
+              class="nuvio-search-clear-chat"
+              @click="clearChat"
+              title="Clear chat"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+              <span>Clear</span>
+            </button>
+          </div>
+
           <!-- Results -->
           <ul
+            v-if="activeTab === 'search'"
             ref="resultsEl"
             class="nuvio-search-results"
             @mousemove="onMouseMove"
           >
+            <!-- AI Prompt Suggestion -->
+            <li v-if="filterText.trim()">
+              <a
+                href="#"
+                class="nuvio-search-result nuvio-search-result--ai-trigger"
+                :class="{ 'is-selected': selectedIndex === 0 }"
+                data-index="0"
+                @mouseenter="!disableMouseOver && (selectedIndex = 0)"
+                @focusin="selectedIndex = 0"
+                @click.prevent="askAiAboutQuery(filterText)"
+              >
+                <div class="nuvio-search-result-inner" style="display: flex; align-items: center; gap: 10px;">
+                  <div class="nuvio-search-ai-icon" style="color: var(--vp-c-brand-1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px; background: var(--vp-c-brand-soft);">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="nuvio-search-titles" style="margin-bottom: 2px;">
+                      <span class="nuvio-search-breadcrumb">AI Assistant</span>
+                    </div>
+                    <div class="nuvio-search-title-main" style="margin-top: 0;">
+                      Ask AI about "{{ filterText }}"
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </li>
+
             <li v-for="(p, index) in results" :key="p.id">
               <a
                 :href="p.id"
                 class="nuvio-search-result"
-                :class="{ 'is-selected': selectedIndex === index }"
+                :class="{ 'is-selected': selectedIndex === (filterText.trim() ? index + 1 : index) }"
                 :aria-label="[...p.titles, p.title].join(' > ')"
-                :data-index="index"
-                @mouseenter="!disableMouseOver && (selectedIndex = index)"
-                @focusin="selectedIndex = index"
+                :data-index="filterText.trim() ? index + 1 : index"
+                @mouseenter="!disableMouseOver && (selectedIndex = (filterText.trim() ? index + 1 : index))"
+                @focusin="selectedIndex = (filterText.trim() ? index + 1 : index)"
                 @click="close"
               >
                 <div class="nuvio-search-result-inner">
@@ -437,25 +812,78 @@ function onMouseMove(e: MouseEvent) {
 
             <!-- No results -->
             <li v-if="filterText && !results.length && enableNoResults" class="nuvio-search-no-results">
-              {{ isDutch ? 'Geen resultaten voor' : 'No results for' }}
-              "<strong>{{ filterText }}</strong>"
+              No results for "<strong>{{ filterText }}</strong>"
             </li>
           </ul>
 
+          <!-- AI Chat Area -->
+          <div
+            v-else
+            ref="chatContainer"
+            class="nuvio-search-chat-container"
+            @click="onMessageClick"
+          >
+            <!-- Welcome message when empty -->
+            <div v-if="messages.length === 0 && !isStreaming" class="ask-ai-welcome">
+              <div class="ask-ai-welcome__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+              </div>
+              <h3 class="ask-ai-welcome__title">Nuvio Assistant</h3>
+              <p class="ask-ai-welcome__text">
+                Ask me anything about Nuvio — installation, settings, add-ons, and troubleshooting.
+              </p>
+            </div>
+
+            <!-- Message bubbles -->
+            <div
+              v-for="(msg, i) in messages"
+              :key="i"
+              class="ask-ai-msg"
+              :class="`ask-ai-msg--${msg.role}`"
+            >
+              <div class="ask-ai-msg__bubble" v-html="msg.role === 'model' ? renderMarkdown(msg.content) : escapeHtml(msg.content)" />
+            </div>
+
+            <!-- Streaming indicator -->
+            <div v-if="isStreaming && !streamingContent" class="ask-ai-msg ask-ai-msg--model">
+              <div class="ask-ai-msg__bubble ask-ai-msg__typing">
+                <span class="ask-ai-dot" /><span class="ask-ai-dot" /><span class="ask-ai-dot" />
+              </div>
+            </div>
+
+            <!-- Error message -->
+            <div v-if="errorMsg" class="ask-ai-error">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              {{ errorMsg }}
+            </div>
+          </div>
+
           <!-- Keyboard hints footer -->
           <div class="nuvio-search-footer">
-            <span class="nuvio-search-hint">
-              <kbd><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></kbd>
-              <kbd><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></kbd>
-              {{ isDutch ? 'navigeren' : 'to navigate' }}
-            </span>
-            <span class="nuvio-search-hint">
-              <kbd><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></kbd>
-              {{ isDutch ? 'selecteren' : 'to select' }}
-            </span>
+            <template v-if="activeTab === 'search'">
+              <span class="nuvio-search-hint">
+                <kbd><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></kbd>
+                <kbd><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></kbd>
+                to navigate
+              </span>
+              <span class="nuvio-search-hint">
+                <kbd><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></kbd>
+                to select
+              </span>
+            </template>
+            <template v-else>
+              <span class="nuvio-search-hint">
+                <kbd><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></kbd>
+                to send
+              </span>
+            </template>
             <span class="nuvio-search-hint">
               <kbd>esc</kbd>
-              {{ isDutch ? 'sluiten' : 'to close' }}
+              to close
             </span>
           </div>
         </div>
@@ -465,6 +893,279 @@ function onMouseMove(e: MouseEvent) {
 </template>
 
 <style scoped>
+/* ── Tabs & Chat Styles ───────────────────────────────────────────────── */
+.nuvio-search-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-alt);
+}
+
+.nuvio-search-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nuvio-search-tab:hover {
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+}
+
+.nuvio-search-tab.is-active {
+  background: var(--vp-c-bg-elv);
+  color: var(--vp-c-brand-1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border-color: var(--vp-c-border);
+}
+
+.tab-icon {
+  opacity: 0.8;
+  color: currentColor;
+}
+
+.nuvio-search-clear-chat {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: 1px solid var(--vp-c-border);
+  border-radius: 6px;
+  background: var(--vp-c-bg-elv);
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nuvio-search-clear-chat:hover {
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+}
+
+.nuvio-search-chat-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  max-height: 420px;
+  background: var(--vp-c-bg-elv);
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vp-c-border) transparent;
+}
+
+.nuvio-search-chat-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nuvio-search-chat-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nuvio-search-chat-container::-webkit-scrollbar-thumb {
+  background: var(--vp-c-border);
+  border-radius: 3px;
+}
+
+.nuvio-search-chat-container::-webkit-scrollbar-thumb:hover {
+  background: var(--vp-c-text-3);
+}
+
+.ask-ai-welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 16px 20px;
+  text-align: center;
+}
+
+.ask-ai-welcome__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+}
+
+.ask-ai-welcome__title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--vp-c-text-1);
+  letter-spacing: -0.02em;
+}
+
+.ask-ai-welcome__text {
+  margin: 0;
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+.ask-ai-msg {
+  margin-bottom: 14px;
+  display: flex;
+  width: 100%;
+}
+
+.ask-ai-msg--user {
+  justify-content: flex-end;
+}
+
+.ask-ai-msg--model {
+  justify-content: flex-start;
+}
+
+.ask-ai-msg__bubble {
+  max-width: 88%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.ask-ai-msg--user .ask-ai-msg__bubble {
+  background: linear-gradient(135deg, var(--vp-c-brand-1), var(--vp-c-brand-2));
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble {
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  border: 1px solid var(--vp-c-border);
+  border-bottom-left-radius: 4px;
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(p) {
+  margin: 0 0 8px;
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(strong) {
+  font-weight: 650;
+  color: var(--vp-c-text-1);
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(a.ask-ai-link) {
+  color: var(--vp-c-brand-1);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 550;
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(a.ask-ai-link:hover) {
+  color: var(--vp-c-brand-2);
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(h1),
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(h2),
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(h3),
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(h4),
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(h5),
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(h6) {
+  margin: 14px 0 6px;
+  font-weight: 750;
+  line-height: 1.3;
+  color: var(--vp-c-text-1);
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(h1) { font-size: 1.2rem; }
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(h2) { font-size: 1.1rem; }
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(h3) { font-size: 1rem; }
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(ol.ask-ai-ol) {
+  list-style-type: decimal;
+  margin: 6px 0;
+  padding-left: 20px;
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(ul.ask-ai-ul) {
+  list-style-type: disc;
+  margin: 6px 0;
+  padding-left: 20px;
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(li) {
+  margin-bottom: 4px;
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(pre.ask-ai-code) {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--vp-c-bg-alt);
+  overflow-x: auto;
+  font-size: 12px;
+}
+
+.ask-ai-msg--model .ask-ai-msg__bubble :deep(code.ask-ai-inline-code) {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--vp-c-brand-soft) 50%, var(--vp-c-bg-soft));
+  font-size: 0.9em;
+  color: var(--vp-c-brand-1);
+}
+
+.ask-ai-msg__typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 16px;
+}
+
+.ask-ai-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vp-c-text-3);
+  animation: ask-ai-bounce 1.4s ease-in-out infinite;
+}
+
+.ask-ai-dot:nth-child(2) { animation-delay: 0.16s; }
+.ask-ai-dot:nth-child(3) { animation-delay: 0.32s; }
+
+@keyframes ask-ai-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.ask-ai-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: color-mix(in srgb, #ef4444 12%, var(--vp-c-bg-soft));
+  border: 1px solid color-mix(in srgb, #ef4444 25%, var(--vp-c-divider));
+  color: #ef4444;
+  font-size: 13px;
+}
+
 /* ── Overlay ──────────────────────────────────────────────────────────── */
 .nuvio-search-overlay {
   position: fixed;

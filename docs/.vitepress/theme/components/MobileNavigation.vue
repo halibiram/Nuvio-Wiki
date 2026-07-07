@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useData, useRoute, withBase } from 'vitepress'
-import AskAI from './AskAI.vue'
 import NuvioSearch from './NuvioSearch.vue'
 
 type SidebarItem = {
@@ -24,7 +23,7 @@ const searchOpen = ref(false)
 const expanded = reactive(new Set<string>())
 const drawer = ref<HTMLElement>()
 const menuButton = ref<HTMLButtonElement>()
-const askAi = ref<any>(null)
+const searchInitialTab = ref<'search' | 'ai'>('search')
 const isDutch = computed(() => route.path.startsWith('/nl/'))
 
 function normalizePath(path = '') {
@@ -127,14 +126,10 @@ function closeDrawer(restoreFocus = true) {
   if (restoreFocus) nextTick(() => menuButton.value?.focus())
 }
 
-function openSearch() {
+function openSearch(tab: 'search' | 'ai' = 'search') {
   closeDrawer(false)
+  searchInitialTab.value = tab
   searchOpen.value = true
-}
-
-function openAI() {
-  closeDrawer(false)
-  askAi.value?.open()
 }
 
 function toggleSection(key: string) {
@@ -301,21 +296,11 @@ onBeforeUnmount(() => {
 
       <div class="nuvio-mobile-header__actions">
         <button
-          class="nuvio-mobile-icon-button"
-          type="button"
-          :aria-label="isDutch ? 'Vraag AI' : 'Ask AI'"
-          @click="openAI"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2Z" />
-          </svg>
-        </button>
-        <button
           ref="menuButton"
           class="nuvio-mobile-icon-button"
           type="button"
-          :aria-label="isDutch ? 'Zoeken' : 'Open search'"
-          @click="openSearch"
+          aria-label="Search"
+          @click="openSearch('search')"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="11" cy="11" r="6.5" />
@@ -500,7 +485,7 @@ onBeforeUnmount(() => {
             </button>
 
             <Transition name="expand">
-              <div v-show="expanded.has(section.key)" class="nuvio-mobile-drawer__items">
+              <div v-show="expanded.has(section.key)" class="nuvio-sidebar__section-items">
                 <div class="nuvio-mobile-drawer__items-inner">
                   <template v-for="item in section.items" :key="item.link || item.text">
                     <a
@@ -534,7 +519,6 @@ onBeforeUnmount(() => {
       </aside>
     </Transition>
 
-    <NuvioSearch v-if="searchOpen" :is-dutch="isDutch" @close="searchOpen = false" />
-    <AskAI ref="askAi" hide-fab />
+    <NuvioSearch v-if="searchOpen" :is-dutch="isDutch" :initial-tab="searchInitialTab" @close="searchOpen = false" />
   </div>
 </template>
