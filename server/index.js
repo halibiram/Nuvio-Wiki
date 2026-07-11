@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { GoogleGenAI } from '@google/genai';
-import { readFileSync, existsSync, writeFileSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
 import { buildAndSaveCache } from './refresh-cache.js';
@@ -14,6 +14,14 @@ import {
 } from './refresh-file-search.js';
 import { runSetup, SetupError } from './quickstart/services.js';
 import { getStatusOverview } from './status.js';
+import {
+  ADMIN_COOKIE_NAME,
+  createAdminSecurity,
+  createDashboardSnapshot,
+  createRequestMetrics,
+  getAdminClearCookieOptions,
+  getAdminCookieOptions
+} from './admin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -38,6 +46,8 @@ if (!process.env.GEMINI_API_KEY) {
 }
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const adminSecurity = createAdminSecurity();
+const requestMetrics = createRequestMetrics();
 
 // ── Cache state ──────────────────────────────────────────────────────────
 
@@ -174,18 +184,277 @@ function getRedirectUri(req) {
   return uri;
 }
 
+const DOCS_DIR = resolve(__dirname, '..', 'docs');
+let contentStatsCache = null;
+let lastAdminFailureAt = null;
+
+function readCookie(req, name) {
+  const header = req.get('cookie') || '';
+  for (const part of header.split(';')) {
+    const separator = part.indexOf('=');
+    if (separator < 0 || part.slice(0, separator).trim() !== name) continue;
+    try {
+      return decodeURIComponent(part.slice(separator + 1).trim());
+    } catch {
+      return '';
+    }
+  }
+  return '';
+}
+
+function requestUsesHttps(req) {
+  const forwardedProtocol = String(req.get('x-forwarded-proto') || '')
+    .split(',')[0]
+    .trim()
+    .toLowerCase();
+  return req.secure || forwardedProtocol === 'https' || process.env.NODE_ENV === 'production';
+}
+
+function hasAllowedAdminOrigin(req) {
+  const origin = req.get('origin');
+  if (!origin) return true;
+
+  let requestOrigin = '';
+  try {
+    requestOrigin = new URL(`${req.protocol}://${req.get('host')}`).origin;
+  } catch {
+    // ALLOWED_ORIGIN remains the authoritative fallback.
+  }
+
+  return origin === ALLOWED_ORIGIN || origin === requestOrigin;
+}
+
+function hideAdminEndpoint(res) {
+  return res.status(404).json({ error: 'Not found.' });
+}
+
+function requireAdminSession(req, res, next) {
+  const sessionToken = readCookie(req, ADMIN_COOKIE_NAME);
+  const session = adminSecurity.verifySession(sessionToken);
+  if (!session.ok) return hideAdminEndpoint(res);
+
+  req.adminSessionToken = sessionToken;
+  req.adminSession = session;
+  next();
+}
+
+function readEnglishContentStats() {
+  const now = Date.now();
+  if (contentStatsCache && now - contentStatsCache.cachedAt < 60_000) {
+    return contentStatsCache.value;
+  }
+
+  let pageCount = 0;
+  let totalBytes = 0;
+  let latestModifiedAt = 0;
+  const pending = [DOCS_DIR];
+
+  try {
+    while (pending.length) {
+      const directory = pending.pop();
+      for (const entry of readdirSync(directory, { withFileTypes: true })) {
+        if (entry.isDirectory()) {
+          if (entry.name === '.vitepress' || (directory === DOCS_DIR && entry.name === 'nl')) continue;
+          pending.push(join(directory, entry.name));
+          continue;
+        }
+        if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
+        const stats = statSync(join(directory, entry.name));
+        pageCount += 1;
+        totalBytes += stats.size;
+        latestModifiedAt = Math.max(latestModifiedAt, stats.mtimeMs);
+      }
+    }
+  } catch (error) {
+    console.warn('Admin content inventory unavailable:', error.message);
+  }
+
+  const value = {
+    pageCount,
+    totalBytes,
+    lastUpdatedAt: latestModifiedAt ? new Date(latestModifiedAt).toISOString() : null
+  };
+  contentStatsCache = { cachedAt: now, value };
+  return value;
+}
+
+function readMetadataCacheStats() {
+  try {
+    if (!existsSync(METADATA_CACHE_FILE)) return { metadataEntries: 0, metadataCacheBytes: 0 };
+    return {
+      metadataEntries: Object.keys(readMetadataCache()).length,
+      metadataCacheBytes: statSync(METADATA_CACHE_FILE).size
+    };
+  } catch {
+    return { metadataEntries: 0, metadataCacheBytes: 0 };
+  }
+}
+
+function buildAdminOverview(session) {
+  const fileSearchData = readFileSearchData();
+  const cacheData = readCacheData();
+  const docs = readEnglishContentStats();
+  const metadata = readMetadataCacheStats();
+  const cacheLoaded = isCacheValid(cacheData);
+  const fileSearchLoaded = Boolean(fileSearchData?.storeName);
+  const knowledgeLoaded = KNOWLEDGE_MODE === 'file-search' ? fileSearchLoaded : cacheLoaded;
+  const integrations = {
+    gemini: Boolean(process.env.GEMINI_API_KEY),
+    trakt: Boolean(process.env.TRAKT_CLIENT_ID && process.env.TRAKT_CLIENT_SECRET),
+    tmdb: Boolean(process.env.TMDB_API_KEY)
+  };
+  const content = {
+    knowledgeLoaded,
+    rebuilding: rebuildPromise !== null,
+    fileSearchLoaded,
+    cacheLoaded,
+    knowledgeMode: KNOWLEDGE_MODE,
+    model: GEMINI_MODEL,
+    createdAt: fileSearchData?.createdAt || cacheData?.createdAt || null,
+    checkedAt: fileSearchData?.checkedAt || null,
+    nextCheckAt: fileSearchData?.nextCheckAt || null,
+    cacheExpiresAt: cacheData?.expiresAt || null,
+    fileCount: fileSearchData?.fileCount ?? cacheData?.fileCount ?? docs.pageCount,
+    activeDocumentsCount: fileSearchData?.activeDocumentsCount ?? 0,
+    contentChars: fileSearchData?.contentChars ?? cacheData?.contentChars ?? 0,
+    estimatedTokens: cacheData?.estimatedTokens ?? 0,
+    ...docs,
+    ...metadata,
+    integrations
+  };
+  const snapshot = createDashboardSnapshot({
+    diskPaths: [{ label: 'server-data', path: __dirname }],
+    content,
+    metrics: requestMetrics,
+    security: adminSecurity
+  });
+  const rawTraffic = snapshot.traffic || { summary: {}, minuteSeries: [], hourSeries: [], endpoints: [], recentRequests: [] };
+  const summary = rawTraffic.summary || {};
+  const mapPoint = (point) => ({
+    ...point,
+    at: point.startAt,
+    averageLatencyMs: point.averageDurationMs,
+    p95LatencyMs: point.p95DurationMs
+  });
+  const traffic = {
+    ...rawTraffic,
+    totalRequests: summary.requests || 0,
+    activeRequests: summary.activeRequests || 0,
+    errorRate: summary.requests ? summary.errors / summary.requests : 0,
+    averageLatencyMs: summary.averageDurationMs || 0,
+    p95LatencyMs: summary.p95DurationMs || 0,
+    uniqueClients1h: summary.uniqueClientsLastHour || 0,
+    uniqueClients24h: summary.uniqueClientsLast24Hours || 0,
+    statusCodes: {
+      successful: summary.successful || 0,
+      '4xx': summary.clientErrors || 0,
+      '5xx': summary.serverErrors || 0
+    },
+    minuteSeries: (rawTraffic.minuteSeries || []).map(mapPoint),
+    hourSeries: (rawTraffic.hourSeries || []).map(mapPoint),
+    endpoints: (rawTraffic.endpoints || []).map((endpoint) => ({
+      ...endpoint,
+      path: endpoint.route,
+      averageLatencyMs: endpoint.averageDurationMs,
+      p95LatencyMs: endpoint.p95DurationMs
+    })),
+    recentRequests: [...(rawTraffic.recentRequests || [])].reverse().map((request) => ({
+      ...request,
+      path: request.endpoint,
+      status: request.statusCode
+    }))
+  };
+  const primaryDisk = snapshot.disks?.find((disk) => disk.available) || null;
+  const runtime = {
+    ...snapshot.runtime,
+    environment: process.env.NODE_ENV || 'development',
+    platform: snapshot.system.platform,
+    arch: snapshot.system.architecture,
+    cpuCount: snapshot.system.cpuCount,
+    loadAverage: snapshot.system.loadAverage,
+    memory: {
+      rss: snapshot.runtime.memory.rssBytes,
+      heapUsed: snapshot.runtime.memory.heapUsedBytes,
+      heapTotal: snapshot.runtime.memory.heapTotalBytes,
+      external: snapshot.runtime.memory.externalBytes
+    },
+    systemMemory: {
+      used: snapshot.system.memory.usedBytes,
+      total: snapshot.system.memory.totalBytes
+    },
+    disk: primaryDisk ? { used: primaryDisk.usedBytes, total: primaryDisk.totalBytes } : null
+  };
+  const knowledge = {
+    model: GEMINI_MODEL,
+    mode: KNOWLEDGE_MODE,
+    loaded: knowledgeLoaded,
+    rebuilding: rebuildPromise !== null,
+    fileSearch: {
+      loaded: fileSearchLoaded,
+      indexedDocuments: fileSearchData?.activeDocumentsCount ?? 0,
+      sourceFiles: fileSearchData?.fileCount ?? 0,
+      contentCharacters: fileSearchData?.contentChars ?? 0,
+      createdAt: fileSearchData?.createdAt || null,
+      checkedAt: fileSearchData?.checkedAt || null,
+      nextCheckAt: fileSearchData?.nextCheckAt || null
+    },
+    cache: {
+      loaded: cacheLoaded,
+      sourceFiles: cacheData?.fileCount ?? 0,
+      estimatedTokens: cacheData?.estimatedTokens ?? 0,
+      expiresAt: cacheData?.expiresAt || null
+    },
+    content: docs
+  };
+  const securitySnapshot = snapshot.security || { counters: {} };
+
+  return {
+    ...snapshot,
+    traffic,
+    runtime,
+    knowledge,
+    integrations: {
+      ...integrations,
+      adminDashboard: adminSecurity.isConfigured()
+    },
+    security: {
+      ...securitySnapshot,
+      failedAttempts: securitySnapshot.counters?.unlockFailed || 0,
+      rateLimitedAttempts: securitySnapshot.counters?.rateLimitedAttempts || 0,
+      lastFailedAt: lastAdminFailureAt,
+      currentSessionExpiresAt: session?.expiresAt || null
+    }
+  };
+}
+
 
 // ── Express app ─────────────────────────────────────────────────────────
 const app = express();
 app.set('trust proxy', true);
 
+app.use(requestMetrics.middleware);
+
 app.use(cors({
   origin: ALLOWED_ORIGIN,
-  methods: ['POST', 'GET', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
+  methods: ['POST', 'GET', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+  credentials: true
 }));
 
 app.use(express.json({ limit: '64kb' }));
+
+app.use('/api/admin', (_req, res, next) => {
+  res.set({
+    'Cache-Control': 'no-store, max-age=0',
+    Pragma: 'no-cache',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-Robots-Tag': 'noindex, nofollow',
+    'Referrer-Policy': 'no-referrer',
+    'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'"
+  });
+  next();
+});
 
 // Rate limiters
 const perMinute = rateLimit({
@@ -215,7 +484,63 @@ const setupLimiter = rateLimit({
   keyGenerator: (req) => req.ip
 });
 
+const adminUnlockLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  handler: (_req, res) => {
+    adminSecurity.recordRateLimitedAttempt();
+    lastAdminFailureAt = new Date().toISOString();
+    hideAdminEndpoint(res);
+  }
+});
+
 // ── Routes ──────────────────────────────────────────────────────────────
+
+app.post('/api/admin/session', adminUnlockLimiter, (req, res) => {
+  const result = adminSecurity.unlock(
+    hasAllowedAdminOrigin(req) ? req.body?.secret : ''
+  );
+  if (!result.ok) {
+    lastAdminFailureAt = new Date().toISOString();
+    return hideAdminEndpoint(res);
+  }
+
+  res.cookie(
+    ADMIN_COOKIE_NAME,
+    result.sessionToken,
+    getAdminCookieOptions({ secure: requestUsesHttps(req) })
+  );
+  res.status(201).json({
+    ok: true,
+    idleExpiresAt: result.idleExpiresAt,
+    expiresAt: result.expiresAt
+  });
+});
+
+app.get('/api/admin/session', requireAdminSession, (req, res) => {
+  res.json({
+    ok: true,
+    idleExpiresAt: req.adminSession.idleExpiresAt,
+    expiresAt: req.adminSession.expiresAt
+  });
+});
+
+app.delete('/api/admin/session', (req, res) => {
+  if (!hasAllowedAdminOrigin(req)) return hideAdminEndpoint(res);
+  adminSecurity.revokeSession(readCookie(req, ADMIN_COOKIE_NAME));
+  res.clearCookie(
+    ADMIN_COOKIE_NAME,
+    getAdminClearCookieOptions({ secure: requestUsesHttps(req) })
+  );
+  res.status(204).end();
+});
+
+app.get('/api/admin/overview', requireAdminSession, (req, res) => {
+  res.json(buildAdminOverview(req.adminSession));
+});
 
 app.get('/api/status', async (_req, res) => {
   try {

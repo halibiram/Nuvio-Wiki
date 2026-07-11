@@ -303,6 +303,10 @@ export default defineConfig({
         '/api/status': {
           target: 'http://localhost:3001',
           changeOrigin: true
+        },
+        '/api/admin': {
+          target: 'http://localhost:3001',
+          changeOrigin: true
         }
       }
     },

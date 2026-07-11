@@ -19,8 +19,7 @@ import {
   debouncedWatch,
   onKeyStroke,
   useEventListener,
-  useScrollLock,
-  useSessionStorage
+  useScrollLock
 } from '@vueuse/core'
 import Mark from 'mark.js'
 import MiniSearch, { type SearchResult } from 'minisearch'
@@ -28,6 +27,7 @@ import { dataSymbol, inBrowser, useRouter } from 'vitepress'
 import {
   computed,
   createApp,
+  defineAsyncComponent,
   markRaw,
   nextTick,
   onBeforeUnmount,
@@ -131,6 +131,10 @@ const props = withDefaults(defineProps<SearchProps>(), {
 })
 const emit = defineEmits<{ (e: 'close'): void }>()
 
+const NuvioAdminDashboard = defineAsyncComponent(
+  () => import('./NuvioAdminDashboard.vue')
+)
+
 /* ── Refs ────────────────────────────────────────────────────────────────── */
 const el = shallowRef<HTMLElement>()
 const resultsEl = shallowRef<HTMLElement>()
@@ -172,7 +176,9 @@ const searchIndex = computedAsync(async () =>
 )
 
 /* ── Filter text ────────────────────────────────────────────────────────── */
-const filterText = useSessionStorage('vitepress:local-search-filter', '')
+// Keep search text ephemeral. Besides being friendlier for shared devices, this
+// ensures a dashboard unlock phrase can never be persisted in web storage.
+const filterText = ref('')
 
 /* ── Tab & AI Assistant State ───────────────────────────────────────────── */
 const activeTab = ref<'search' | 'ai'>(props.initialTab)
@@ -182,11 +188,95 @@ const streamingContent = ref('')
 const errorMsg = ref('')
 const chatContainer = ref<HTMLElement>()
 
+/* ── Private admin unlock ──────────────────────────────────────────────── */
+const ADMIN_TRIGGER_PREFIX = 'nuvio-admin:'
+const adminDashboardOpen = ref(false)
+const adminUnlocking = ref(false)
+let lastAdminCandidate = ''
+
+const isAdminEntry = computed(() =>
+  activeTab.value === 'search' &&
+  filterText.value.trimStart().startsWith(ADMIN_TRIGGER_PREFIX)
+)
+
+function isStrongAdminCandidate(value: string) {
+  if (!value.startsWith(ADMIN_TRIGGER_PREFIX)) return false
+  const suffix = value.slice(ADMIN_TRIGGER_PREFIX.length)
+  if (suffix === 'codex') return true
+  if (suffix.length < 43 || !/^[A-Za-z0-9_-]+$/.test(suffix)) return false
+
+  const characterClasses = [
+    /[a-z]/.test(suffix),
+    /[A-Z]/.test(suffix),
+    /\d/.test(suffix),
+    /[_-]/.test(suffix)
+  ].filter(Boolean).length
+
+  return characterClasses >= 3
+}
+
+async function attemptAdminUnlock(candidate: string) {
+  if (!inBrowser || adminUnlocking.value || candidate === lastAdminCandidate) return
+  lastAdminCandidate = candidate
+  adminUnlocking.value = true
+
+  try {
+    const response = await fetch('/api/admin/session', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ secret: candidate })
+    })
+
+    if (filterText.value.trim() !== candidate) return
+
+    // A marker-shaped value is always private input. Clear it on both success
+    // and failure so it can never fall through to docs search or Gemini.
+    filterText.value = ''
+    if (!response.ok) {
+      await nextTick()
+      focusSearchInput(false)
+      return
+    }
+
+    adminDashboardOpen.value = true
+  } catch {
+    if (filterText.value.trim() === candidate) filterText.value = ''
+  } finally {
+    adminUnlocking.value = false
+    if (!adminDashboardOpen.value) lastAdminCandidate = ''
+
+    const nextCandidate = filterText.value.trim()
+    if (
+      nextCandidate !== candidate &&
+      isStrongAdminCandidate(nextCandidate)
+    ) {
+      void attemptAdminUnlock(nextCandidate)
+    }
+  }
+}
+
+debouncedWatch(
+  () => [activeTab.value, filterText.value] as const,
+  ([tab, value]) => {
+    const candidate = value.trim()
+    if (tab !== 'search' || !isStrongAdminCandidate(candidate)) return
+    void attemptAdminUnlock(candidate)
+  },
+  { debounce: 700 }
+)
+
 watch(() => props.initialTab, (newTab) => {
   activeTab.value = newTab
 })
 
 function setTab(tab: 'search' | 'ai') {
+  if (filterText.value.trim().startsWith(ADMIN_TRIGGER_PREFIX)) {
+    filterText.value = ''
+  }
   activeTab.value = tab
   nextTick(() => {
     focusSearchInput(false)
@@ -322,7 +412,7 @@ const selectedIndex = ref(-1)
 const disableMouseOver = ref(true)
 
 const totalItemsCount = computed(() => {
-  if (activeTab.value !== 'search') return 0
+  if (activeTab.value !== 'search' || isAdminEntry.value) return 0
   const hasAiItem = filterText.value.trim().length > 0 ? 1 : 0
   return results.value.length + hasAiItem
 })
@@ -340,7 +430,7 @@ function scrollToSelectedResult() {
 }
 
 onKeyStroke('ArrowUp', (event) => {
-  if (activeTab.value !== 'search') return
+  if (activeTab.value !== 'search' || isAdminEntry.value) return
   event.preventDefault()
   if (totalItemsCount.value === 0) return
   selectedIndex.value--
@@ -350,7 +440,7 @@ onKeyStroke('ArrowUp', (event) => {
 })
 
 onKeyStroke('ArrowDown', (event) => {
-  if (activeTab.value !== 'search') return
+  if (activeTab.value !== 'search' || isAdminEntry.value) return
   event.preventDefault()
   if (totalItemsCount.value === 0) return
   selectedIndex.value++
@@ -364,6 +454,7 @@ const router = useRouter()
 const visible = ref(true)
 function close() {
   visible.value = false
+  if (adminDashboardOpen.value) emit('close')
 }
 
 async function askAiAboutQuery(query: string) {
@@ -377,8 +468,18 @@ onKeyStroke('Enter', (e) => {
   if (e.isComposing) return
   if (e.target instanceof HTMLButtonElement && e.target.type !== 'submit') return
 
+  const candidate = filterText.value.trim()
+  if (candidate.startsWith(ADMIN_TRIGGER_PREFIX)) {
+    e.preventDefault()
+    if (activeTab.value === 'search' && isStrongAdminCandidate(candidate)) {
+      void attemptAdminUnlock(candidate)
+    }
+    else filterText.value = ''
+    return
+  }
+
   if (activeTab.value === 'ai') {
-    const text = filterText.value.trim()
+    const text = candidate
     if (text) {
       filterText.value = ''
       sendAiMessage(text)
@@ -667,7 +768,18 @@ function renderMarkdown(text: string) {
 
 <template>
   <Teleport to="body">
-    <Transition name="nuvio-search" appear :duration="{ enter: 200, leave: 150 }" @after-leave="$emit('close')">
+    <NuvioAdminDashboard
+      v-if="visible && adminDashboardOpen"
+      @close="close"
+      @logout="close"
+    />
+    <Transition
+      v-else
+      name="nuvio-search"
+      appear
+      :duration="{ enter: 200, leave: 150 }"
+      @after-leave="$emit('close')"
+    >
       <div v-if="visible" ref="el" class="nuvio-search-overlay" role="dialog" aria-modal="true" aria-label="Search">
         <!-- Backdrop -->
         <div class="nuvio-search-backdrop" @click="close" />
@@ -685,12 +797,12 @@ function renderMarkdown(text: string) {
               v-model="filterText"
               class="nuvio-search-input"
               :placeholder="activeTab === 'search' ? 'Search docs...' : 'Ask AI a question...'"
-              type="search"
+              :type="isAdminEntry ? 'password' : 'search'"
               autocomplete="off"
               autocorrect="off"
               autocapitalize="off"
               spellcheck="false"
-              maxlength="64"
+              :maxlength="isAdminEntry ? 128 : 64"
               :enterkeyhint="activeTab === 'search' ? 'go' : 'send'"
             />
             <kbd class="nuvio-search-esc" @click="close">ESC</kbd>
@@ -738,12 +850,13 @@ function renderMarkdown(text: string) {
           </div>
 
           <!-- Results -->
-          <ul
-            v-if="activeTab === 'search'"
-            ref="resultsEl"
-            class="nuvio-search-results"
-            @mousemove="onMouseMove"
-          >
+          <template v-if="activeTab === 'search'">
+            <ul
+              v-if="!isAdminEntry"
+              ref="resultsEl"
+              class="nuvio-search-results"
+              @mousemove="onMouseMove"
+            >
             <!-- AI Prompt Suggestion -->
             <li v-if="filterText.trim()">
               <a
@@ -814,11 +927,15 @@ function renderMarkdown(text: string) {
             <li v-if="filterText && !results.length && enableNoResults" class="nuvio-search-no-results">
               No results for "<strong>{{ filterText }}</strong>"
             </li>
-          </ul>
+            </ul>
+
+            <!-- Deliberately blank while a private marker-shaped value is checked. -->
+            <div v-else class="nuvio-search-results" aria-live="off" />
+          </template>
 
           <!-- AI Chat Area -->
           <div
-            v-else
+            v-else-if="activeTab === 'ai'"
             ref="chatContainer"
             class="nuvio-search-chat-container"
             @click="onMessageClick"

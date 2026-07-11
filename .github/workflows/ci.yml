@@ -25,5 +25,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Install Server Dependencies
+        run: npm --prefix server ci
+
+      - name: Test Server
+        run: npm --prefix server test
+
       - name: Build docs and verify links
         run: npm run docs:build
