@@ -90,6 +90,166 @@ function safeString(value, maximumLength = 128) {
 }
 
 /**
+ * Retain a small, process-local feed of console output for the protected
+ * control room. Values are flattened to text and obvious credentials are
+ * redacted before they enter the store.
+ */
+export function createServerLogStore({
+  now = Date.now,
+  maxEntries = 250,
+  maxMessageLength = 2_000
+} = {}) {
+  const entries = [];
+  const limit = clampInteger(maxEntries, 250, 1, 1_000);
+  const messageLimit = clampInteger(maxMessageLength, 2_000, 80, 10_000);
+  let nextId = 1;
+
+  function serialize(value) {
+    if (value instanceof Error) return `${value.name}: ${value.message}`;
+    if (typeof value === 'string') return value;
+    if (typeof value === 'bigint') return `${value}n`;
+    if (value === undefined) return 'undefined';
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+
+  function redact(value) {
+    return value
+      .replace(/(bearer\s+)[a-z0-9._~+/=-]+/gi, '$1[redacted]')
+      .replace(/((?:api[_-]?key|password|secret|token)\s*[=:]\s*)[^\s,;]+/gi, '$1[redacted]');
+  }
+
+  function record(level, values) {
+    const normalizedLevel = ['debug', 'info', 'warn', 'error'].includes(level) ? level : 'info';
+    const parts = Array.isArray(values) ? values : [values];
+    const message = redact(parts.map(serialize).join(' ')).slice(0, messageLimit).trim();
+    if (!message) return;
+    entries.push({
+      id: nextId++,
+      at: isoDate(nowValue(now)),
+      level: normalizedLevel,
+      message
+    });
+    if (entries.length > limit) entries.splice(0, entries.length - limit);
+  }
+
+  function snapshot() {
+    const counts = { debug: 0, info: 0, warn: 0, error: 0 };
+    for (const entry of entries) counts[entry.level] += 1;
+    return {
+      retainedEntries: entries.length,
+      retentionLimit: limit,
+      counts,
+      entries: entries.slice().reverse().map((entry) => ({ ...entry }))
+    };
+  }
+
+  return Object.freeze({ record, snapshot });
+}
+
+/**
+ * Keep anonymous Setup Doctor outcomes in a bounded in-memory store. Records
+ * intentionally exclude IP addresses, user agents, free text and credentials.
+ */
+export function createSetupDoctorFeedbackStore({
+  now = Date.now,
+  maxEntries = 100,
+  maxAnswers = 20,
+  maxResults = 5
+} = {}) {
+  const entries = [];
+  const limit = clampInteger(maxEntries, 100, 1, 1_000);
+  const answerLimit = clampInteger(maxAnswers, 20, 1, 50);
+  const resultLimit = clampInteger(maxResults, 5, 1, 10);
+
+  function cleanLabel(value, maximumLength = 120) {
+    const clean = safeString(value, maximumLength)?.trim();
+    return clean || null;
+  }
+
+  function cleanPairList(value, itemLimit) {
+    if (!Array.isArray(value)) return [];
+    return value.slice(0, itemLimit).map((item) => ({
+      id: cleanLabel(item?.id, 80),
+      label: cleanLabel(item?.label, 180),
+      value: cleanLabel(item?.value, 80)
+    })).filter((item) => item.id && item.label && item.value);
+  }
+
+  function record(payload) {
+    const source = payload && typeof payload === 'object' ? payload : {};
+    if (typeof source.helpful !== 'boolean') return { ok: false };
+
+    const area = cleanLabel(source.area, 80);
+    const platform = cleanLabel(source.platform, 80);
+    const symptom = cleanLabel(source.symptom, 180);
+    const areaId = cleanLabel(source.areaId, 80);
+    const platformId = cleanLabel(source.platformId, 80);
+    const symptomId = cleanLabel(source.symptomId, 80);
+    if (!area || !platform || !symptom || !areaId || !platformId || !symptomId) {
+      return { ok: false };
+    }
+
+    const timestamp = nowValue(now);
+    entries.push({
+      at: isoDate(timestamp),
+      helpful: source.helpful,
+      area: { id: areaId, label: area },
+      platform: { id: platformId, label: platform },
+      symptom: { id: symptomId, label: symptom },
+      answers: cleanPairList(source.answers, answerLimit),
+      results: (Array.isArray(source.results) ? source.results : []).slice(0, resultLimit)
+        .map((item) => ({ id: cleanLabel(item?.id, 80), label: cleanLabel(item?.label, 180) }))
+        .filter((item) => item.id && item.label),
+      page: cleanLabel(source.page, 180)?.startsWith('/') ? cleanLabel(source.page, 180) : null
+    });
+    if (entries.length > limit) entries.splice(0, entries.length - limit);
+    return { ok: true };
+  }
+
+  function breakdown(key) {
+    const counts = new Map();
+    for (const entry of entries) {
+      const item = entry[key];
+      const current = counts.get(item.id) || { id: item.id, label: item.label, total: 0, helpful: 0 };
+      current.total += 1;
+      if (entry.helpful) current.helpful += 1;
+      counts.set(item.id, current);
+    }
+    return [...counts.values()]
+      .map((item) => ({ ...item, notHelpful: item.total - item.helpful, helpRate: round(item.helpful / item.total, 4) }))
+      .sort((left, right) => right.total - left.total || left.label.localeCompare(right.label));
+  }
+
+  function snapshot() {
+    const helpful = entries.filter((entry) => entry.helpful).length;
+    return {
+      summary: {
+        total: entries.length,
+        helpful,
+        notHelpful: entries.length - helpful,
+        helpRate: entries.length ? round(helpful / entries.length, 4) : 0,
+        retainedEntries: entries.length,
+        retentionLimit: limit
+      },
+      byArea: breakdown('area'),
+      byPlatform: breakdown('platform'),
+      bySymptom: breakdown('symptom'),
+      recent: entries.slice().reverse().map((entry) => ({
+        ...entry,
+        answers: entry.answers.map((answer) => ({ ...answer })),
+        results: entry.results.map((result) => ({ ...result }))
+      }))
+    };
+  }
+
+  return Object.freeze({ record, snapshot });
+}
+
+/**
  * Validate the complete string that an administrator must type into search.
  * The suffix format matches a 32-byte base64url token and rejects obvious low-
  * diversity values. Entropy still depends on generating the value randomly.

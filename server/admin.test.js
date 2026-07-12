@@ -7,11 +7,58 @@ import {
   createAdminSecurity,
   createDashboardSnapshot,
   createRequestMetrics,
+  createServerLogStore,
+  createSetupDoctorFeedbackStore,
   generateAdminSecret,
   getAdminClearCookieOptions,
   getAdminCookieOptions,
   isStrongAdminSecret
 } from './admin.js';
+
+test('stores bounded redacted server logs newest first', () => {
+  let now = Date.parse('2026-07-12T12:00:00.000Z');
+  const logs = createServerLogStore({ now: () => now, maxEntries: 2 });
+
+  logs.record('info', ['Server ready', { port: 3001 }]);
+  now += 1_000;
+  logs.record('warn', ['token=do-not-expose', 'Retrying']);
+  now += 1_000;
+  logs.record('error', [new Error('Request failed')]);
+
+  const snapshot = logs.snapshot();
+  assert.equal(snapshot.retainedEntries, 2);
+  assert.deepEqual(snapshot.counts, { debug: 0, info: 0, warn: 1, error: 1 });
+  assert.equal(snapshot.entries[0].message, 'Error: Request failed');
+  assert.match(snapshot.entries[1].message, /token=\[redacted\]/);
+  assert.equal(JSON.stringify(snapshot).includes('do-not-expose'), false);
+});
+
+test('stores bounded anonymous Setup Doctor feedback and builds useful breakdowns', () => {
+  let now = Date.parse('2026-07-12T10:00:00.000Z');
+  const feedback = createSetupDoctorFeedbackStore({ now: () => now, maxEntries: 2 });
+  const base = {
+    areaId: 'playback', area: 'Playback', platformId: 'android-tv', platform: 'Android TV',
+    symptomId: 'buffering', symptom: 'Streams keep buffering', page: '/setup-doctor',
+    answers: [{ id: 'vpn', label: 'Does it work without VPN?', value: 'No' }],
+    results: [{ id: 'network-buffering', label: 'Check the connection' }]
+  };
+
+  assert.deepEqual(feedback.record({ ...base, helpful: true }), { ok: true });
+  now += 1_000;
+  assert.deepEqual(feedback.record({ ...base, helpful: false }), { ok: true });
+  now += 1_000;
+  assert.deepEqual(feedback.record({ ...base, helpful: false, symptomId: 'other', symptom: 'Other symptom' }), { ok: true });
+  assert.deepEqual(feedback.record({ ...base, helpful: 'yes' }), { ok: false });
+
+  const snapshot = feedback.snapshot();
+  assert.deepEqual(snapshot.summary, {
+    total: 2, helpful: 0, notHelpful: 2, helpRate: 0, retainedEntries: 2, retentionLimit: 2
+  });
+  assert.equal(snapshot.byPlatform[0].label, 'Android TV');
+  assert.equal(snapshot.bySymptom.length, 2);
+  assert.equal(snapshot.recent[0].symptom.id, 'other');
+  assert.equal(JSON.stringify(snapshot).includes('203.0.113'), false);
+});
 
 const STRONG_SECRET =
   'nuvio-admin:Ab3_defGHIjklMNOpqrSTUvwxYZ0123456789-ABCDE';

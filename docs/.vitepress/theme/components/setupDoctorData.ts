@@ -7,7 +7,6 @@ export type PlatformId =
   | 'tizen'
   | 'webos'
   | 'windows'
-  | 'other'
 
 export type AnswerValue =
   | 'yes'
@@ -355,6 +354,16 @@ export const findings = {
     href: '/troubleshooting#_1-playback-issues',
     linkLabel: 'See playback checks'
   },
+  'ios-p2p-unsupported': {
+    title: 'iOS does not support peer-to-peer (P2P) streaming',
+    summary: 'Apple does not allow or support raw torrent/P2P streaming on iOS, and it likely never will.',
+    fixes: [
+      'Use a Debrid service (TorBox, Real-Debrid, Premiumize) or a plugin to cache and stream the file over HTTPS.',
+      'Make sure you configure your scraper addons to resolve streams via Debrid rather than returning raw P2P links.'
+    ],
+    href: '/troubleshooting#_8-4-ios-ipados',
+    linkLabel: 'Check iOS troubleshooting'
+  },
   'codec-renderer': {
     title: 'The built-in player may not support this codec',
     summary: 'Black video, silent audio, or playback that works elsewhere usually points to decoder or renderer compatibility.',
@@ -507,11 +516,19 @@ export type DoctorCheck = {
   findingByAnswer: Partial<Record<AnswerValue, FindingId>>
 }
 
-export type Symptom = {
+export type SubSymptom = {
   id: string
   label: string
   description: string
   checks: readonly DoctorCheck[]
+}
+
+export type Symptom = {
+  id: string
+  label: string
+  description: string
+  checks?: readonly DoctorCheck[]
+  subSymptoms?: readonly SubSymptom[]
 }
 
 export const areas = [
@@ -528,8 +545,7 @@ export const platforms = [
   { id: 'ios', label: 'iPhone or iPad', description: 'iOS or iPadOS', installHref: '/installation/ios' },
   { id: 'tizen', label: 'Samsung TV', description: 'Tizen or TizenBrew', installHref: '/installation/tizen' },
   { id: 'webos', label: 'LG TV', description: 'webOS', installHref: '/installation/webos' },
-  { id: 'windows', label: 'Windows', description: 'Desktop or laptop', installHref: '/installation/windows' },
-  { id: 'other', label: 'Another device', description: 'A different platform', installHref: '/installation/' }
+  { id: 'windows', label: 'Windows', description: 'Desktop or laptop', installHref: '/installation/windows' }
 ] as const satisfies readonly { id: PlatformId; label: string; description: string; installHref: string }[]
 
 const yesNoUnsure = [
@@ -595,20 +611,32 @@ const windowsInstallChecks = [
   check('windows-uac', 'Did you approve the User Account Control prompt?', 'Setup cannot continue without that permission.', { no: 'windows-install', unsure: 'windows-install' })
 ]
 
-const otherInstallChecks = [
-  check('platform-method', 'Does Nuvio have an installation method for this platform?', 'Check the supported platform guides before trying another package type.', { no: 'platform-install', unsure: 'platform-install' }),
-  check('official-package', 'Is this the latest official package for the device?', 'Packages made for another platform will not install.', { no: 'wrong-build', unsure: 'wrong-build' }),
-  check('free-storage', 'Does the device have at least 500 MB free?', 'Low storage can prevent setup from finishing.', { no: 'low-storage', unsure: 'low-storage' })
-]
-
 export const installChecksByPlatform: Record<PlatformId, Partial<Record<string, readonly DoctorCheck[]>>> = {
   'android-tv': { 'install-error': androidInstallChecks, 'wont-update': androidUpdateChecks },
   'android-mobile': { 'install-error': androidInstallChecks, 'wont-update': androidUpdateChecks },
   ios: { 'install-error': iosInstallChecks, 'wont-update': iosInstallChecks },
   tizen: { 'install-error': tizenInstallChecks, 'wont-update': tizenInstallChecks },
   webos: { 'install-error': webosInstallChecks, 'wont-update': webosInstallChecks },
-  windows: { 'install-error': windowsInstallChecks, 'wont-update': windowsInstallChecks },
-  other: { 'install-error': otherInstallChecks, 'wont-update': otherInstallChecks }
+  windows: { 'install-error': windowsInstallChecks, 'wont-update': windowsInstallChecks }
+}
+
+const defaultPlaybackErrorChecks = [
+  check('is-standard-file', 'Is this a standard media file format (e.g., MP4 or MKV)?', 'Unusual or non-standard file formats may fail to load natively.', { no: 'stream-file', unsure: 'stream-file' }),
+  check('external-player-tried', 'Have you tried playing the stream in an external player?', 'Using VLC or MX Player can resolve built-in player format/codec limitations.', { no: 'codec-renderer', unsure: 'codec-renderer' })
+]
+
+const iosPlaybackErrorChecks = [
+  check('is-standard-file', 'Is this a standard media file format (e.g., MP4 or MKV)?', 'Unusual or non-standard file formats may fail to load natively.', { no: 'stream-file', unsure: 'stream-file' }),
+  check('debrid-plugin-used-ios', 'Are you using a Debrid service or plugin to stream?', 'Debrid services (like TorBox or Real-Debrid) or specialized plugins resolve torrents to HTTPS links.', { no: 'ios-p2p-unsupported', unsure: 'ios-p2p-unsupported', yes: 'codec-renderer' })
+]
+
+export const playbackChecksByPlatform: Record<PlatformId, Partial<Record<string, readonly DoctorCheck[]>>> = {
+  'android-tv': { 'file-type-unsupported': defaultPlaybackErrorChecks },
+  'android-mobile': { 'file-type-unsupported': defaultPlaybackErrorChecks },
+  ios: { 'file-type-unsupported': iosPlaybackErrorChecks },
+  tizen: { 'file-type-unsupported': defaultPlaybackErrorChecks },
+  webos: { 'file-type-unsupported': defaultPlaybackErrorChecks },
+  windows: { 'file-type-unsupported': defaultPlaybackErrorChecks }
 }
 
 export const symptomsByArea: Record<AreaId, readonly Symptom[]> = {
@@ -741,6 +769,19 @@ export const symptomsByArea: Record<AreaId, readonly Symptom[]> = {
           { value: 'unsure', label: 'Not sure' }
         ]),
         check('cache-cleared', 'Have you restarted Nuvio and cleared its cache?', 'Stale local playback data can affect every stream.', { no: 'stale-app-data', unsure: 'stale-app-data' })
+      ]
+    },
+    {
+      id: 'playback-error',
+      label: 'Playback error or failed to play',
+      description: 'The player refuses to play, crashes, or returns format errors.',
+      subSymptoms: [
+        {
+          id: 'file-type-unsupported',
+          label: '“File type not supported”',
+          description: 'The player rejects the stream with a format/codec compatibility message.',
+          checks: defaultPlaybackErrorChecks
+        }
       ]
     },
     {

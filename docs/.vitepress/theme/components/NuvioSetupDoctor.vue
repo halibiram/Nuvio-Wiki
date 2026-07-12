@@ -5,6 +5,7 @@ import {
   areas,
   findings,
   installChecksByPlatform,
+  playbackChecksByPlatform,
   platforms,
   symptomsByArea,
   type AnswerValue,
@@ -25,6 +26,7 @@ const steps = [
 const findingPriority: Partial<Record<FindingId, number>> = {
   'dolby-vision': 100,
   'addon-disabled': 100,
+  'ios-p2p-unsupported': 95,
   'native-debrid-readiness': 95,
   'native-debrid-connection': 95,
   'native-debrid-p2p': 95,
@@ -52,31 +54,62 @@ const maxStepReached = ref<DoctorStep>(1)
 const selectedArea = ref<AreaId | ''>('')
 const selectedPlatform = ref<PlatformId | ''>('')
 const selectedSymptom = ref('')
+const selectedSubSymptom = ref('')
+const showingSubSymptoms = ref(false)
 const answers = ref<Record<string, AnswerValue>>({})
 const stageHeading = ref<HTMLElement>()
+const feedbackChoice = ref<boolean | null>(null)
+const feedbackState = ref<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
+const discordDmHref = 'https://discord.com/channels/@me'
 
 const selectedAreaData = computed(() => areas.find((area) => area.id === selectedArea.value))
 const selectedPlatformData = computed(() => platforms.find((platform) => platform.id === selectedPlatform.value))
 const availableSymptoms = computed(() => selectedArea.value ? symptomsByArea[selectedArea.value] : [])
 const selectedSymptomData = computed(() => availableSymptoms.value.find((symptom) => symptom.id === selectedSymptom.value))
+const selectedSubSymptomData = computed(() => {
+  if (!selectedSymptomData.value?.subSymptoms) return undefined
+  return selectedSymptomData.value.subSymptoms.find((sub) => sub.id === selectedSubSymptom.value)
+})
 const currentChecks = computed(() => {
   const symptom = selectedSymptomData.value
   if (!symptom) return []
 
-  if (selectedArea.value === 'install' && selectedPlatform.value) {
-    return installChecksByPlatform[selectedPlatform.value][symptom.id] ?? symptom.checks
+  if (symptom.subSymptoms) {
+    const subSymptom = selectedSubSymptomData.value
+    if (!subSymptom) return []
+
+    if (selectedPlatform.value && selectedArea.value === 'playback') {
+      return playbackChecksByPlatform[selectedPlatform.value]?.[subSymptom.id] ?? subSymptom.checks
+    }
+    return subSymptom.checks
   }
 
-  return symptom.checks
+  if (selectedPlatform.value) {
+    if (selectedArea.value === 'install') {
+      return installChecksByPlatform[selectedPlatform.value][symptom.id] ?? symptom.checks
+    } else if (selectedArea.value === 'playback') {
+      return playbackChecksByPlatform[selectedPlatform.value]?.[symptom.id] ?? symptom.checks
+    }
+  }
+
+  return symptom.checks ?? []
 })
 const canLeaveStart = computed(() => Boolean(selectedArea.value && selectedPlatform.value))
-const canLeaveSymptom = computed(() => Boolean(selectedSymptom.value))
+const canLeaveSymptom = computed(() => {
+  if (!selectedSymptom.value) return false
+  if (selectedSymptomData.value?.subSymptoms && showingSubSymptoms.value) {
+    return Boolean(selectedSubSymptom.value)
+  }
+  return true
+})
 const canShowResults = computed(() => currentChecks.value.length > 0 && currentChecks.value.every((check) => answers.value[check.id]))
 
 const resultContext = computed(() => [
   selectedPlatformData.value?.label,
   selectedAreaData.value?.label,
-  selectedSymptomData.value?.label
+  selectedSymptomData.value?.label,
+  selectedSubSymptomData.value?.label
 ].filter(Boolean).join(' · '))
 
 const diagnosisResults = computed(() => {
@@ -147,6 +180,8 @@ function selectPlatform(id: PlatformId) {
 function selectArea(id: AreaId) {
   if (selectedArea.value && selectedArea.value !== id) {
     selectedSymptom.value = ''
+    selectedSubSymptom.value = ''
+    showingSubSymptoms.value = false
     answers.value = {}
     maxStepReached.value = 1
   }
@@ -155,10 +190,20 @@ function selectArea(id: AreaId) {
 
 function selectSymptom(id: string) {
   if (selectedSymptom.value !== id) {
+    selectedSubSymptom.value = ''
+    showingSubSymptoms.value = false
     answers.value = {}
     maxStepReached.value = 2
   }
   selectedSymptom.value = id
+}
+
+function selectSubSymptom(id: string) {
+  if (selectedSubSymptom.value !== id) {
+    answers.value = {}
+    maxStepReached.value = 2
+  }
+  selectedSubSymptom.value = id
 }
 
 function selectAnswer(checkId: string, value: AnswerValue) {
@@ -170,18 +215,74 @@ function continueFromStart() {
 }
 
 function continueFromSymptom() {
-  if (canLeaveSymptom.value) setStep(3)
+  if (!canLeaveSymptom.value) return
+
+  if (selectedSymptomData.value?.subSymptoms && !showingSubSymptoms.value) {
+    showingSubSymptoms.value = true
+    focusCurrentStage()
+  } else {
+    setStep(3)
+  }
+}
+
+function goBackFromSymptom() {
+  if (showingSubSymptoms.value) {
+    showingSubSymptoms.value = false
+    selectedSubSymptom.value = ''
+    focusCurrentStage()
+  } else {
+    setStep(1)
+  }
 }
 
 function showResults() {
   if (canShowResults.value) setStep(4)
 }
 
+async function submitFeedback(helpful: boolean) {
+  if (feedbackState.value === 'sending' || feedbackState.value === 'sent') return
+  feedbackChoice.value = helpful
+  feedbackState.value = 'sending'
+
+  const payload = {
+    helpful,
+    areaId: selectedArea.value,
+    area: selectedAreaData.value?.label,
+    platformId: selectedPlatform.value,
+    platform: selectedPlatformData.value?.label,
+    symptomId: selectedSubSymptom.value || selectedSymptom.value,
+    symptom: selectedSubSymptomData.value?.label || selectedSymptomData.value?.label,
+    page: typeof window === 'undefined' ? '/setup-doctor' : window.location.pathname,
+    answers: currentChecks.value.map((check) => ({
+      id: check.id,
+      label: check.question,
+      value: check.options.find((option) => option.value === answers.value[check.id])?.label || answers.value[check.id]
+    })),
+    results: diagnosisResults.value.map((result) => ({ id: result.id, label: result.title }))
+  }
+
+  try {
+    const response = await fetch('/api/setup-doctor/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    if (!response.ok) throw new Error(`Feedback returned HTTP ${response.status}`)
+    feedbackState.value = 'sent'
+  } catch {
+    feedbackState.value = 'error'
+  }
+}
+
 function resetDoctor() {
   selectedArea.value = ''
   selectedPlatform.value = ''
   selectedSymptom.value = ''
+  selectedSubSymptom.value = ''
+  showingSubSymptoms.value = false
   answers.value = {}
+  feedbackChoice.value = null
+  feedbackState.value = 'idle'
   maxStepReached.value = 1
   setStep(1)
 }
@@ -192,16 +293,16 @@ function resetDoctor() {
     <header class="doctor-hero">
       <div class="doctor-kicker">
         <img class="doctor-kicker__logo" :src="withBase('/tools_icon_coloured.webp')" alt="" aria-hidden="true" />
-        Guided troubleshooting
+        Triage Desk
       </div>
-      <h1>Find the next fix without the guesswork.</h1>
+      <h1>Tell the Doctor where it hurts.</h1>
       <p>
-        Choose what you are seeing, answer a few focused checks, and get a short list of likely causes from the Nuvio troubleshooting guide.
+        Select your symptoms, answer a few diagnostic questions, and get a custom prescription to cure what's ailing your Nuvio setup.
       </p>
       <div class="doctor-trust" aria-label="Setup Doctor details">
-        <span>No login</span>
-        <span>No data leaves your browser</span>
-        <span>About 1 minute</span>
+        <span>No insurance required</span>
+        <span>Doctor-patient confidentiality</span>
+        <span>Express check-up (~1 min)</span>
       </div>
     </header>
 
@@ -290,37 +391,81 @@ function resetDoctor() {
         </div>
 
         <div v-else-if="step === 2" class="doctor-stage">
-          <div class="doctor-stage__header">
-            <span>Step 2 of 3</span>
-            <h2 ref="stageHeading" tabindex="-1">Which symptom is closest?</h2>
-            <p>Choose the best match. You can go back if none of these feels right.</p>
-          </div>
-
-          <fieldset class="doctor-fieldset doctor-fieldset--flush">
-            <legend class="sr-only">Choose a symptom</legend>
-            <div class="choice-grid">
-              <label
-                v-for="symptom in availableSymptoms"
-                :key="symptom.id"
-                class="choice-card choice-card--symptom"
-                :class="{ selected: selectedSymptom === symptom.id }"
-              >
-                <input
-                  type="radio"
-                  name="doctor-symptom"
-                  :value="symptom.id"
-                  :checked="selectedSymptom === symptom.id"
-                  @change="selectSymptom(symptom.id)"
-                />
-                <span class="choice-card__check" aria-hidden="true"></span>
-                <strong>{{ symptom.label }}</strong>
-                <small>{{ symptom.description }}</small>
-              </label>
+          <template v-if="!showingSubSymptoms">
+            <div class="doctor-stage__header">
+              <span>Step 2 of 3</span>
+              <h2 ref="stageHeading" tabindex="-1">Which symptom is closest?</h2>
+              <p>Choose the best match. You can go back if none of these feels right.</p>
             </div>
-          </fieldset>
+
+            <fieldset class="doctor-fieldset doctor-fieldset--flush">
+              <legend class="sr-only">Choose a symptom</legend>
+              <div class="choice-grid">
+                <label
+                  v-for="symptom in availableSymptoms"
+                  :key="symptom.id"
+                  class="choice-card choice-card--symptom"
+                  :class="{ selected: selectedSymptom === symptom.id }"
+                >
+                  <input
+                    type="radio"
+                    name="doctor-symptom"
+                    :value="symptom.id"
+                    :checked="selectedSymptom === symptom.id"
+                    @change="selectSymptom(symptom.id)"
+                  />
+                  <span class="choice-card__check" aria-hidden="true"></span>
+                  <strong>{{ symptom.label }}</strong>
+                  <small>{{ symptom.description }}</small>
+                </label>
+              </div>
+            </fieldset>
+          </template>
+
+          <template v-else>
+            <div class="doctor-stage__header">
+              <span>Step 2 of 3</span>
+              <h2 ref="stageHeading" tabindex="-1">Narrow down the playback error</h2>
+              <p>Select the specific playback issue you are experiencing.</p>
+            </div>
+
+            <fieldset class="doctor-fieldset doctor-fieldset--flush">
+              <legend class="sr-only">Choose a specific playback error</legend>
+              <div class="choice-grid">
+                <label
+                  v-for="subSymptom in selectedSymptomData?.subSymptoms"
+                  :key="subSymptom.id"
+                  class="choice-card choice-card--symptom"
+                  :class="{ selected: selectedSubSymptom === subSymptom.id }"
+                >
+                  <input
+                    type="radio"
+                    name="doctor-subsymptom"
+                    :value="subSymptom.id"
+                    :checked="selectedSubSymptom === subSymptom.id"
+                    @change="selectSubSymptom(subSymptom.id)"
+                  />
+                  <span class="choice-card__check" aria-hidden="true"></span>
+                  <strong>{{ subSymptom.label }}</strong>
+                  <small>{{ subSymptom.description }}</small>
+                </label>
+              </div>
+            </fieldset>
+          </template>
+
+          <aside class="doctor-contact-card">
+            <div>
+              <strong>Is your symptom missing?</strong>
+              <p>Tell me what you are seeing so I can add it to the Setup Doctor.</p>
+            </div>
+            <div class="doctor-contact-links doctor-contact-card__links">
+              <a :href="discordDmHref" target="_blank" rel="noopener noreferrer">Discord · @haaihondschildpad</a>
+              <button type="button" disabled title="Reddit link will be added later">Reddit · soon</button>
+            </div>
+          </aside>
 
           <div class="doctor-actions">
-            <button class="doctor-button doctor-button--quiet" type="button" @click="setStep(1)">
+            <button class="doctor-button doctor-button--quiet" type="button" @click="goBackFromSymptom">
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m13 4-6 6 6 6" /></svg>
               Back
             </button>
@@ -422,6 +567,27 @@ function resetDoctor() {
               <p>Never post Debrid API keys, addon manifest URLs, or account credentials when asking for help.</p>
             </div>
           </aside>
+
+          <section class="doctor-feedback" aria-labelledby="doctor-feedback-heading">
+            <div>
+              <span>Guide feedback</span>
+              <h3 id="doctor-feedback-heading">Did this help?</h3>
+              <p>Your anonymous setup choices and results help show which parts of the guide need work.</p>
+            </div>
+            <div v-if="feedbackState === 'idle' || feedbackState === 'sending' || feedbackState === 'error'" class="doctor-feedback__actions">
+              <button type="button" :disabled="feedbackState === 'sending'" @click="submitFeedback(true)">Yes, it helped</button>
+              <button type="button" :disabled="feedbackState === 'sending'" @click="submitFeedback(false)">No, not yet</button>
+            </div>
+            <p v-if="feedbackState === 'error'" class="doctor-feedback__status is-error" role="alert">Feedback could not be sent. You can try again.</p>
+            <div v-else-if="feedbackState === 'sent'" class="doctor-feedback__status" role="status">
+              <strong>{{ feedbackChoice ? 'Thanks — that helps.' : 'Thanks — let’s improve it.' }}</strong>
+              <p v-if="feedbackChoice === false">To help troubleshoot and update the guide, send me what happened:</p>
+              <div v-if="feedbackChoice === false" class="doctor-contact-links">
+                <a :href="discordDmHref" target="_blank" rel="noopener noreferrer">DM @haaihondschildpad on Discord</a>
+                <button type="button" disabled title="Reddit link will be added later">Reddit post (coming soon)</button>
+              </div>
+            </div>
+          </section>
 
           <div class="doctor-actions doctor-actions--results">
             <button class="doctor-button doctor-button--quiet" type="button" @click="setStep(3)">Review answers</button>
@@ -1012,6 +1178,131 @@ function resetDoctor() {
   text-decoration: none;
 }
 
+.doctor-contact-card,
+.doctor-feedback {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 30%, var(--vp-c-divider));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--vp-c-brand-soft) 55%, var(--vp-c-bg));
+}
+
+.doctor-contact-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-style: dashed;
+  background: color-mix(in srgb, var(--vp-c-brand-soft) 25%, var(--vp-c-bg));
+}
+
+.doctor-feedback h3 {
+  font-size: 15px;
+}
+
+.doctor-contact-card strong {
+  font-size: 13px;
+}
+
+.doctor-contact-card p,
+.doctor-feedback p {
+  margin: 4px 0 0;
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.doctor-contact-card p {
+  margin-top: 2px;
+  font-size: 11px;
+}
+
+.doctor-contact-links,
+.doctor-feedback__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.doctor-contact-links a,
+.doctor-contact-links button,
+.doctor-feedback__actions button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 13px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 9px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.doctor-contact-links a,
+.doctor-feedback__actions button:first-child {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-1);
+  color: var(--vp-c-white);
+}
+
+.doctor-contact-links button:disabled,
+.doctor-feedback__actions button:disabled {
+  cursor: not-allowed;
+  opacity: .56;
+}
+
+.doctor-contact-card__links {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.doctor-contact-card__links a,
+.doctor-contact-card__links button {
+  min-height: 30px;
+  padding: 0 9px;
+  border-radius: 7px;
+  font-size: 10px;
+}
+
+.doctor-feedback {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+}
+
+.doctor-feedback > div:first-child > span {
+  color: var(--vp-c-brand-1);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.doctor-feedback h3 {
+  margin: 3px 0 0;
+  border: 0;
+}
+
+.doctor-feedback__status {
+  grid-column: 1 / -1;
+  margin: 0 !important;
+}
+
+.doctor-feedback__status > p {
+  margin-bottom: 10px;
+}
+
+.doctor-feedback__status.is-error {
+  color: var(--vp-c-danger-1);
+}
+
 .doctor-privacy {
   display: flex;
   gap: 13px;
@@ -1146,6 +1437,23 @@ function resetDoctor() {
 
   .doctor-actions {
     flex-direction: column;
+  }
+
+  .doctor-contact-card,
+  .doctor-feedback {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .doctor-contact-links,
+  .doctor-feedback__actions {
+    flex-direction: column;
+  }
+
+  .doctor-contact-card__links {
+    flex-direction: row;
+    align-self: flex-start;
   }
 
   .doctor-button {

@@ -19,6 +19,8 @@ import {
   createAdminSecurity,
   createDashboardSnapshot,
   createRequestMetrics,
+  createServerLogStore,
+  createSetupDoctorFeedbackStore,
   getAdminClearCookieOptions,
   getAdminCookieOptions
 } from './admin.js';
@@ -48,6 +50,22 @@ if (!process.env.GEMINI_API_KEY) {
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const adminSecurity = createAdminSecurity();
 const requestMetrics = createRequestMetrics();
+const setupDoctorFeedback = createSetupDoctorFeedbackStore();
+const serverLogs = createServerLogStore();
+
+for (const [method, level] of Object.entries({
+  log: 'info',
+  info: 'info',
+  warn: 'warn',
+  error: 'error',
+  debug: 'debug'
+})) {
+  const writeToConsole = console[method].bind(console);
+  console[method] = (...values) => {
+    serverLogs.record(level, values);
+    writeToConsole(...values);
+  };
+}
 
 // ── Cache state ──────────────────────────────────────────────────────────
 
@@ -417,6 +435,8 @@ function buildAdminOverview(session) {
       ...integrations,
       adminDashboard: adminSecurity.isConfigured()
     },
+    setupDoctorFeedback: setupDoctorFeedback.snapshot(),
+    serverLogs: serverLogs.snapshot(),
     security: {
       ...securitySnapshot,
       failedAttempts: securitySnapshot.counters?.unlockFailed || 0,
@@ -484,6 +504,15 @@ const setupLimiter = rateLimit({
   keyGenerator: (req) => req.ip
 });
 
+const setupFeedbackLimiter = rateLimit({
+  windowMs: 10 * 60_000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many feedback submissions. Please try again later.' },
+  keyGenerator: (req) => req.ip
+});
+
 const adminUnlockLimiter = rateLimit({
   windowMs: 15 * 60_000,
   max: 5,
@@ -540,6 +569,12 @@ app.delete('/api/admin/session', (req, res) => {
 
 app.get('/api/admin/overview', requireAdminSession, (req, res) => {
   res.json(buildAdminOverview(req.adminSession));
+});
+
+app.post('/api/setup-doctor/feedback', setupFeedbackLimiter, (req, res) => {
+  const result = setupDoctorFeedback.record(req.body);
+  if (!result.ok) return res.status(400).json({ error: 'Invalid feedback payload.' });
+  res.status(201).json({ ok: true });
 });
 
 app.get('/api/status', async (req, res) => {

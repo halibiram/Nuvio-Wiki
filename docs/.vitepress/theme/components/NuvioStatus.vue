@@ -315,7 +315,6 @@ onUnmounted(() => {
             @click="selectProvider(provider.id)"
           >
             {{ provider.label }}
-            <small v-if="provider.id === 'ibbylabs'">Default</small>
           </button>
         </div>
 

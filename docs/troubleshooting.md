@@ -474,6 +474,10 @@ Samsung Tizen TVs do not support direct APK sideloading. Nuvio must be installed
 - Nuvio on iOS may require installation via **AltStore**, **Sideloadly**, or a similar sideloading tool, depending on the distribution method. For full installation instructions, see the [iOS Installation Guide](installation/ios.md).
 - If the app expires (a common issue with sideloaded iOS apps), re-sign it using your tool of choice.
 - iOS has stricter background activity limits. Playback that pauses when the screen locks may require enabling **Background App Refresh** for Nuvio in iOS Settings.
+- **Playback Error ("File type not supported" / format error):**
+  - **No P2P support:** iOS does not support raw peer-to-peer (P2P/torrent) streaming. Apple is not fond of it and doesn't allow it, so P2P torrent streaming will likely never be supported natively on iOS.
+  - **Use Debrid/Plugins:** To stream on iOS, you must use a Debrid service (e.g., TorBox, Real-Debrid, Premiumize) or a plugin that caches the files and streams them to the player over HTTPS. Make sure your scraper addons are configured to resolve links via Debrid rather than returning raw P2P links.
+  - **Verify file type compatibility:** Ensure you are playing standard video files (like MP4 or H.264/HEVC inside compatible containers). Apple's built-in player is restrictive; if a stream fails to play, try configuring an external player like VLC, Outplayer, or Infuse.
 
 ---
 

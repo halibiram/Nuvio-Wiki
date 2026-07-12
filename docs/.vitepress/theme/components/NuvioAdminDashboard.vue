@@ -8,7 +8,7 @@ import {
   watch
 } from 'vue'
 
-type AdminTab = 'overview' | 'traffic' | 'services' | 'system'
+type AdminTab = 'overview' | 'traffic' | 'feedback' | 'logs' | 'services' | 'system'
 type TrafficWindow = 'minutes' | 'hours'
 
 interface TrafficPoint {
@@ -100,6 +100,61 @@ interface SecurityOverview {
   currentSessionExpiresAt?: string | null
 }
 
+interface FeedbackBreakdown {
+  id?: string | null
+  label?: string | null
+  total?: number | null
+  helpful?: number | null
+  notHelpful?: number | null
+  helpRate?: number | null
+}
+
+interface FeedbackAnswer {
+  id?: string | null
+  label?: string | null
+  value?: string | null
+}
+
+interface FeedbackRecord {
+  at?: string | null
+  helpful?: boolean | null
+  area?: { id?: string | null; label?: string | null } | null
+  platform?: { id?: string | null; label?: string | null } | null
+  symptom?: { id?: string | null; label?: string | null } | null
+  answers?: FeedbackAnswer[] | null
+  results?: Array<{ id?: string | null; label?: string | null }> | null
+  page?: string | null
+}
+
+interface SetupDoctorFeedback {
+  summary?: {
+    total?: number | null
+    helpful?: number | null
+    notHelpful?: number | null
+    helpRate?: number | null
+    retainedEntries?: number | null
+    retentionLimit?: number | null
+  } | null
+  byArea?: FeedbackBreakdown[] | null
+  byPlatform?: FeedbackBreakdown[] | null
+  bySymptom?: FeedbackBreakdown[] | null
+  recent?: FeedbackRecord[] | null
+}
+
+interface ServerLogEntry {
+  id?: number | null
+  at?: string | null
+  level?: 'debug' | 'info' | 'warn' | 'error' | null
+  message?: string | null
+}
+
+interface ServerLogsOverview {
+  retainedEntries?: number | null
+  retentionLimit?: number | null
+  counts?: Record<string, number | null> | null
+  entries?: ServerLogEntry[] | null
+}
+
 interface AdminOverview {
   generatedAt?: string | null
   traffic?: TrafficOverview | null
@@ -107,6 +162,8 @@ interface AdminOverview {
   knowledge?: KnowledgeOverview | null
   integrations?: Record<string, boolean | null> | null
   security?: SecurityOverview | null
+  setupDoctorFeedback?: SetupDoctorFeedback | null
+  serverLogs?: ServerLogsOverview | null
 }
 
 class HttpError extends Error {
@@ -134,6 +191,8 @@ const emit = defineEmits<{
 const tabs: Array<{ id: AdminTab; label: string; description: string }> = [
   { id: 'overview', label: 'Overview', description: 'Live operating picture' },
   { id: 'traffic', label: 'Traffic', description: 'Requests and latency' },
+  { id: 'feedback', label: 'Doctor feedback', description: 'Guide outcomes and gaps' },
+  { id: 'logs', label: 'Server logs', description: 'Live process output' },
   { id: 'services', label: 'Services', description: 'Integrations and knowledge' },
   { id: 'system', label: 'System', description: 'Runtime and security' }
 ]
@@ -162,6 +221,14 @@ const traffic = computed(() => overview.value?.traffic || {})
 const runtime = computed(() => overview.value?.runtime || {})
 const knowledge = computed(() => overview.value?.knowledge || {})
 const security = computed(() => overview.value?.security || {})
+const feedback = computed(() => overview.value?.setupDoctorFeedback || {})
+const feedbackSummary = computed(() => feedback.value.summary || {})
+const feedbackBySymptom = computed(() => normalizeArray<FeedbackBreakdown>(feedback.value.bySymptom))
+const feedbackByPlatform = computed(() => normalizeArray<FeedbackBreakdown>(feedback.value.byPlatform))
+const recentFeedback = computed(() => normalizeArray<FeedbackRecord>(feedback.value.recent))
+const serverLogs = computed(() => overview.value?.serverLogs || {})
+const serverLogEntries = computed(() => normalizeArray<ServerLogEntry>(serverLogs.value.entries))
+const serverLogCounts = computed(() => serverLogs.value.counts || {})
 
 const minuteSeries = computed(() => normalizeArray<TrafficPoint>(traffic.value.minuteSeries))
 const hourSeries = computed(() => normalizeArray<TrafficPoint>(traffic.value.hourSeries))
@@ -749,6 +816,14 @@ onBeforeUnmount(() => {
                     <path d="M4 18V9M10 18V5M16 18v-7M22 18V3" />
                     <path d="M2 18h20" />
                   </svg>
+                  <svg v-else-if="tab.id === 'feedback'" viewBox="0 0 24 24">
+                    <path d="M4 5h16v11H9l-5 4V5Z" />
+                    <path d="m8 10 2.2 2.2L16 7.5" />
+                  </svg>
+                  <svg v-else-if="tab.id === 'logs'" viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="16" rx="2" />
+                    <path d="m7 9 3 3-3 3M13 15h4" />
+                  </svg>
                   <svg v-else-if="tab.id === 'services'" viewBox="0 0 24 24">
                     <rect x="3" y="4" width="18" height="6" rx="2" />
                     <rect x="3" y="14" width="18" height="6" rx="2" />
@@ -1082,6 +1157,152 @@ onBeforeUnmount(() => {
                     </table>
                   </div>
                   <div v-else class="inline-empty inline-empty--large">The recent request log is empty.</div>
+                </article>
+              </section>
+
+              <section
+                v-show="activeTab === 'feedback'"
+                id="admin-panel-feedback"
+                class="tab-panel"
+                role="tabpanel"
+                aria-labelledby="admin-tab-feedback"
+              >
+                <div class="metric-grid feedback-metric-grid">
+                  <article class="metric-card metric-card--brand">
+                    <span class="metric-card__label">Responses</span>
+                    <strong>{{ formatExactNumber(feedbackSummary.total) }}</strong>
+                    <small>Since process start</small>
+                  </article>
+                  <article class="metric-card">
+                    <span class="metric-card__label">Helpful</span>
+                    <strong>{{ formatExactNumber(feedbackSummary.helpful) }}</strong>
+                    <small>Users who found a next step</small>
+                  </article>
+                  <article class="metric-card" :class="{ 'is-warning': (finiteNumber(feedbackSummary.notHelpful) ?? 0) > 0 }">
+                    <span class="metric-card__label">Needs work</span>
+                    <strong>{{ formatExactNumber(feedbackSummary.notHelpful) }}</strong>
+                    <small>Users still troubleshooting</small>
+                  </article>
+                  <article class="metric-card">
+                    <span class="metric-card__label">Help rate</span>
+                    <strong>{{ formatPercent(feedbackSummary.helpRate) }}</strong>
+                    <small>{{ formatExactNumber(feedbackSummary.retainedEntries) }} of {{ formatExactNumber(feedbackSummary.retentionLimit) }} records retained</small>
+                  </article>
+                </div>
+
+                <div class="feedback-breakdown-grid">
+                  <article class="dashboard-card table-card">
+                    <header class="card-heading"><div><span>Guide gaps</span><h3>Results by symptom</h3></div><span class="record-count">{{ feedbackBySymptom.length }} symptoms</span></header>
+                    <div v-if="feedbackBySymptom.length" class="data-table-wrap">
+                      <table class="data-table feedback-table">
+                        <thead><tr><th>Symptom</th><th>Responses</th><th>Helpful</th><th>Needs work</th><th>Help rate</th></tr></thead>
+                        <tbody>
+                          <tr v-for="item in feedbackBySymptom" :key="item.id || item.label || ''">
+                            <td>{{ item.label || 'Unknown symptom' }}</td>
+                            <td>{{ formatExactNumber(item.total) }}</td>
+                            <td>{{ formatExactNumber(item.helpful) }}</td>
+                            <td>{{ formatExactNumber(item.notHelpful) }}</td>
+                            <td>{{ formatPercent(item.helpRate) }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div v-else class="inline-empty inline-empty--large">No Setup Doctor feedback has been submitted yet.</div>
+                  </article>
+
+                  <article class="dashboard-card platform-feedback-card">
+                    <header class="card-heading"><div><span>Devices</span><h3>Results by platform</h3></div></header>
+                    <div v-if="feedbackByPlatform.length" class="feedback-distribution">
+                      <div v-for="item in feedbackByPlatform" :key="item.id || item.label || ''" class="feedback-distribution__row">
+                        <div><strong>{{ item.label || 'Unknown platform' }}</strong><span>{{ formatExactNumber(item.total) }} responses</span></div>
+                        <div class="progress-track"><span :style="{ width: `${normalizedPercent(item.helpRate) ?? 0}%` }"></span></div>
+                        <b>{{ formatPercent(item.helpRate) }}</b>
+                      </div>
+                    </div>
+                    <div v-else class="inline-empty">No platform breakdown is available.</div>
+                  </article>
+                </div>
+
+                <article class="dashboard-card feedback-records-card">
+                  <header class="card-heading"><div><span>Submitted context</span><h3>Recent answers and diagnoses</h3></div><span class="record-count">{{ recentFeedback.length }} records</span></header>
+                  <div v-if="recentFeedback.length" class="feedback-record-list">
+                    <details v-for="(record, index) in recentFeedback" :key="`${record.at}-${index}`" class="feedback-record">
+                      <summary>
+                        <span class="feedback-outcome" :class="record.helpful ? 'is-helpful' : 'is-unhelpful'">{{ record.helpful ? 'Helpful' : 'Needs work' }}</span>
+                        <strong>{{ record.symptom?.label || 'Unknown symptom' }}</strong>
+                        <span>{{ record.platform?.label || 'Unknown platform' }}</span>
+                        <time :datetime="record.at || undefined">{{ formatDate(record.at, true) }}</time>
+                      </summary>
+                      <div class="feedback-record__details">
+                        <dl>
+                          <div><dt>Area</dt><dd>{{ record.area?.label || '—' }}</dd></div>
+                          <div><dt>Platform</dt><dd>{{ record.platform?.label || '—' }}</dd></div>
+                          <div><dt>Symptom</dt><dd>{{ record.symptom?.label || '—' }}</dd></div>
+                          <div><dt>Page</dt><dd><code>{{ record.page || '—' }}</code></dd></div>
+                        </dl>
+                        <div>
+                          <h4>Check answers</h4>
+                          <ul><li v-for="answer in normalizeArray(record.answers)" :key="answer.id || answer.label || ''"><span>{{ answer.label || answer.id }}</span><strong>{{ answer.value || '—' }}</strong></li></ul>
+                        </div>
+                        <div>
+                          <h4>Diagnoses shown</h4>
+                          <ol><li v-for="result in normalizeArray(record.results)" :key="result.id || result.label || ''">{{ result.label || result.id }}</li></ol>
+                        </div>
+                      </div>
+                    </details>
+                  </div>
+                  <div v-else class="inline-empty inline-empty--large">Detailed feedback records will appear here after users respond.</div>
+                </article>
+              </section>
+
+              <section
+                v-show="activeTab === 'logs'"
+                id="admin-panel-logs"
+                class="tab-panel"
+                role="tabpanel"
+                aria-labelledby="admin-tab-logs"
+              >
+                <div class="metric-grid server-log-metric-grid">
+                  <article class="metric-card metric-card--brand">
+                    <span class="metric-card__label">Retained</span>
+                    <strong>{{ formatExactNumber(serverLogs.retainedEntries) }}</strong>
+                    <small>Latest {{ formatExactNumber(serverLogs.retentionLimit) }} lines maximum</small>
+                  </article>
+                  <article class="metric-card">
+                    <span class="metric-card__label">Info</span>
+                    <strong>{{ formatExactNumber(serverLogCounts.info) }}</strong>
+                    <small>Normal process activity</small>
+                  </article>
+                  <article class="metric-card" :class="{ 'is-warning': (finiteNumber(serverLogCounts.warn) ?? 0) > 0 }">
+                    <span class="metric-card__label">Warnings</span>
+                    <strong>{{ formatExactNumber(serverLogCounts.warn) }}</strong>
+                    <small>Items that may need attention</small>
+                  </article>
+                  <article class="metric-card" :class="{ 'is-danger': (finiteNumber(serverLogCounts.error) ?? 0) > 0 }">
+                    <span class="metric-card__label">Errors</span>
+                    <strong>{{ formatExactNumber(serverLogCounts.error) }}</strong>
+                    <small>Failures since process start</small>
+                  </article>
+                </div>
+
+                <article class="dashboard-card server-log-card">
+                  <header class="card-heading">
+                    <div><span>Process console</span><h3>Recent server output</h3></div>
+                    <span class="record-count">Newest first</span>
+                  </header>
+                  <div v-if="serverLogEntries.length" class="server-log-list" role="log" aria-label="Recent server logs">
+                    <div
+                      v-for="(entry, index) in serverLogEntries"
+                      :key="entry.id ?? `${entry.at}-${index}`"
+                      class="server-log-entry"
+                      :class="`is-${entry.level || 'info'}`"
+                    >
+                      <time :datetime="entry.at || undefined">{{ formatDate(entry.at, true) }}</time>
+                      <span class="server-log-level">{{ entry.level || 'info' }}</span>
+                      <code>{{ entry.message || '—' }}</code>
+                    </div>
+                  </div>
+                  <div v-else class="inline-empty inline-empty--large">No server output has been captured yet.</div>
                 </article>
               </section>
 
@@ -1477,6 +1698,7 @@ onBeforeUnmount(() => {
   flex: 1;
   display: grid;
   grid-template-columns: 238px minmax(0, 1fr);
+  zoom: 1.2;
 }
 
 .admin-sidebar {
@@ -1802,6 +2024,10 @@ onBeforeUnmount(() => {
 
 .metric-card.is-warning::before {
   background: var(--admin-amber);
+}
+
+.metric-card.is-danger::before {
+  background: var(--admin-red);
 }
 
 .metric-card__label {
@@ -2385,6 +2611,153 @@ onBeforeUnmount(() => {
 .request-table td:nth-child(3) { max-width: 520px; }
 .request-table td:nth-child(3) code { max-width: min(45vw, 500px); }
 
+.feedback-metric-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.feedback-breakdown-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, .5fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.feedback-table {
+  min-width: 580px;
+}
+
+.platform-feedback-card .inline-empty {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+}
+
+.feedback-distribution {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+}
+
+.feedback-distribution__row {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) minmax(80px, 1fr) 46px;
+  align-items: center;
+  gap: 10px;
+}
+
+.feedback-distribution__row > div:first-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.feedback-distribution__row strong { overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.feedback-distribution__row span { color: var(--vp-c-text-3); font-size: 8px; }
+.feedback-distribution__row b { color: var(--vp-c-text-2); font-size: 9px; text-align: right; }
+
+.feedback-record-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.feedback-record {
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.feedback-record:last-child { border-bottom: 0; }
+
+.feedback-record summary {
+  display: grid;
+  grid-template-columns: 72px minmax(180px, 1fr) minmax(110px, .5fr) 125px;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 9px 14px;
+  cursor: pointer;
+  color: var(--vp-c-text-2);
+  font-size: 9px;
+  list-style-position: inside;
+}
+
+.feedback-record summary:hover { background: color-mix(in srgb, var(--vp-c-bg-soft) 55%, transparent); }
+.feedback-record summary strong { overflow: hidden; color: var(--vp-c-text-1); text-overflow: ellipsis; white-space: nowrap; }
+.feedback-record summary time { color: var(--vp-c-text-3); text-align: right; }
+
+.feedback-outcome {
+  display: inline-flex;
+  justify-content: center;
+  padding: 3px 6px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.feedback-outcome.is-helpful { background: var(--admin-green-soft); color: var(--admin-green); }
+.feedback-outcome.is-unhelpful { background: var(--admin-amber-soft); color: var(--admin-amber); }
+
+.feedback-record__details {
+  display: grid;
+  grid-template-columns: minmax(160px, .65fr) minmax(260px, 1.35fr) minmax(180px, 1fr);
+  gap: 18px;
+  padding: 15px 18px 18px;
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 55%, transparent);
+  color: var(--vp-c-text-2);
+  font-size: 9px;
+}
+
+.feedback-record__details dl,
+.feedback-record__details ul,
+.feedback-record__details ol { margin: 0; }
+.feedback-record__details dl div { display: grid; grid-template-columns: 62px 1fr; gap: 8px; padding: 3px 0; }
+.feedback-record__details dt { color: var(--vp-c-text-3); }
+.feedback-record__details dd { margin: 0; }
+.feedback-record__details h4 { margin: 0 0 7px; font-size: 9px; text-transform: uppercase; }
+.feedback-record__details ul { padding: 0; list-style: none; }
+.feedback-record__details li { margin: 4px 0; }
+.feedback-record__details ul li { display: flex; justify-content: space-between; gap: 10px; }
+.feedback-record__details ul li span { color: var(--vp-c-text-3); }
+
+.server-log-metric-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.server-log-card { overflow: hidden; }
+
+.server-log-list {
+  max-height: min(62vh, 720px);
+  overflow: auto;
+  background: color-mix(in srgb, #090d12 94%, var(--vp-c-bg));
+  scrollbar-color: color-mix(in srgb, var(--vp-c-text-3) 45%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+.server-log-entry {
+  display: grid;
+  grid-template-columns: 132px 54px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgb(255 255 255 / 6%);
+  color: #b8c1cc;
+  font-size: 9px;
+}
+
+.server-log-entry:last-child { border-bottom: 0; }
+.server-log-entry time { color: #6f7b88; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.server-log-entry code { color: inherit; font-family: var(--vp-font-family-mono); overflow-wrap: anywhere; white-space: pre-wrap; }
+.server-log-entry.is-warn { background: color-mix(in srgb, var(--admin-amber) 7%, transparent); color: #e7c47f; }
+.server-log-entry.is-error { background: color-mix(in srgb, var(--admin-red) 8%, transparent); color: #ef9aa5; }
+.server-log-entry.is-debug { color: #7f8a96; }
+
+.server-log-level {
+  color: inherit;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
 .service-summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2916,7 +3289,10 @@ onBeforeUnmount(() => {
   .admin-main { padding-top: 20px; }
   .overview-grid,
   .overview-grid--lower,
-  .traffic-secondary-grid { grid-template-columns: 1fr; }
+  .traffic-secondary-grid,
+  .feedback-breakdown-grid { grid-template-columns: 1fr; }
+  .feedback-record__details { grid-template-columns: 1fr 1fr; }
+  .feedback-record__details > div:last-child { grid-column: 1 / -1; }
   .activity-chart { height: 175px; }
 }
 
@@ -2958,6 +3334,10 @@ onBeforeUnmount(() => {
   .utilization-row { justify-content: flex-start; }
   .warning-banner { grid-template-columns: auto 1fr; }
   .warning-banner button { grid-column: 2; justify-self: start; }
+  .feedback-record summary { grid-template-columns: 72px minmax(130px, 1fr) 110px; }
+  .feedback-record summary time { display: none; }
+  .feedback-record__details { grid-template-columns: 1fr; }
+  .feedback-record__details > div:last-child { grid-column: auto; }
   .skeleton-grid { grid-template-columns: repeat(2, 1fr); }
   .skeleton-grid--wide { grid-template-columns: 1fr; }
 }
@@ -2980,6 +3360,8 @@ onBeforeUnmount(() => {
   .client-comparison { grid-template-columns: 1fr 45px 1fr; }
   .client-comparison svg { width: 45px; }
   .dashboard-state__actions { width: 100%; flex-direction: column; }
+  .feedback-record summary { grid-template-columns: 72px minmax(110px, 1fr); }
+  .feedback-record summary > span:nth-of-type(2) { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
