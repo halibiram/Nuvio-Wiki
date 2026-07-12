@@ -408,10 +408,7 @@ async function submitSetup() {
         @click="isCollapsed = !isCollapsed"
       >
         <span class="qs-brand">
-          <svg viewBox="0 0 40 40" class="logo-mark" aria-hidden="true">
-            <path d="M9 27V13l11-6 11 6v14l-11 6-11-6Z"></path>
-            <path d="m15 24 5-9 5 9"></path>
-          </svg>
+          <img :src="withBase('/tools_icon_coloured.webp')" class="logo-mark" alt="" aria-hidden="true" />
           <span class="qs-brand-text">Nuvio Quickstart Tool</span>
         </span>
         <span class="qs-meta-actions">
@@ -879,6 +876,7 @@ async function submitSetup() {
   border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 32%, var(--vp-c-border));
   border-radius: 8px;
   background: var(--vp-c-brand-soft);
+  object-fit: contain;
   fill: none;
   stroke: var(--vp-c-brand-1);
   stroke-width: 2;

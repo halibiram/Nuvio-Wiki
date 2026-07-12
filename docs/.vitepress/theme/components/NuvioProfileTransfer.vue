@@ -8,6 +8,7 @@ import {
   mergeStagedRecords,
   pluginMergeKey
 } from './profileTransferMerge'
+import { withBase } from 'vitepress'
 
 type TransferMode = 'export' | 'import'
 type RestoreStrategy = 'merge' | 'replace'
@@ -1295,6 +1296,11 @@ async function runImport() {
 
 <template>
   <div class="profile-transfer">
+    <div class="tool-brand" aria-label="Nuvio Profile Transfer">
+      <img :src="withBase('/tools_icon_coloured.webp')" alt="" aria-hidden="true" />
+      <span>Nuvio Profile Transfer</span>
+    </div>
+
     <div class="privacy-note">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
@@ -1715,6 +1721,24 @@ async function runImport() {
   flex-direction: column;
   gap: 18px;
   color: var(--vp-c-text-1);
+}
+
+.tool-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--vp-c-text-1);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tool-brand img {
+  width: 42px;
+  height: 24px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  background: var(--vp-c-bg-soft);
+  object-fit: contain;
 }
 
 .privacy-note,

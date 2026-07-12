@@ -34,6 +34,9 @@ function buildNav(locale: WikiLocale): DefaultTheme.NavItem[] {
     {
       text: labels.help,
       items: [
+        ...(locale.key === 'root'
+          ? [{ text: 'Setup Doctor', link: siteRoutes.setupDoctor }]
+          : []),
         { text: labels.troubleshooting, link: localeLink(locale, siteRoutes.troubleshooting) },
         { text: labels.faq, link: localeLink(locale, siteRoutes.faq) },
         { text: labels.features, link: localeLink(locale, siteRoutes.features) }
@@ -103,7 +106,10 @@ function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
   const otherLocaleKeys = wikiLocales
     .map(l => l.key)
     .filter(k => k !== locale.key)
-  const excludeByGlobPattern = otherLocaleKeys.map(k => `${k}/**`)
+  const excludeByGlobPattern = [
+    ...otherLocaleKeys.map(k => `${k}/**`),
+    ...(isRoot ? ['tools/**'] : [])
+  ]
 
   const sidebar = generateSidebar({
     documentRootPath: 'docs',
@@ -147,6 +153,27 @@ function buildSidebar(locale: WikiLocale): DefaultTheme.SidebarItem[] {
 
   const sidebarItems = sidebar as DefaultTheme.SidebarItem[]
   cleanSidebarLinks(sidebarItems)
+
+  if (isRoot) {
+    const helpLinks = new Set([siteRoutes.troubleshooting, siteRoutes.faq])
+    const remainingItems = sidebarItems.filter((item) => !item.link || !helpLinks.has(item.link))
+    const helpSourceItems = sidebarItems.filter((item) => item.link && helpLinks.has(item.link))
+    const normalizedSettingsRoute = siteRoutes.settings.replace(/\/$/, '')
+    const settingsIndex = remainingItems.findIndex((item) => item.link?.replace(/\/$/, '') === normalizedSettingsRoute)
+    const insertAt = settingsIndex >= 0 ? settingsIndex + 1 : remainingItems.length
+
+    remainingItems.splice(insertAt, 0, {
+      text: 'Help',
+      collapsed: false,
+      items: [
+        { text: 'Setup Doctor', link: siteRoutes.setupDoctor },
+        ...helpSourceItems
+      ]
+    })
+
+    return remainingItems
+  }
+
   return sidebarItems
 }
 

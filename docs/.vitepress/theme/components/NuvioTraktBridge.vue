@@ -599,7 +599,7 @@ async function prepareEpisodeMapper() {
       addons,
       effectiveProfileId: Number(state.nuvio.profileId),
       disabled: false,
-      startedAt: 0,
+      startedAt: Date.now(),
       timeoutLogged: false,
       metaTimeoutMs: 3000,
       traktTimeoutMs: 4500,
@@ -718,8 +718,54 @@ async function getTraktEpisodes(showId: string, mapper: any): Promise<EpisodeEnt
   }
 }
 
+// Batch-prefetch episode maps for a list of shows to warm caches in parallel
+async function prefetchEpisodeMaps(mapper: any, shows: Array<{ contentId: string; contentType: string; imdb?: string }>) {
+  if (!mapper || mapper.disabled) return
+  const seen = new Set<string>()
+  const tasks: Array<{ contentId: string; contentType: string; lookupId: string }> = []
+  for (const s of shows) {
+    const key = s.contentId
+    if (seen.has(key)) continue
+    seen.add(key)
+    tasks.push({
+      contentId: s.contentId,
+      contentType: s.contentType,
+      lookupId: s.imdb || s.contentId.replace(/^(trakt|tmdb):/, '')
+    })
+  }
+  if (!tasks.length) return
+  logLine(`Pre-fetching episode maps for ${tasks.length} show(s)...`)
+  const concurrency = 6
+  for (let i = 0; i < tasks.length; i += concurrency) {
+    if (mapper.disabled) break
+    if (mapper.startedAt && (Date.now() - mapper.startedAt) > mapper.totalBudgetMs) {
+      mapper.disabled = true
+      logLine(`Episode mapping budget exhausted during prefetch (${tasks.length - i} shows skipped).`)
+      break
+    }
+    const batch = tasks.slice(i, i + concurrency)
+    await Promise.all(batch.map(t =>
+      Promise.all([
+        getAddonEpisodes(t.contentId, t.contentType, mapper).catch(() => []),
+        getTraktEpisodes(t.lookupId, mapper).catch(() => [])
+      ])
+    ))
+    if (i + concurrency < tasks.length) {
+      logLine(`  Prefetched ${Math.min(i + concurrency, tasks.length)}/${tasks.length} shows...`)
+    }
+  }
+  if (!mapper.disabled) {
+    logLine(`Episode map prefetch complete (${tasks.length} shows).`)
+  }
+}
+
 async function resolveEpisodeMapping(mapper: any, params: any, isExport = false) {
   if (!mapper || mapper.disabled) return null
+  if (mapper.startedAt && (Date.now() - mapper.startedAt) > mapper.totalBudgetMs) {
+    mapper.disabled = true
+    logLine('Episode mapping budget exhausted. Disabling mapping for remaining items.')
+    return null
+  }
   const cacheKey = `${mapper.effectiveProfileId}|${params.contentType}|${params.contentId}|${params.season}|${params.episode}|${isExport ? 'export' : 'import'}`
   if (episodeMappingCache.has(cacheKey)) return episodeMappingCache.get(cacheKey)
 
@@ -851,6 +897,7 @@ async function buildSyncPlan(isPreviewOnly = false) {
         traktRequestAll('/sync/watched/movies'),
         traktRequestAll('/sync/watched/shows', { extended: 'progress' })
       ])
+      logLine(`Received ${Array.isArray(movies.data) ? movies.data.length : 0} movies, ${Array.isArray(shows.data) ? shows.data.length : 0} shows from Trakt.`)
 
       // Movies
       for (const m of (Array.isArray(movies.data) ? movies.data : [])) {
@@ -865,8 +912,17 @@ async function buildSyncPlan(isPreviewOnly = false) {
         })
       }
 
-      // Shows / Episodes
-      for (const s of (Array.isArray(shows.data) ? shows.data : [])) {
+      // Shows / Episodes — prefetch episode maps in parallel before iterating
+      const showsArray = Array.isArray(shows.data) ? shows.data : []
+      if (mapper && showsArray.length) {
+        const showList = showsArray
+          .map(s => ({ contentId: resolveContentId(s.show?.ids, 'show'), contentType: 'series', imdb: s.show?.ids?.imdb }))
+          .filter(s => s.contentId) as Array<{ contentId: string; contentType: string; imdb?: string }>
+        await prefetchEpisodeMaps(mapper, showList)
+      }
+
+      let episodeCount = 0
+      for (const s of showsArray) {
         const id = resolveContentId(s.show?.ids, 'show')
         if (!id) { plan.skipped++; continue }
         for (const season of (s.seasons || [])) {
@@ -894,9 +950,11 @@ async function buildSyncPlan(isPreviewOnly = false) {
               watched_at: new Date(ep.last_watched_at || s.last_watched_at || Date.now()).getTime(),
               _display_type: 'watched episode'
             })
+            episodeCount++
           }
         }
       }
+      logLine(`Processed ${episodeCount} watched episodes across ${showsArray.length} shows.`)
     }
 
     if (state.options.syncProgress) {
@@ -1017,6 +1075,14 @@ async function buildSyncPlan(isPreviewOnly = false) {
       }
 
       logLine(`Pulled ${watched.length} watched items from Nuvio profile. Remapping numbers...`)
+
+      // Prefetch episode maps for all unique series in parallel
+      if (mapper) {
+        const seriesItems = watched.filter(i => i.content_type === 'series' && i.content_id)
+        const showList = [...new Map(seriesItems.map(i => [i.content_id, { contentId: i.content_id, contentType: 'series' }])).values()]
+        await prefetchEpisodeMaps(mapper, showList)
+      }
+
       for (const item of watched) {
         if (item.content_type === 'movie') {
           plan.history.push({
@@ -1569,7 +1635,7 @@ function formatEpochMs(val: number) {
       <div v-if="!hideHeader" class="qs-header clickable-header" @click="isCollapsed = !isCollapsed" role="button" :aria-expanded="!isCollapsed" tabindex="0" @keydown.enter.prevent="isCollapsed = !isCollapsed" @keydown.space.prevent="isCollapsed = !isCollapsed">
         <div class="qs-brand">
           <div class="brand-icons">
-            <img :src="withBase('/logo.png')" class="logo-mark nuvio-logo" alt="Nuvio" />
+            <img :src="withBase('/tools_icon_coloured.webp')" class="logo-mark tools-logo" alt="" aria-hidden="true" />
             <svg viewBox="0 0 24 24" class="logo-mark trakt-logo" aria-hidden="true">
               <path d="m15.082 15.107-.73-.73 9.578-9.583a4.499 4.499 0 0 0-.115-.575L13.662 14.382l1.08 1.08-.73.73-1.81-1.81L23.422 3.144c-.075-.15-.155-.3-.25-.44L11.508 14.377l2.154 2.155-.73.73-7.193-7.199.73-.73 4.309 4.31L22.546 1.86A5.618 5.618 0 0 0 18.362 0H5.635A5.637 5.637 0 0 0 0 5.634V18.37A5.632 5.632 0 0 0 5.635 24h12.732C21.477 24 24 21.48 24 18.37V6.19l-8.913 8.918zm-4.314-2.155L6.814 8.988l.73-.73 3.954 3.96zm1.075-1.084-3.954-3.96.73-.73 3.959 3.96zm9.853 5.688a4.141 4.141 0 0 1-4.14 4.14H6.438a4.144 4.144 0 0 1-4.139-4.14V6.438A4.141 4.141 0 0 1 6.44 2.3h10.387v1.04H6.438c-1.71 0-3.099 1.39-3.099 3.1V17.55c0 1.71 1.39 3.105 3.1 3.105h11.117c1.71 0 3.1-1.395 3.1-3.105v-1.754h1.04v1.754z"/>
             </svg>
@@ -1930,7 +1996,7 @@ function formatEpochMs(val: number) {
   top: 2px;
 }
 
-.brand-icons .nuvio-logo {
+.brand-icons .tools-logo {
   background: var(--vp-c-bg-alt);
   left: 0;
   z-index: 2;

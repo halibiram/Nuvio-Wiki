@@ -17,6 +17,7 @@
  * conditional engine, ported to run in the browser.
  */
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
+import { withBase } from 'vitepress'
 
 // ---------------------------------------------------------------------------
 // TAMS template resolution engine (browser port of template.ts)
@@ -575,6 +576,11 @@ onMounted(async () => {
 
 <template>
   <div class="p2p-gen">
+    <div class="tool-brand" aria-label="P2P Setup Generator">
+      <img :src="withBase('/tools_icon_coloured.webp')" alt="" aria-hidden="true" />
+      <span>P2P Setup Generator</span>
+    </div>
+
     <!-- Mode toggle -->
     <div class="mode-toggle" role="tablist" aria-label="Generator mode">
       <button
@@ -992,6 +998,25 @@ onMounted(async () => {
 .p2p-gen {
   margin: 24px 0;
   font-family: inherit;
+}
+
+.tool-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  color: var(--vp-c-text-1);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tool-brand img {
+  width: 42px;
+  height: 24px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  background: var(--vp-c-bg-soft);
+  object-fit: contain;
 }
 
 /* Mode toggle tabs */
