@@ -119,14 +119,16 @@ export function normalizeIbbyLabsStatus(payload) {
       const latencyMs = Number.isFinite(latency) ? Math.max(0, Math.round(latency)) : null;
       const isNuvioService = group.trim().toLocaleLowerCase() === 'nuvio'
         || String(service?.id || '').startsWith('nuvio-');
+      const isStremioService = group.trim().toLocaleLowerCase() === 'stremio'
+        || String(service?.id || '').startsWith('stremio-');
       const isNuvioWebsite = service?.id === 'nuvio-website';
 
       return {
         id: String(service?.id || `${group}-${service?.name || 'service'}`),
         name: isNuvioWebsite ? 'Nuvio' : String(service?.name || 'Unnamed service'),
-        group: isNuvioService ? 'Nuvio Platform' : group,
-        groupOrder: isNuvioService ? 0 : groupOrders.get(group),
-        kind: isNuvioService ? 'platform' : 'community',
+        group: isNuvioService ? 'Nuvio' : group,
+        groupOrder: isNuvioService ? 0 : isStremioService ? Number.MAX_SAFE_INTEGER : groupOrders.get(group),
+        kind: 'community',
         url: service?.url || null,
         hostname: hostnameFromUrl(service?.url),
         status,
@@ -241,9 +243,9 @@ async function checkNuvio(fetchImpl, now, priorHistory) {
   return {
     id: 'nuvio-platform',
     name: 'Nuvio',
-    group: 'Nuvio Platform',
+    group: 'Nuvio',
     groupOrder: 0,
-    kind: 'platform',
+    kind: 'community',
     url: NUVIO_URL,
     hostname: 'nuvio.tv',
     status,

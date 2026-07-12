@@ -23,6 +23,10 @@ const ibbyLabsPayload = {
       last: { state: 'DOWN', up: false, latency: 900, checkedAt: '2026-07-10T12:00:00.000Z' }
     },
     {
+      id: 'stremio-app', name: 'Stremio App', group: 'Stremio', url: 'https://app.strem.io/',
+      last: { state: 'UP', up: true, latency: 200, checkedAt: '2026-07-10T12:00:00.000Z' }
+    },
+    {
       id: 'hidden-service', name: 'Hidden', group: 'Internal', hideFromStatusPage: true,
       last: { state: 'DOWN', up: false }
     }
@@ -81,18 +85,24 @@ test('normalizes community checks and removes Stremio platform services', () => 
   );
 });
 
-test('normalizes Ibby Labs services and promotes every Nuvio service', () => {
+test('normalizes Ibby Labs services and puts every Nuvio service first', () => {
   const services = normalizeIbbyLabsStatus(ibbyLabsPayload);
 
-  assert.equal(services.length, 3);
-  assert.equal(services[0].kind, 'platform');
+  assert.equal(services.length, 4);
+  assert.equal(services[0].kind, 'community');
+  assert.equal(services[0].group, 'Nuvio');
+  assert.equal(services[0].groupOrder, 0);
   assert.equal(services[0].name, 'Nuvio');
   assert.equal(services[0].latencyMs, 125);
-  assert.equal(services[1].kind, 'platform');
+  assert.equal(services[1].kind, 'community');
+  assert.equal(services[1].group, 'Nuvio');
+  assert.equal(services[1].groupOrder, 0);
   assert.equal(services[1].name, 'Nuvio API');
   assert.equal(services[1].status, 'outage');
   assert.equal(services[2].status, 'degraded');
   assert.equal(services[2].hostname, 'addon.example');
+  assert.equal(services[3].group, 'Stremio');
+  assert.equal(services[3].groupOrder, Number.MAX_SAFE_INTEGER);
 });
 
 test('uses Ibby Labs by default and caches its overview', async () => {
@@ -113,7 +123,7 @@ test('uses Ibby Labs by default and caches its overview', async () => {
   assert.equal(first.provider, 'ibbylabs');
   assert.equal(first.source.url, 'https://uptime.ibbylabs.dev');
   assert.deepEqual(first.summary, {
-    total: 3, operational: 1, degraded: 1, outages: 1, unknown: 0
+    total: 4, operational: 2, degraded: 1, outages: 1, unknown: 0
   });
 });
 

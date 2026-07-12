@@ -15,7 +15,7 @@ interface StatusService {
   name: string
   group: string
   groupOrder: number
-  kind: 'platform' | 'community'
+  kind: 'community'
   url: string | null
   hostname: string | null
   status: ServiceState
@@ -72,12 +72,12 @@ const selectedProvider = ref<StatusProvider>('ibbylabs')
 let refreshTimer: ReturnType<typeof setInterval> | undefined
 let requestController: AbortController | undefined
 
-const platformServices = computed(() =>
-  statusData.value?.services.filter((service) => service.kind === 'platform') || []
-)
-
 const communityServices = computed(() =>
   statusData.value?.services.filter((service) => service.kind === 'community') || []
+)
+
+const nuvioServices = computed(() =>
+  communityServices.value.filter((service) => service.group === 'Nuvio')
 )
 
 const groupOptions = computed(() => {
@@ -132,12 +132,14 @@ const issueCount = computed(() => {
   return summary ? summary.degraded + summary.outages + summary.unknown : 0
 })
 
-const unavailablePlatformServices = computed(() =>
-  platformServices.value.filter((service) => service.status === 'outage')
+const unavailableNuvioServices = computed(() =>
+  nuvioServices.value.filter((service) => service.status === 'outage')
 )
 
 const communityOutageCount = computed(() =>
-  communityServices.value.filter((service) => service.status === 'outage').length
+  communityServices.value.filter((service) =>
+    service.group !== 'Nuvio' && service.status === 'outage'
+  ).length
 )
 
 const averageLatency = computed(() => {
@@ -150,7 +152,7 @@ const averageLatency = computed(() => {
 
 const overallState = computed<ServiceState>(() => {
   if (!statusData.value) return 'unknown'
-  if (unavailablePlatformServices.value.length > 0) return 'outage'
+  if (unavailableNuvioServices.value.length > 0) return 'outage'
   if (statusData.value.summary.outages > 0) return 'outage'
   if (statusData.value.summary.degraded > 0) return 'degraded'
   if (statusData.value.summary.unknown > 0 || statusData.value.partial) return 'unknown'
@@ -159,8 +161,8 @@ const overallState = computed<ServiceState>(() => {
 
 const overallLabel = computed(() => {
   if (!statusData.value) return 'Checking service health'
-  if (unavailablePlatformServices.value.length > 0) {
-    const names = unavailablePlatformServices.value.map((service) => service.name)
+  if (unavailableNuvioServices.value.length > 0) {
+    const names = unavailableNuvioServices.value.map((service) => service.name)
     const nuvioMessage = names.length === 1
       ? `${names[0]} is currently unavailable`
       : `${names.length} Nuvio services are currently unavailable: ${names.join(', ')}`
@@ -382,57 +384,12 @@ onUnmounted(() => {
       </div>
 
       <template v-else-if="statusData">
-        <section v-if="platformServices.length" class="platform-section" aria-labelledby="platform-heading">
-          <div class="section-kicker">First-party Nuvio services</div>
-          <article
-            v-for="(service, index) in platformServices"
-            :key="service.id"
-            class="platform-card"
-            :class="`is-${service.status}`"
-          >
-            <div class="platform-card__brand">
-              <div class="platform-logo" aria-hidden="true">
-                <img :src="withBase('/logo.png')" alt="" />
-              </div>
-              <div>
-                <h2 :id="index === 0 ? 'platform-heading' : undefined">{{ service.name }}</h2>
-                <a :href="service.url || 'https://nuvio.tv/'" target="_blank" rel="noopener noreferrer">
-                  {{ service.hostname || 'nuvio.tv' }}
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 5h5v5M19 5l-9 9M19 14v5H5V5h5" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-            <div class="platform-card__telemetry">
-              <div class="history-strip" :aria-label="`Recent ${service.name} checks`">
-                <span
-                  v-for="(check, checkIndex) in historySlots(service)"
-                  :key="checkIndex"
-                  class="history-bar"
-                  :class="check ? `is-${check.status}` : 'is-empty'"
-                  :title="check ? `${statusLabel(check.status)} · ${formatLatency(check.latencyMs)} · ${formatCheckedAt(check.checkedAt)}` : 'No check recorded'"
-                ></span>
-              </div>
-              <div class="platform-card__latency">
-                <span>Response time</span>
-                <strong>{{ formatLatency(service.latencyMs) }}</strong>
-              </div>
-              <span class="state-pill" :class="`is-${service.status}`">
-                <span aria-hidden="true"></span>
-                {{ statusLabel(service.status) }}
-              </span>
-            </div>
-          </article>
-        </section>
-
         <section class="community-section" aria-labelledby="community-heading">
           <div class="community-heading">
             <div>
-              <div class="section-kicker">Community infrastructure</div>
+              <div class="section-kicker">Monitored infrastructure</div>
               <h2 id="community-heading">Connected services</h2>
-              <p>Independent instances and APIs commonly used with Nuvio.</p>
+              <p>Nuvio services, independent instances, and APIs used by the app.</p>
             </div>
             <span>{{ communityServices.length }} monitored</span>
           </div>
@@ -859,56 +816,8 @@ onUnmounted(() => {
 .status-error strong { font-size: 14px; }
 .status-error span { color: var(--vp-c-text-2); font-size: 13px; }
 
-.platform-section { margin-bottom: 52px; }
 .section-kicker { margin-bottom: 10px; }
 
-.platform-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  padding: 23px 24px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 15px;
-  background: var(--vp-c-bg-elv);
-  box-shadow: 0 14px 40px rgba(17, 24, 39, 0.05);
-}
-
-.platform-card + .platform-card { margin-top: 12px; }
-
-.dark .platform-card { box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2); }
-
-.platform-card__brand {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.platform-logo {
-  display: grid;
-  width: 47px;
-  height: 47px;
-  overflow: hidden;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 18%, var(--vp-c-divider));
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--vp-c-brand-1) 8%, var(--vp-c-bg-soft));
-}
-
-.platform-logo img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-}
-
-.platform-card h2 {
-  margin: 0 0 4px;
-  font-size: 18px;
-  font-weight: 690;
-  letter-spacing: -0.02em;
-}
-
-.platform-card a,
 .service-identity a {
   display: inline-flex;
   align-items: center;
@@ -918,11 +827,8 @@ onUnmounted(() => {
   transition: color 150ms ease;
 }
 
-.platform-card a { font-size: 12px; }
-.platform-card a:hover,
 .service-identity a:hover { color: var(--vp-c-brand-1); }
 
-.platform-card a svg,
 .service-identity a svg {
   width: 12px;
   height: 12px;
@@ -933,13 +839,6 @@ onUnmounted(() => {
   stroke-linejoin: round;
 }
 
-.platform-card__telemetry {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
-
-.history-strip,
 .service-history {
   display: flex;
   align-items: center;
@@ -960,14 +859,12 @@ onUnmounted(() => {
 .history-bar.is-unknown,
 .history-bar.is-empty { background: var(--vp-c-divider); }
 
-.platform-card__latency,
 .service-latency {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.platform-card__latency span,
 .service-latency span {
   color: var(--vp-c-text-3);
   font-size: 10px;
@@ -976,7 +873,6 @@ onUnmounted(() => {
   text-transform: uppercase;
 }
 
-.platform-card__latency strong,
 .service-latency strong {
   font-size: 13px;
   font-weight: 650;
@@ -1411,27 +1307,6 @@ onUnmounted(() => {
   .overview-stats > div { padding: 0 10px; }
   .overview-stats strong { font-size: 13px; }
   .overview-stats span { font-size: 9px; }
-
-  .platform-card {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 20px;
-    padding: 19px;
-  }
-
-  .platform-card__telemetry {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 14px;
-    padding-top: 17px;
-    border-top: 1px solid var(--vp-c-divider);
-  }
-
-  .platform-card__telemetry .history-strip {
-    grid-column: 1 / -1;
-  }
-
-  .platform-card__telemetry .history-bar { flex: 1; max-width: none; }
 
   .community-heading {
     align-items: flex-start;
