@@ -671,10 +671,11 @@ async function getAddonEpisodes(contentId: string, type: string, mapper: any): P
 
 async function fetchSeriesMeta(contentId: string, type: string, mapper: any) {
   const prefixes = [contentId, contentId.replace(/^(tmdb|trakt):/, '')]
+  const timeout = mapper?.metaTimeoutMs || 3000
   for (const addon of mapper.addons) {
     for (const prefix of prefixes) {
       const url = `${addon.baseUrl}/meta/${type}/${prefix}.json`
-      const data = await fetchJsonUrl(url).catch(() => null)
+      const data = await fetchJsonUrl(url, timeout).catch(() => null)
       if (data?.meta) return data.meta
     }
   }
@@ -734,27 +735,47 @@ async function prefetchEpisodeMaps(mapper: any, shows: Array<{ contentId: string
     })
   }
   if (!tasks.length) return
+
+  // Reset budget timer so Trakt fetch time doesn't count against mapping
+  mapper.startedAt = Date.now()
+
   logLine(`Pre-fetching episode maps for ${tasks.length} show(s)...`)
-  const concurrency = 6
-  for (let i = 0; i < tasks.length; i += concurrency) {
-    if (mapper.disabled) break
-    if (mapper.startedAt && (Date.now() - mapper.startedAt) > mapper.totalBudgetMs) {
-      mapper.disabled = true
-      logLine(`Episode mapping budget exhausted during prefetch (${tasks.length - i} shows skipped).`)
-      break
-    }
-    const batch = tasks.slice(i, i + concurrency)
-    await Promise.all(batch.map(t =>
-      Promise.all([
+
+  // Concurrent worker queue — workers pull the next task as soon as they finish,
+  // so fast responses aren't blocked waiting for slow ones in the same batch
+  const concurrency = 20
+  let cursor = 0
+  let completed = 0
+  let lastLoggedAt = 0
+
+  async function worker() {
+    while (cursor < tasks.length) {
+      if (mapper.disabled) return
+      if (mapper.startedAt && (Date.now() - mapper.startedAt) > mapper.totalBudgetMs) {
+        mapper.disabled = true
+        return
+      }
+      const idx = cursor++
+      const t = tasks[idx]
+      if (!t) return
+      await Promise.all([
         getAddonEpisodes(t.contentId, t.contentType, mapper).catch(() => []),
         getTraktEpisodes(t.lookupId, mapper).catch(() => [])
       ])
-    ))
-    if (i + concurrency < tasks.length) {
-      logLine(`  Prefetched ${Math.min(i + concurrency, tasks.length)}/${tasks.length} shows...`)
+      completed++
+      // Log progress every ~50 shows
+      if (completed - lastLoggedAt >= 50) {
+        lastLoggedAt = completed
+        logLine(`  Prefetched ${completed}/${tasks.length} shows...`)
+      }
     }
   }
-  if (!mapper.disabled) {
+
+  await Promise.all(Array.from({ length: Math.min(concurrency, tasks.length) }, () => worker()))
+
+  if (mapper.disabled) {
+    logLine(`Episode mapping budget exhausted during prefetch (${tasks.length - completed} of ${tasks.length} shows skipped).`)
+  } else {
     logLine(`Episode map prefetch complete (${tasks.length} shows).`)
   }
 }
@@ -883,7 +904,6 @@ async function buildSyncPlan(isPreviewOnly = false) {
   }
 
   const direction = state.options.syncDirection
-  const mapper = await prepareEpisodeMapper()
 
   if (direction === 'import') {
     // ----------------------------------------
@@ -891,12 +911,58 @@ async function buildSyncPlan(isPreviewOnly = false) {
     // ----------------------------------------
     logLine('Pulling data from Trakt...')
 
-    if (state.options.syncHistory) {
-      logLine('Fetching Trakt watched movies & shows...')
-      const [movies, shows] = await Promise.all([
-        traktRequestAll('/sync/watched/movies'),
-        traktRequestAll('/sync/watched/shows', { extended: 'progress' })
-      ])
+    // Fire mapper prep and all Trakt API calls in parallel
+    const mapperPromise = prepareEpisodeMapper()
+
+    const historyPromise = state.options.syncHistory
+      ? (logLine('Fetching Trakt watched movies & shows...'),
+         Promise.all([
+           traktRequestAll('/sync/watched/movies'),
+           traktRequestAll('/sync/watched/shows', { extended: 'progress' })
+         ]))
+      : Promise.resolve(null)
+
+    const progressPromise = state.options.syncProgress
+      ? traktRequestAll('/sync/playback')
+      : Promise.resolve(null)
+
+    const libraryPromise = (state.options.syncWatchlist || state.options.syncCollection)
+      ? (async () => {
+          const items = [] as any[]
+          // Fire watchlist and collection requests in parallel
+          const [wlResult, colResult] = await Promise.all([
+            state.options.syncWatchlist
+              ? traktRequestAll('/users/me/watchlist')
+              : Promise.resolve(null),
+            state.options.syncCollection
+              ? Promise.all([
+                  traktRequestAll('/sync/collection/movies'),
+                  traktRequest('/sync/collection/shows')
+                ])
+              : Promise.resolve(null)
+          ])
+          if (wlResult) {
+            items.push(...(Array.isArray(wlResult.data) ? wlResult.data.map((i: any) => ({ ...i, _src: 'watchlist' })) : []))
+          }
+          if (colResult) {
+            const [movies, shows] = colResult as [any, any]
+            items.push(
+              ...(Array.isArray(movies.data) ? movies.data.map((i: any) => ({ ...i, _src: 'collection' })) : []),
+              ...(Array.isArray(shows.data) ? shows.data.map((i: any) => ({ ...i, _src: 'collection' })) : [])
+            )
+          }
+          return items
+        })()
+      : Promise.resolve(null)
+
+    // Await all parallel fetches
+    const [mapper, historyData, pbData, libraryItems] = await Promise.all([
+      mapperPromise, historyPromise, progressPromise, libraryPromise
+    ])
+
+    // --- Process History ---
+    if (historyData) {
+      const [movies, shows] = historyData
       logLine(`Received ${Array.isArray(movies.data) ? movies.data.length : 0} movies, ${Array.isArray(shows.data) ? shows.data.length : 0} shows from Trakt.`)
 
       // Movies
@@ -957,10 +1023,10 @@ async function buildSyncPlan(isPreviewOnly = false) {
       logLine(`Processed ${episodeCount} watched episodes across ${showsArray.length} shows.`)
     }
 
-    if (state.options.syncProgress) {
-      logLine('Fetching Trakt playback progress...')
-      const pb = await traktRequestAll('/sync/playback')
-      for (const p of (Array.isArray(pb.data) ? pb.data : [])) {
+    // --- Process Playback Progress ---
+    if (pbData) {
+      logLine('Processing playback progress...')
+      for (const p of (Array.isArray(pbData.data) ? pbData.data : [])) {
         const progressVal = Number(p.progress)
         if (isNaN(progressVal) || progressVal <= 0) continue
         if (!state.options.keepFinishedProgress && progressVal >= 95) continue
@@ -1015,26 +1081,9 @@ async function buildSyncPlan(isPreviewOnly = false) {
       }
     }
 
-    if (state.options.syncWatchlist || state.options.syncCollection) {
-      const items = [] as any[]
-      if (state.options.syncWatchlist) {
-        logLine('Fetching Trakt watchlist...')
-        const wl = await traktRequestAll('/users/me/watchlist')
-        items.push(...(Array.isArray(wl.data) ? wl.data.map(i => ({ ...i, _src: 'watchlist' })) : []))
-      }
-      if (state.options.syncCollection) {
-        logLine('Fetching Trakt collection...')
-        const [movies, shows] = await Promise.all([
-          traktRequestAll('/sync/collection/movies'),
-          traktRequest('/sync/collection/shows')
-        ])
-        items.push(
-          ...(Array.isArray(movies.data) ? movies.data.map(i => ({ ...i, _src: 'collection' })) : []),
-          ...(Array.isArray(shows.data) ? shows.data.map(i => ({ ...i, _src: 'collection' })) : [])
-        )
-      }
-
-      for (const item of items) {
+    // --- Process Library (Watchlist / Collection) ---
+    if (libraryItems && libraryItems.length) {
+      for (const item of libraryItems) {
         const isMovie = item.type === 'movie' || item.movie
         const media = isMovie ? item.movie : item.show
         const kind = isMovie ? 'movie' : 'series'
@@ -1057,6 +1106,7 @@ async function buildSyncPlan(isPreviewOnly = false) {
     // NUVIO -> TRAKT (EXPORT)
     // ----------------------------------------
     logLine('Pulling data from Nuvio Sync...')
+    const mapper = await prepareEpisodeMapper()
     const profileId = Number(state.nuvio.profileId)
 
     if (state.options.syncHistory) {
@@ -1257,12 +1307,16 @@ async function executeSync() {
       if (plan.history.length) {
         logLine(`Pushing ${plan.history.length} watched items...`)
         const chunks = chunkArray(plan.history.map(stripDisplayFields), 500)
-        for (let i = 0; i < chunks.length; i++) {
-          await nuvioRpc('sync_push_watched_items', {
-            p_profile_id: profileId,
-            p_items: chunks[i]
-          })
-          logLine(`Pushed watched batch ${i + 1}/${chunks.length}`)
+        // Push batches concurrently (3 at a time)
+        const pushConcurrency = 3
+        for (let i = 0; i < chunks.length; i += pushConcurrency) {
+          const batch = chunks.slice(i, i + pushConcurrency)
+          await Promise.all(batch.map((chunk, j) =>
+            nuvioRpc('sync_push_watched_items', {
+              p_profile_id: profileId,
+              p_items: chunk
+            }).then(() => logLine(`Pushed watched batch ${i + j + 1}/${chunks.length}`))
+          ))
         }
       }
 
