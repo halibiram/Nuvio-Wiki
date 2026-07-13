@@ -1,3 +1,44 @@
+## New Releases - 2026-07-13
+
+### Nuvio TV (0.7.16-beta)
+
+- **Trakt Time**: We've fixed some pesky Trakt problems. Our system now ignores out-of-date play history and makes sure watched series markers appear on the Home screen. We've also updated the way we fetch watched movies, so everything should load faster and more smoothly. 
+- **Credentials Sorted**: Now, your Trakt login is synced across all Nuvio devices, so you only need to log in once.
+- **Updates Galore**: We've added some sweet features like periodic refresh support, which updates your content in the background. We've also fixed the loading screen startup issue and made the stream chip loading badge look better on your TV.
+- **Tech Talk**: Behind the scenes, we've enabled Sentry tombstone reporting for faster diagnostic help.
+
+### Localization
+
+- **Bonjour France!** We've added a bunch of missing French translations to Nuvio TV, so everything should be more readable and friendly for our French friends.
+- **Shalom Hebrew!** We've added new Hebrew translations and updated some of the existing ones to make Nuvio TV more accessible and fun for Hebrew speakers.
+- **Hola Amigos!**: We've updated the Latin American Spanish localization strings and added more Italian translations to make Nuvio TV a global player.
+
+### Nuvio Mobile (0.2.23)
+
+- **New Card Style**: We've added customizable card depth effects on Nuvio Mobile, so you can choose your favorite style and make it pop on your mobile screen.
+- **Settings Saved**: We've fixed a critical bug that could reset your synced profile settings. Your settings should now stay saved and be ready for next time.
+
+### Nuvio Desktop (0.1.12-alpha)
+
+- **Fixes Galore**: We've fixed a bunch of issues on Nuvio Desktop, including restoring unaired episodes and preventing settings sync reset.
+- **Card Customization**: You can now customize your card depth on Nuvio Desktop, so it looks exactly how you like it.
+- **Runtimes and Sync**: We've improved the way player runtimes work on Nuvio Desktop and added foreground sync, so you can enjoy your favorite shows and movies without interruptions.
+- **Debrid Resolution**: We've prioritized debrid resolution in player sources, so you should get the best possible video quality.
+- **Playback Pro**: We've fixed the playback proxy issue and made sure everything runs smoothly.
+
+### Nuvio Web (0.3.12-beta)
+
+- **Navigation Navigated**: On Samsung Tizen, we've fixed duplicate Back events that could cause the sidebar to open unexpectedly.
+- **Playback Smooth**: We've improved adaptive stream playback on Samsung Tizen, so you get the best possible video quality without buffering.
+- **Trailer Tamed**: We've reduced recurring trailer stutters on Samsung Tizen by optimizing the way we load and display trailers.
+- **Subtitles Sorted**: We've fixed a problem that made built-in subtitle tracks appear as "Unknown". Now, they should display correctly.
+- **Language Labels**: We've improved subtitle language detection for regional variants and updated the subtitle selection menu to look more like Android TV.
+- **Hidden Languages**: We've added an option to show only preferred languages, so unrelated subtitle languages are hidden from view.
+- **Profile Performance**: We've improved profile startup performance by reusing loaded data and reducing duplicate synchronization passes.
+- **Startup Watchdog**: We've improved the startup watchdog by renewing its timeout during boot progress, preventing slow initialization stages from being reported as frozen.
+- **Playback Stability**: We've improved webOS playback startup stability by delaying subtitle decoder initialization until the first playback frame.
+- **Collection Caching**: We've preloaded focused artwork ahead of the visual update, so backdrops and Hero images load faster.
+---
 ## New Releases - 2026-07-12
 
 **Nuvio TV (0.7.16-beta)**
@@ -137,71 +178,3 @@ We've been working on some significant updates for our web experience:
 - Aligned quality sorting with Android TV by ordering streams by resolution, quality, and file size.
 - Fixed Trakt credential sync errors and improved synchronization with Nuvio Sync.
 - And, to top it off, we've improved Continue Watching synchronization when restoring or selecting profiles.
----
-## New Releases - 2026-07-10
-
-### Nuvio TV (0.7.16-beta)
-
-**What's New for Nuvio TV:**
-
-- We've made some great improvements to Trakt, the service you love, to make your experience even better. We've fixed issues where markers didn't appear on Home and some watched series weren't syncing correctly.
-- You'll now see watch movies on Trakt, too, so you can keep track of all your favorite flicks. And guess what? We've got pagination, so you won't see them all at once – it's like browsing through your favorite movie catalog!
-- Your Trakt credentials will now sync across all your devices, so you won't have to log in every time you switch between your TV and phone.
-- If you've got a slow internet connection, don't worry! Your Nuvio TV will automatically refresh the info when it detects a stable connection, ensuring you always have the latest info.
-- And, as a bonus, we've improved the loading indicator so it doesn't reset when you start a new media. It's the little things that count, right?
-- We've also fixed some pesky bugs that made your posters appear with weird sizes. It's now a nice, clean image – no more squished or stretched posters!
-- Dolby Vision lovers, rejoice! We've ensured that only Dolby Vision tracks override the video MIME type, so you get the best audio-visual experience possible.
-- Your visual experience just got a little better, with a resized stream chip loading badge for better visual consistency.
-- Last but not least, we've made it easier for our developers to fix issues by enabling Sentry tombstone reporting for improved diagnostics.
-
-### Localization
-
-**Language and Translation Updates:**
-
-- We're thrilled to announce the addition of formal French translations, making your experience even more enjoyable in French. We backfilled missing translations so you can now enjoy Nuvio TV with more precise language.
-- Get ready for a richer experience in Hebrew! We've added new translations for a more immersive experience.
-- For our Latin American Spanish friends, we've got some new updates: fresh strings to make your experience even smoother.
-- We've added missing Greek translations, and when we don't have a translation, we'll now show English placeholders – it's all about making things clear and easy to understand.
-- Italian speakers, rejoice! We've got new translations to bring you closer to the action, with the added benefit of clearer placeholders for what we're still working on.
-
-### Nuvio Mobile (0.2.21)
-
-**Mobile Improvements:**
-
-- We've improved iOS player rotation to give you a seamless, distraction-free experience when rotating your device.
-- To reduce lag and improve overall performance, we've increased the build memory and implemented a device fallback feature.
-- To ensure stability, we've updated our MPVKit to support the latest libmpv release and fixed an issue with AudioUnits.
-- To keep your watching experience seamless, we've fixed issues related to the Trakt continue watching sync.
-- We've fixed the stream continue watching metadata enrichment, so you get the right information at the right time.
-- We've also fixed issues related to preserving home catalog sync keys, ensuring your watchlist is accurate.
-
-### Nuvio Desktop (0.1.11-alpha)
-
-**Your Desktop Just Got a Boost:**
-
-- We've fine-tuned the buffer cache to optimize your media buffering experience.
-- To improve desktop stability, we've fixed desktop compile issues and ensured that the actuals are accurate.
-- A fix to prevent the desktop loading spinner crashes will give you a smoother experience.
-- We've added desktop scrollbars, making it easier to navigate through your watchlist and collections.
-- We've fixed issues related to the entity browse plural crash, ensuring that you can browse through your media without issues.
-- With this update, you can now wire deeplinks into the desktop app, making it easier to access your favorite content directly.
-- We've also fixed an issue where Windows would go to sleep during playback, and we've made sure desktop addon and playback networking are in sync.
-- Last but not least, we've fixed an issue where your window's fullscreen state, position, and size wouldn't restore properly on relaunch. 
-
-### Nuvio Web (0.3.8-beta)
-
-**New Features and Improvements:**
-
-- For Samsung Tizen users, we've now got a safer fallback to alternate playback engines when AVPlay fails with network-related startup errors, reducing playback startup failures.
-- We've improved Tizen playback reliability for sources that may fail on the first selected engine, making sure you can watch your favorite media without issues.
-- To enhance the navigation, we've fixed the P2P consent dialog on TV devices, allowing proper left/right focus movement between Cancel and Enable P2P.
-- We've updated the P2P enable flow so the focus starts on Enable P2P, reducing the risk of accidentally confirming Cancel instead of enabling the option.
-- For webOS users, we've fixed playback settings persistence issues related to profile sync responses by handling no-content Supabase responses correctly.
-- We've fixed Supabase sync failures caused by 204, 205, and 304 responses, and improved the sync by routing proxy requests through the Luna service instead of calling the local media server directly.
-- To address webOS sync errors where profile, settings, collections, plugins, addons, library, and watched items could fail, we've made some adjustments to make sure your watchlist and other settings are always up-to-date.
-- In this update, we've preserved local custom addon names on Web TV when remote sync data doesn't explicitly include an override, giving you more control over your experience.
-- We've also updated the addon name override sync on Web TV to safely support legacy addon sync, making sure you don't lose your favorite plugins.
-- To make your experience even better, we've added support for Original Language as a preferred audio language option on Web TV, giving you more control over your media playback.
-- We've updated the preferred audio language behavior to be more consistent with Android TV, using TMDB original-language metadata when Original Language is selected.
-- To bring you even more info, we've improved the player route metadata to include the original content language from detail pages into playback when available.
-- Lastly, we've aligned Web TV profile settings sync with Android TV for the Original Language audio preference, bringing you more consistency across your favorite streaming devices.
