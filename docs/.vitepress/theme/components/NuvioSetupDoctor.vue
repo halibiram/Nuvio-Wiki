@@ -63,6 +63,7 @@ const feedbackState = ref<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
 const discordDmHref = 'https://discord.com/channels/@me'
 const kofiHref = 'https://ko-fi.com/haaihond'
+const redditThreadHref = 'https://www.reddit.com/r/Nuvio/comments/1uv9eka/the_setup_doctor_is_live/'
 
 const selectedAreaData = computed(() => areas.find((area) => area.id === selectedArea.value))
 const selectedPlatformData = computed(() => platforms.find((platform) => platform.id === selectedPlatform.value))
@@ -461,7 +462,7 @@ function resetDoctor() {
             </div>
             <div class="doctor-contact-links doctor-contact-card__links">
               <a :href="discordDmHref" target="_blank" rel="noopener noreferrer">Discord · @haaihondschildpad</a>
-              <button type="button" disabled title="Reddit link will be added later">Reddit · soon</button>
+              <a :href="redditThreadHref" target="_blank" rel="noopener noreferrer">Reddit · thread</a>
             </div>
           </aside>
 
@@ -589,7 +590,7 @@ function resetDoctor() {
               <p v-if="feedbackChoice === false">To help troubleshoot and update the guide, send me what happened:</p>
               <div v-if="feedbackChoice === false" class="doctor-contact-links">
                 <a :href="discordDmHref" target="_blank" rel="noopener noreferrer">DM @haaihondschildpad on Discord</a>
-                <button type="button" disabled title="Reddit link will be added later">Reddit post (coming soon)</button>
+                <a :href="redditThreadHref" target="_blank" rel="noopener noreferrer">Reddit post</a>
               </div>
             </div>
           </section>
