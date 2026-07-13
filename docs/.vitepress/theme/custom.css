@@ -202,6 +202,8 @@ body {
 .platform-badge--ios { --platform-color: #8b5cf6; }
 .platform-badge--webos { --platform-color: #e14377; }
 .platform-badge--tizen { --platform-color: #00a6a6; }
+.platform-badge--windows { --platform-color: #0078d4; }
+.platform-badge--multi { --platform-color: #4f70d9; }
 
 .mermaid-diagram {
   overflow-x: auto;

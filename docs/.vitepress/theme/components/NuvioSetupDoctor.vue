@@ -37,6 +37,8 @@ const findingPriority: Partial<Record<FindingId, number>> = {
   'signature-conflict': 90,
   'addon-host-load': 85,
   'isp-routing': 85,
+  'auto-frame-rate': 80,
+  'tunneled-playback': 75,
   'stream-file': 80,
   'vpn-filter': 80,
   'subtitle-source': 80,
@@ -45,7 +47,7 @@ const findingPriority: Partial<Record<FindingId, number>> = {
   'local-network': 70,
   'content-availability': 65,
   'codec-renderer': 45,
-  'network-buffering': 40,
+  'network-buffering': 85,
   'common-checks-passed': 0
 }
 
@@ -427,12 +429,20 @@ function resetDoctor() {
           <template v-else>
             <div class="doctor-stage__header">
               <span>Step 2 of 3</span>
-              <h2 ref="stageHeading" tabindex="-1">Narrow down the playback error</h2>
-              <p>Select the specific playback issue you are experiencing.</p>
+              <h2 ref="stageHeading" tabindex="-1">
+                {{ selectedSymptomData?.id === 'buffering' ? 'Buffering or stuttering?' : 'Narrow down the playback error' }}
+              </h2>
+              <p>
+                {{ selectedSymptomData?.id === 'buffering'
+                  ? 'Identify which type of playback issue you are experiencing. Buffering is network-related, while stuttering is usually decoding/performance-related.'
+                  : 'Select the specific playback issue you are experiencing.' }}
+              </p>
             </div>
 
             <fieldset class="doctor-fieldset doctor-fieldset--flush">
-              <legend class="sr-only">Choose a specific playback error</legend>
+              <legend class="sr-only">
+                {{ selectedSymptomData?.id === 'buffering' ? 'Choose buffering or stuttering' : 'Choose a specific playback error' }}
+              </legend>
               <div class="choice-grid">
                 <label
                   v-for="subSymptom in selectedSymptomData?.subSymptoms"

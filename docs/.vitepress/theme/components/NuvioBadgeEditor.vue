@@ -766,7 +766,6 @@ onUnmounted(() => {
           <div>
             <h3 id="preview-heading">Preview</h3>
           </div>
-          <span class="live-pill"><span></span>Live</span>
         </div>
 
         <label class="field preview-title-field">
@@ -1271,7 +1270,6 @@ summary:focus-visible {
 }
 
 .queue-count,
-.live-pill,
 .validation-total {
   display: inline-flex;
   align-items: center;
@@ -1980,18 +1978,6 @@ summary:focus-visible {
   margin: 0 -20px 18px;
 }
 
-.live-pill {
-  gap: 5px;
-  color: #41b883;
-}
-
-.live-pill span {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: none;
-}
 
 .preview-title-field textarea {
   min-height: 96px;

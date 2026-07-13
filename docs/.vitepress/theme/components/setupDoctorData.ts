@@ -305,11 +305,13 @@ export const findings = {
     linkLabel: 'Check VPN conflicts'
   },
   'network-buffering': {
-    title: 'The stream may be outrunning the connection',
-    summary: 'High-bitrate video needs stable bandwidth, not only a high advertised internet speed.',
+    title: 'The stream bitrate may exceed your connection speed',
+    summary: 'High-bitrate video needs stable bandwidth. If only some streams buffer, those specific files are too large for your connection.',
     fixes: [
-      'Run a speed test on this device and try a lower-bitrate stream.',
-      'Use Ethernet or 5 GHz Wi-Fi where possible; Android TV users can also increase playback buffers.'
+      'Select a lower-bitrate stream from the list (prefer smaller files under 5-10 GB).',
+      'Configure a quality or bitrate cap in your scraper addon settings to automatically filter out heavy streams.',
+      'Use Ethernet or 5 GHz Wi-Fi instead of 2.4 GHz Wi-Fi.',
+      'If on Android TV, increase the Custom Playback Buffers to pre-load more video.'
     ],
     href: '/troubleshooting#_1-1-video-stutters-or-buffers',
     linkLabel: 'Tune buffering and playback'
@@ -328,6 +330,7 @@ export const findings = {
     title: 'Wi-Fi quality may be limiting streams',
     summary: 'Distance, congestion, and a 2.4 GHz connection can make video unstable even when browsing seems normal.',
     fixes: [
+      'Select a lower-bitrate stream or configure a quality cap in your addon to match your current bandwidth.',
       'Move closer to the router or switch to a 5 GHz network.',
       'Use wired Ethernet on TV devices when available.'
     ],
@@ -338,6 +341,7 @@ export const findings = {
     title: 'Your ISP route may be slowing video traffic',
     summary: 'A stream that becomes faster only through a VPN can indicate ISP throttling or a poor route to the source.',
     fixes: [
+      'Select a lower-bitrate stream to ease the bandwidth requirements.',
       'Compare multiple VPN locations before assuming Nuvio is at fault.',
       'Keep the faster stable route or contact the ISP if the slowdown affects video services consistently.'
     ],
@@ -369,6 +373,7 @@ export const findings = {
     summary: 'Black video, silent audio, or playback that works elsewhere usually points to decoder or renderer compatibility.',
     fixes: [
       'Try VLC or MX Player as the external player.',
+      'If using libmpv as your internal engine, try switching to ExoPlayer under Settings → Player (ExoPlayer is lighter and uses less processing power).',
       'For missing dialogue, enable audio downmix; optical/SPDIF users can try Force AC-3 Transcoding.'
     ],
     href: '/troubleshooting#_1-2-no-audio-or-black-screen',
@@ -493,6 +498,26 @@ export const findings = {
     ],
     href: '/troubleshooting#_3-3-library-or-watchlist-not-updating',
     linkLabel: 'Fix list synchronization'
+  },
+  'auto-frame-rate': {
+    title: 'Display refresh rate may be mismatched',
+    summary: 'Mismatched frame rates between the stream and your display can cause judder, frame drops, or micro-stutters.',
+    fixes: [
+      'On Android TV, go to Settings → Player → Advanced Processing & Decoding → Auto Frame Rate & Resolution.',
+      'Experiment with setting this to On start or On start/stop. If your TV does not support refresh rate switching well, try setting it to Off.'
+    ],
+    href: '/troubleshooting#_1-1-video-stutters-or-buffers',
+    linkLabel: 'Check player settings'
+  },
+  'tunneled-playback': {
+    title: 'Tunneled playback might help or interfere',
+    summary: 'Tunneled playback routes audio/video directly at the hardware level, which can solve stutters for heavy 4K files but cause issues if unsupported.',
+    fixes: [
+      'Go to Settings → Player → Advanced Processing & Decoding (or Settings → Playback on older versions) and toggle Tunneled Playback.',
+      'Test with it both enabled and disabled to see which performs better on your specific hardware.'
+    ],
+    href: '/settings/player#player-and-decoder-options',
+    linkLabel: 'Review tunneled playback details'
   },
   'device-resources': {
     title: 'The device may be under memory or storage pressure',
@@ -630,13 +655,68 @@ const iosPlaybackErrorChecks = [
   check('debrid-plugin-used-ios', 'Are you using a Debrid service or plugin to stream?', 'Debrid services (like TorBox or Real-Debrid) or specialized plugins resolve torrents to HTTPS links.', { no: 'ios-p2p-unsupported', unsure: 'ios-p2p-unsupported', yes: 'codec-renderer' })
 ]
 
+const defaultBufferingChecks = [
+  check('all-streams', 'Does it happen with every stream you try?', 'A single failing source is usually a file or host problem.', { no: 'network-buffering', yes: 'network-buffering', unsure: 'network-buffering' }),
+  check('debrid-connected', 'Is your Debrid service connected and active?', 'Without a Debrid service, Nuvio streams from slower public peers, which causes buffering.', { no: 'debrid-subscription', unsure: 'debrid-subscription' }),
+  check('speedtest-high-enough', 'Is your speedtest result fast and stable enough?', 'Testing on your streaming device is the most reliable. You need stable bandwidth (10+ Mbps for 1080p, 25+ Mbps for 4K) plus overhead for bitrate spikes—heavy remux files can exceed 80 Mbps.', { no: 'network-buffering', unsure: 'network-buffering' }),
+  check('wired-or-5g', 'Are you using a 5 GHz Wi-Fi band or a wired Ethernet connection?', '2.4 GHz Wi-Fi is often too slow or congested for high-bitrate video streaming.', { no: 'wifi-quality', unsure: 'wifi-quality' }),
+  check('cache-cleared-buffering', 'Have you restarted Nuvio and cleared its cache?', 'Stale local playback data can affect every stream.', { no: 'stale-app-data', unsure: 'stale-app-data' })
+]
+
+const androidTvBufferingChecks = [
+  check('all-streams', 'Does it happen with every stream you try?', 'A single failing source is usually a file or host problem.', { no: 'network-buffering', yes: 'network-buffering', unsure: 'network-buffering' }),
+  check('debrid-connected', 'Is your Debrid service connected and active?', 'Without a Debrid service, Nuvio streams from slower public peers, which causes buffering.', { no: 'debrid-subscription', unsure: 'debrid-subscription' }),
+  check('speedtest-high-enough-tv', 'Is your speedtest result fast and stable enough?', 'Testing on your streaming device is the most reliable. You need stable bandwidth (10+ Mbps for 1080p, 25+ Mbps for 4K) plus overhead for bitrate spikes—heavy remux files can exceed 80 Mbps. Android TV users can test under Settings → Advanced → Diagnostics.', { no: 'network-buffering', unsure: 'network-buffering' }),
+  check('wired-or-5g', 'Are you using a 5 GHz Wi-Fi band or a wired Ethernet connection?', '2.4 GHz Wi-Fi is often too slow or congested for high-bitrate video streaming.', { no: 'wifi-quality', unsure: 'wifi-quality' }),
+  check('cache-cleared-buffering', 'Have you restarted Nuvio and cleared its cache?', 'Stale local playback data can affect every stream.', { no: 'stale-app-data', unsure: 'stale-app-data' })
+]
+
+const androidTvStutteringChecks = [
+  check('heavy-stream-tv', 'Does the stuttering happen only on high-resolution (4K, HDR, or Dolby Vision) streams?', 'Weaker hardware can struggle to decode high-bitrate or advanced video formats.', { yes: 'device-resources', unsure: 'device-resources' }),
+  check('both-engines-stutter-tv', 'Does the stuttering happen in both internal player engines (ExoPlayer and libmpv)?', 'Switch engines under Settings → Player. Note that libmpv is heavier and uses more processing power than ExoPlayer.', { no: 'codec-renderer', unsure: 'codec-renderer' }),
+  check('afr-configured-tv', 'Have you configured Auto Frame Rate & Resolution?', 'Matching your display refresh rate to the stream PACE eliminates panning judder.', { no: 'auto-frame-rate', unsure: 'auto-frame-rate' }),
+  check('tunneled-playback-tv', 'Have you tried toggling Tunneled Playback?', 'Tunneled Playback can reduce stuttering for heavy files but can cause glitches if unsupported.', { no: 'tunneled-playback', unsure: 'tunneled-playback' }),
+  check('external-player-tried-tv', 'Have you tried playing the stream in an external player?', 'Using VLC or MX Player can resolve built-in player format/codec limitations.', { no: 'codec-renderer', unsure: 'codec-renderer' })
+]
+
+const defaultStutteringChecks = [
+  check('heavy-stream', 'Does the stuttering happen only on high-resolution (4K, HDR, or Dolby Vision) streams?', 'Weaker hardware can struggle to decode high-bitrate or advanced video formats.', { yes: 'device-resources', unsure: 'device-resources' }),
+  check('both-engines-stutter', 'Does the stuttering happen in both internal player engines (ExoPlayer and libmpv)?', 'Switch engines under Settings → Player. Note that libmpv is heavier and uses more processing power than ExoPlayer.', { no: 'codec-renderer', unsure: 'codec-renderer' }),
+  check('external-player-tried', 'Have you tried playing the stream in an external player?', 'Using VLC or MX Player can resolve built-in player format/codec limitations.', { no: 'codec-renderer', unsure: 'codec-renderer' }),
+  check('cache-cleared-stuttering', 'Have you restarted Nuvio and cleared its cache?', 'Stale local playback data can affect every stream.', { no: 'stale-app-data', unsure: 'stale-app-data' })
+]
+
 export const playbackChecksByPlatform: Record<PlatformId, Partial<Record<string, readonly DoctorCheck[]>>> = {
-  'android-tv': { 'file-type-unsupported': defaultPlaybackErrorChecks },
-  'android-mobile': { 'file-type-unsupported': defaultPlaybackErrorChecks },
-  ios: { 'file-type-unsupported': iosPlaybackErrorChecks },
-  tizen: { 'file-type-unsupported': defaultPlaybackErrorChecks },
-  webos: { 'file-type-unsupported': defaultPlaybackErrorChecks },
-  windows: { 'file-type-unsupported': defaultPlaybackErrorChecks }
+  'android-tv': {
+    'file-type-unsupported': defaultPlaybackErrorChecks,
+    'buffering-sub': androidTvBufferingChecks,
+    'stuttering-sub': androidTvStutteringChecks
+  },
+  'android-mobile': {
+    'file-type-unsupported': defaultPlaybackErrorChecks,
+    'buffering-sub': defaultBufferingChecks,
+    'stuttering-sub': defaultStutteringChecks
+  },
+  ios: {
+    'file-type-unsupported': iosPlaybackErrorChecks,
+    'buffering-sub': defaultBufferingChecks,
+    'stuttering-sub': defaultStutteringChecks
+  },
+  tizen: {
+    'file-type-unsupported': defaultPlaybackErrorChecks,
+    'buffering-sub': defaultBufferingChecks,
+    'stuttering-sub': defaultStutteringChecks
+  },
+  webos: {
+    'file-type-unsupported': defaultPlaybackErrorChecks,
+    'buffering-sub': defaultBufferingChecks,
+    'stuttering-sub': defaultStutteringChecks
+  },
+  windows: {
+    'file-type-unsupported': defaultPlaybackErrorChecks,
+    'buffering-sub': defaultBufferingChecks,
+    'stuttering-sub': defaultStutteringChecks
+  }
 }
 
 export const symptomsByArea: Record<AreaId, readonly Symptom[]> = {
@@ -760,15 +840,19 @@ export const symptomsByArea: Record<AreaId, readonly Symptom[]> = {
       id: 'buffering',
       label: 'Buffers or stutters',
       description: 'Playback pauses, catches up, or drops frames.',
-      checks: [
-        check('all-streams', 'Does it happen with every stream you try?', 'A single failing source is usually a file or host problem.', { no: 'stream-file', yes: 'network-buffering', unsure: 'network-buffering' }),
-        check('debrid-connected', 'If you use Debrid, is it connected and active?', 'Choose “Not using it” for a Debrid-free setup.', { no: 'debrid-subscription', unsure: 'debrid-subscription' }, [
-          { value: 'yes', label: 'Yes' },
-          { value: 'no', label: 'No' },
-          { value: 'not-used', label: 'Not using it' },
-          { value: 'unsure', label: 'Not sure' }
-        ]),
-        check('cache-cleared', 'Have you restarted Nuvio and cleared its cache?', 'Stale local playback data can affect every stream.', { no: 'stale-app-data', unsure: 'stale-app-data' })
+      subSymptoms: [
+        {
+          id: 'buffering-sub',
+          label: 'Buffering',
+          description: 'The video pauses completely to load more data. You will see a spinner or loading screen, and playback stops temporarily.',
+          checks: defaultBufferingChecks
+        },
+        {
+          id: 'stuttering-sub',
+          label: 'Stuttering',
+          description: 'The video keeps playing but feels choppy, laggy, or drops frames (juddering) without pausing to load.',
+          checks: defaultStutteringChecks
+        }
       ]
     },
     {
