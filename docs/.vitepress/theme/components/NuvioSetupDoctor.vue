@@ -582,9 +582,9 @@ function resetDoctor() {
             <p v-if="feedbackState === 'error'" class="doctor-feedback__status is-error" role="alert">Feedback could not be sent. You can try again.</p>
             <div v-else-if="feedbackState === 'sent'" class="doctor-feedback__status" role="status">
               <strong>{{ feedbackChoice ? 'Thanks — that helps.' : 'Thanks — let’s improve it.' }}</strong>
-              <p v-if="feedbackChoice">If you would like to support the project, you can buy me a coffee:</p>
+              <p v-if="feedbackChoice">If you would like to support the clinic, you can buy the doctor a coffee:</p>
               <div v-if="feedbackChoice" class="doctor-contact-links">
-                <a :href="kofiHref" target="_blank" rel="noopener noreferrer">Support me on Ko-fi</a>
+                <a :href="kofiHref" target="_blank" rel="noopener noreferrer">Tip the Doctor on Ko-fi</a>
               </div>
               <p v-if="feedbackChoice === false">To help troubleshoot and update the guide, send me what happened:</p>
               <div v-if="feedbackChoice === false" class="doctor-contact-links">
