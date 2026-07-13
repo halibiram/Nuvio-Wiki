@@ -1067,7 +1067,7 @@ onMounted(async () => {
   border: 1px solid var(--vp-c-divider);
   border-radius: 16px;
   padding: 20px 24px;
-  background: var(--vp-c-bg-soft);
+  background: var(--tool-surface-alt, var(--vp-c-bg-alt));
   margin-bottom: 20px;
 }
 .simple-header h3 {
@@ -1359,7 +1359,7 @@ onMounted(async () => {
   padding: 16px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 12px;
-  background: var(--vp-c-bg-soft);
+  background: var(--tool-surface-alt, var(--vp-c-bg-alt));
   cursor: pointer;
   text-align: left;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);

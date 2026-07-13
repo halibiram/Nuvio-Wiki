@@ -69,6 +69,8 @@ const tabs: ToolTab[] = [
     details: 'Export a Nuvio profile to a file, or import a profile from a saved file.',
     component: markRaw(defineAsyncComponent(() => import('./NuvioProfileTransfer.vue'))),
     props: {},
+    workspace: true,
+    showHeader: false,
     icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="tab-icon-svg"><path d="M7 7h11l-3-3m3 3-3 3M17 17H6l3 3m-3-3 3-3"/></svg>`
   }
 ]
@@ -142,6 +144,8 @@ const selectTab = (id: ToolId) => {
 
 <style scoped>
 .tools-container {
+  --tool-surface: var(--vp-c-bg);
+  --tool-surface-alt: var(--vp-c-bg-alt);
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -151,38 +155,38 @@ const selectTab = (id: ToolId) => {
 
 .tools-tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
   background: var(--vp-c-bg-soft);
-  padding: 8px;
-  border-radius: 12px;
+  padding: 10px;
+  border-radius: 14px;
   border: 1px solid var(--vp-c-divider);
 }
 
 .tools-tab-btn {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 16px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: transparent;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 86px;
+  padding: 14px;
+  border-radius: 11px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-alt);
   text-align: left;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 0;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tools-tab-btn:hover {
-  background: var(--vp-c-bg-alt);
-  transform: translateY(-2px);
+  background: var(--vp-c-bg-elv);
+  border-color: var(--vp-c-text-3);
 }
 
 .tools-tab-btn.active {
   background: var(--vp-c-bg-elv);
   border-color: var(--vp-c-brand-1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
 .dark .tools-tab-btn.active {
@@ -193,17 +197,18 @@ const selectTab = (id: ToolId) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
   background: var(--vp-c-bg-soft);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--vp-c-text-2);
-  transition: all 0.25s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .tools-tab-btn.active .tab-icon-wrap {
   background: var(--vp-c-brand-soft);
   color: var(--vp-c-brand-1);
-  transform: scale(1.05);
 }
 
 :deep(.tab-icon-svg) {
@@ -219,25 +224,25 @@ const selectTab = (id: ToolId) => {
 .tab-text-wrap {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 
 .tab-label {
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 650;
+  font-size: 15px;
   color: var(--vp-c-text-1);
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .tab-description {
-  font-size: 11px;
-  color: var(--vp-c-text-3);
-  line-height: 1.3;
+  font-size: 12px;
+  color: var(--vp-c-text-2);
+  line-height: 1.35;
 }
 
 .tools-content {
-  background: var(--vp-c-bg-elv);
+  background: var(--tool-surface);
   border: 1px solid var(--vp-c-divider);
   border-radius: 12px;
   padding: 24px;
@@ -271,32 +276,41 @@ const selectTab = (id: ToolId) => {
 }
 
 @container (max-width: 950px) {
-  .tools-tab-btn {
-    align-items: center;
-    gap: 9px;
-    padding: 12px 10px;
-  }
-
-  .tab-icon-wrap {
-    padding: 8px;
-  }
-
-  .tab-description {
-    display: none;
+  .tools-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @container (max-width: 680px) {
   .tools-tabs {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scrollbar-width: thin;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px;
   }
 
   .tools-tab-btn {
-    flex: 0 0 164px;
-    scroll-snap-align: start;
+    gap: 9px;
+    min-height: 72px;
+    padding: 10px;
+  }
+
+  .tab-icon-wrap {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  :deep(.tab-icon-svg) {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tab-label {
+    font-size: 13px;
+  }
+
+  .tab-description {
+    display: none;
   }
 }
 </style>

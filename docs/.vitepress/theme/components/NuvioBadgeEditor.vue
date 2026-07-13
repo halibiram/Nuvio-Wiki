@@ -463,23 +463,19 @@ onUnmounted(() => {
   <div class="badge-studio">
     <header class="studio-header">
       <div class="studio-heading">
-        <span class="studio-kicker">
-          <span class="studio-kicker-dot" aria-hidden="true"></span>
-          Badge Studio
-        </span>
-        <h2>Build the rules. Test the stream. Ship the JSON.</h2>
-        <p>Everything stays in your browser until you copy or download it.</p>
+        <h2>Badge editor</h2>
+        <p>Create, test, and export stream badges. Changes are saved in this browser.</p>
       </div>
 
       <div class="studio-commands" aria-label="Badge editor actions">
         <button type="button" class="studio-button studio-button--quiet" @click="showGroups = !showGroups">
-          {{ showGroups ? 'Close groups' : 'Groups' }}
+          {{ showGroups ? 'Close groups' : 'Manage groups' }}
         </button>
         <button type="button" class="studio-button studio-button--quiet" @click="showImport = !showImport">
-          {{ showImport ? 'Close import' : 'Import' }}
+          {{ showImport ? 'Close import' : 'Import JSON' }}
         </button>
         <button type="button" class="studio-button studio-button--quiet" @click="loadStarter">
-          {{ starterArmed ? 'Replace with starter?' : 'Starter set' }}
+          {{ starterArmed ? 'Replace all badges?' : 'Use examples' }}
         </button>
         <button type="button" class="studio-button studio-button--primary" @click="addBadge">
           <span aria-hidden="true">＋</span> New badge
@@ -487,11 +483,11 @@ onUnmounted(() => {
       </div>
 
       <div class="studio-metrics" aria-label="Workspace summary">
-        <span><strong>{{ badges.length }}</strong> filters</span>
-        <span><strong>{{ enabledCount }}</strong> enabled</span>
+        <span><strong>{{ badges.length }}</strong> badges</span>
+        <span><strong>{{ enabledCount }}</strong> active</span>
         <span><strong>{{ groups.length }}</strong> groups</span>
         <span :class="{ 'metric-alert': blockingIssues.length }">
-          <strong>{{ blockingIssues.length }}</strong> blocking
+          <strong>{{ blockingIssues.length }}</strong> problems
         </span>
       </div>
     </header>
@@ -499,7 +495,6 @@ onUnmounted(() => {
     <section v-if="showImport" class="studio-drawer" aria-labelledby="import-heading">
       <div class="drawer-heading">
         <div>
-          <span class="section-eyebrow">Bring your own set</span>
           <h3 id="import-heading">Import badge JSON</h3>
         </div>
         <label class="compact-field">
@@ -539,8 +534,7 @@ onUnmounted(() => {
     <section v-if="showGroups" class="studio-drawer group-drawer" aria-labelledby="groups-heading">
       <div class="drawer-heading">
         <div>
-          <span class="section-eyebrow">Organization layer</span>
-          <h3 id="groups-heading">Group library</h3>
+          <h3 id="groups-heading">Groups</h3>
         </div>
         <button type="button" class="studio-button studio-button--quiet" @click="addGroup">＋ Add group</button>
       </div>
@@ -571,8 +565,8 @@ onUnmounted(() => {
       <aside class="badge-queue" aria-labelledby="queue-heading">
         <div class="panel-heading queue-heading">
           <div>
-            <span class="section-eyebrow">Global order</span>
-            <h3 id="queue-heading">Badge stack</h3>
+            <h3 id="queue-heading">Badges</h3>
+            <p class="panel-description">Higher badges take priority.</p>
           </div>
           <span class="queue-count">{{ filteredBadges.length }}</span>
         </div>
@@ -581,7 +575,7 @@ onUnmounted(() => {
           <label class="search-field">
             <span class="visually-hidden">Search badges</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
-            <input v-model="search" type="search" placeholder="Search rules">
+            <input v-model="search" type="search" placeholder="Search badges">
           </label>
           <label class="visually-hidden" for="badge-group-filter">Filter by group</label>
           <select id="badge-group-filter" v-model="groupFilter" class="group-filter">
@@ -591,10 +585,10 @@ onUnmounted(() => {
         </div>
 
         <div class="queue-bulk">
-          <span>{{ visibleEnabled }}/{{ filteredBadges.length }} visible enabled</span>
+          <span>{{ visibleEnabled }} of {{ filteredBadges.length }} shown badges active</span>
           <div>
-            <button type="button" @click="setVisibleEnabled(true)">Enable</button>
-            <button type="button" @click="setVisibleEnabled(false)">Disable</button>
+            <button type="button" @click="setVisibleEnabled(true)">Enable shown</button>
+            <button type="button" @click="setVisibleEnabled(false)">Disable shown</button>
           </div>
         </div>
 
@@ -622,8 +616,8 @@ onUnmounted(() => {
                 <input v-model="badge.isEnabled" type="checkbox" :aria-label="`${badge.isEnabled ? 'Disable' : 'Enable'} ${badge.name || badge.id}`">
                 <span></span>
               </label>
-              <button type="button" :disabled="badges.indexOf(badge) === 0" :aria-label="`Move ${badge.name} up`" @click="moveBadge(badge, -1)">↑</button>
-              <button type="button" :disabled="badges.indexOf(badge) === badges.length - 1" :aria-label="`Move ${badge.name} down`" @click="moveBadge(badge, 1)">↓</button>
+              <button type="button" :disabled="badges.indexOf(badge) === 0" :aria-label="`Move ${badge.name} up`" :title="`Move ${badge.name} earlier`" @click="moveBadge(badge, -1)">↑</button>
+              <button type="button" :disabled="badges.indexOf(badge) === badges.length - 1" :aria-label="`Move ${badge.name} down`" :title="`Move ${badge.name} later`" @click="moveBadge(badge, 1)">↓</button>
             </div>
           </li>
         </ol>
@@ -637,28 +631,27 @@ onUnmounted(() => {
       <main v-if="selectedBadge" class="badge-inspector" aria-labelledby="inspector-heading">
         <div class="panel-heading inspector-heading">
           <div>
-            <span class="section-eyebrow">Priority {{ selectedIndex + 1 }}</span>
+            <span class="section-eyebrow">Badge {{ selectedIndex + 1 }} of {{ badges.length }}</span>
             <h3 id="inspector-heading">{{ selectedBadge.name || 'Untitled badge' }}</h3>
           </div>
           <div class="inspector-actions">
-            <button type="button" @click="duplicateSelected">Duplicate</button>
-            <button type="button" class="danger-text" @click="removeSelected">Delete</button>
+            <button type="button" @click="duplicateSelected">Make a copy</button>
+            <button type="button" class="danger-text" @click="removeSelected">Delete badge</button>
           </div>
         </div>
 
         <section class="inspector-section">
           <div class="section-title">
-            <span>01</span>
-            <div><h4>Identity</h4><p>Names, IDs, and grouping stay portable across clients.</p></div>
+            <div><h4>Details</h4><p>Name the badge and choose where it belongs.</p></div>
           </div>
           <div class="form-grid">
             <label class="field">
-              <span>Display name</span>
+              <span>Badge name</span>
               <input v-model="selectedBadge.name" type="text" :class="{ 'has-warning': fieldIssue('name')?.severity === 'warning' }">
               <small v-if="fieldIssue('name')" class="field-message field-message--warning">{{ fieldIssue('name')?.message }}</small>
             </label>
             <label class="field">
-              <span>Unique ID</span>
+              <span>Badge ID <em>advanced</em></span>
               <input v-model.trim="selectedBadge.id" type="text" :class="{ 'has-error': fieldIssue('id')?.severity === 'error' }">
               <small v-if="fieldIssue('id')" class="field-message field-message--warning">{{ fieldIssue('id')?.message }}</small>
             </label>
@@ -671,12 +664,12 @@ onUnmounted(() => {
               <small v-if="fieldIssue('groupId')" class="field-message field-message--warning">{{ fieldIssue('groupId')?.message }}</small>
             </label>
             <label class="field">
-              <span>Entry type</span>
+              <span>Rule type <em>advanced</em></span>
               <input v-model.trim="selectedBadge.type" type="text" placeholder="filter">
             </label>
           </div>
           <label class="full-switch">
-            <span><strong>Enabled</strong><small>Disabled rules stay in the JSON but never match.</small></span>
+            <span><strong>Badge is active</strong><small>Turn this off to keep the badge without showing it.</small></span>
             <input v-model="selectedBadge.isEnabled" type="checkbox">
             <span class="switch-track" aria-hidden="true"></span>
           </label>
@@ -684,28 +677,27 @@ onUnmounted(() => {
 
         <section class="inspector-section regex-section">
           <div class="section-title">
-            <span>02</span>
-            <div><h4>Match rule</h4><p>Use the same Java-style inline flags accepted by Nuvio.</p></div>
+            <div><h4>Match</h4><p>Choose which stream details should show this badge.</p></div>
           </div>
           <label class="field field--wide">
-            <span>Regex pattern</span>
+            <span>Match pattern <em>regular expression</em></span>
             <textarea v-model="selectedBadge.pattern" rows="3" spellcheck="false" :class="{ 'has-error': selectedPatternTest.error }"></textarea>
+            <small class="field-help">Example: <code>\b(4k|uhd)\b</code> matches stream text containing 4K or UHD.</small>
           </label>
           <div :class="['pattern-result', { 'is-match': selectedPatternTest.matches, 'is-error': selectedPatternTest.error }]" role="status">
             <span class="pattern-result-icon" aria-hidden="true">{{ selectedPatternTest.error ? '!' : selectedPatternTest.matches ? '✓' : '–' }}</span>
             <div>
               <strong v-if="selectedPatternTest.error">Pattern needs attention</strong>
-              <strong v-else-if="selectedPatternTest.matches">Matches “{{ selectedPatternTest.match }}”</strong>
-              <strong v-else>No match in the test stream</strong>
-              <small>{{ selectedPatternTest.error || 'The preview updates as you type.' }}</small>
+              <strong v-else-if="selectedPatternTest.matches">Found “{{ selectedPatternTest.match }}” in the test stream</strong>
+              <strong v-else>Not found in the test stream</strong>
+              <small>{{ selectedPatternTest.error || 'Change the test title in the preview to try another example.' }}</small>
             </div>
           </div>
         </section>
 
         <section class="inspector-section">
           <div class="section-title">
-            <span>03</span>
-            <div><h4>Badge artwork</h4><p>Use a direct PNG, SVG, or GIF URL; raw GitHub links work best.</p></div>
+            <div><h4>Image <em>optional</em></h4><p>Paste a direct PNG, SVG, or GIF link. Without one, the badge name is used.</p></div>
           </div>
           <label class="field field--wide">
             <span>Image URL</span>
@@ -726,15 +718,15 @@ onUnmounted(() => {
               >
               <span v-else>{{ selectedBadge.name || 'Badge' }}</span>
             </div>
-            <p>{{ failedImages.has(selectedBadge.imageURL) ? 'The image could not be loaded. The URL is still preserved.' : 'Previewed at a realistic stream-chip height.' }}</p>
+            <p>{{ failedImages.has(selectedBadge.imageURL) ? 'The image could not be loaded. The URL is still preserved.' : 'Shown at roughly the size used in Nuvio.' }}</p>
           </div>
         </section>
 
-        <section class="inspector-section">
-          <div class="section-title">
-            <span>04</span>
-            <div><h4>Appearance metadata</h4><p>Eight-digit colors use Android ARGB: alpha comes first.</p></div>
-          </div>
+        <details class="inspector-section advanced-section">
+          <summary class="section-title">
+            <div><h4>Style options <em>advanced</em></h4><p>Optional Android ARGB colors. Alpha comes first in eight-digit values.</p></div>
+            <span class="section-disclosure" aria-hidden="true"></span>
+          </summary>
           <div class="appearance-grid">
             <div v-for="field in (['tagColor', 'borderColor', 'textColor'] as ColorField[])" :key="field" class="color-control">
               <div class="color-control-heading">
@@ -759,7 +751,7 @@ onUnmounted(() => {
             <datalist id="tag-style-options"><option value="filled"></option><option value="none"></option></datalist>
             <small v-if="fieldIssue('tagStyle')" class="field-message field-message--warning">{{ fieldIssue('tagStyle')?.message }}</small>
           </label>
-        </section>
+        </details>
       </main>
 
       <main v-else class="badge-inspector badge-inspector--empty">
@@ -772,18 +764,17 @@ onUnmounted(() => {
       <aside class="preview-panel" aria-labelledby="preview-heading">
         <div class="panel-heading preview-heading">
           <div>
-            <span class="section-eyebrow">Test bench</span>
-            <h3 id="preview-heading">Live stream preview</h3>
+            <h3 id="preview-heading">Preview</h3>
           </div>
           <span class="live-pill"><span></span>Live</span>
         </div>
 
         <label class="field preview-title-field">
-          <span>Stream metadata</span>
+          <span>Test stream title and details</span>
           <textarea v-model="streamTitle" rows="4" spellcheck="false"></textarea>
         </label>
         <label class="sample-select">
-          <span>Try a sample</span>
+          <span>Or try an example</span>
           <select @change="applySample">
             <option value="">Choose a test title…</option>
             <option v-for="sample in previewSamples" :key="sample" :value="sample">{{ sample }}</option>
@@ -791,49 +782,59 @@ onUnmounted(() => {
         </label>
 
         <div class="preview-mode" aria-label="Preview matching mode">
-          <button type="button" :class="{ active: previewMode === 'apps' }" :aria-pressed="previewMode === 'apps'" @click="previewMode = 'apps'">Current apps</button>
-          <button type="button" :class="{ active: previewMode === 'priority' }" :aria-pressed="previewMode === 'priority'" @click="previewMode = 'priority'">Wiki priority</button>
+          <button type="button" :class="{ active: previewMode === 'apps' }" :aria-pressed="previewMode === 'apps'" title="Show badges like current Nuvio apps" @click="previewMode = 'apps'">App preview</button>
+          <button type="button" :class="{ active: previewMode === 'priority' }" :aria-pressed="previewMode === 'priority'" title="Show only the first match in each group" @click="previewMode = 'priority'">One per group</button>
         </div>
 
         <div class="stream-card">
-          <div class="stream-card-art" aria-hidden="true"><span>N</span></div>
-          <div class="stream-card-copy">
-            <span class="stream-card-label">Test stream</span>
-            <strong>{{ streamTitle || 'Untitled stream' }}</strong>
-            <div v-if="previewBadges.length" class="preview-badges">
-              <div
-                v-for="badge in previewBadges"
-                :key="`${badge.id}-${badge.imageURL}`"
-                class="preview-chip"
-                :title="badge.name"
-                :style="{ '--badge-fill': androidColorToCss(badge.tagColor), '--badge-stroke': androidColorToCss(badge.borderColor) }"
+          <div class="stream-card-heading">
+            <span class="stream-card-label">Badges</span>
+            <span class="stream-card-count">{{ previewBadges.length }} {{ previewBadges.length === 1 ? 'match' : 'matches' }}</span>
+          </div>
+
+          <div v-if="previewBadges.length" class="preview-badges">
+            <div
+              v-for="badge in previewBadges"
+              :key="`${badge.id}-${badge.imageURL}`"
+              class="preview-chip"
+              :title="badge.name"
+              :style="{ '--badge-fill': androidColorToCss(badge.tagColor), '--badge-stroke': androidColorToCss(badge.borderColor), '--badge-text': androidColorToCss(badge.textColor) }"
+            >
+              <img
+                v-if="isImageVisible(badge.imageURL)"
+                :src="badge.imageURL"
+                :alt="badge.name"
+                @error="markImageFailed(badge.imageURL)"
               >
-                <img
-                  v-if="isImageVisible(badge.imageURL)"
-                  :src="badge.imageURL"
-                  :alt="badge.name"
-                  @error="markImageFailed(badge.imageURL)"
-                >
-                <span v-else>{{ badge.name }}</span>
-              </div>
+              <span v-else>{{ badge.name }}</span>
             </div>
-            <span v-else class="no-matches">No visible badges matched</span>
+          </div>
+          <div v-else class="no-matches">
+            <strong>No badges matched</strong>
+            <span>Try another example or adjust the selected badge pattern.</span>
+          </div>
+
+          <div class="stream-card-source">
+            <span class="stream-card-source-icon" aria-hidden="true">&#x270E;</span>
+            <span>
+              <small>Matched against</small>
+              <strong>{{ streamTitle || 'Untitled stream' }}</strong>
+            </span>
           </div>
         </div>
 
         <p class="preview-explainer">
-          <template v-if="previewMode === 'apps'">Shows up to nine image badges in global order, matching current clients.</template>
-          <template v-else>Shows only the first matching image badge per group, matching the wiki priority guide.</template>
+          <template v-if="previewMode === 'apps'">Shows up to nine matching image badges, just like current Nuvio apps.</template>
+          <template v-else>Shows the first matching image badge from each group.</template>
         </p>
 
         <section class="validation-panel" aria-labelledby="validation-heading">
           <div class="validation-heading">
             <div>
-              <span class="section-eyebrow">Preflight</span>
-              <h4 id="validation-heading">Validation</h4>
+              <h4 id="validation-heading">Checks</h4>
             </div>
             <span :class="['validation-total', { ready: !blockingIssues.length }]">
-              {{ blockingIssues.length ? `${blockingIssues.length} blocking` : 'Export ready' }}
+              {{ blockingIssues.length ? `${blockingIssues.length} to fix` : 'Ready to export' }}
             </span>
           </div>
           <ul v-if="issues.length" class="issue-list">
@@ -851,17 +852,16 @@ onUnmounted(() => {
         <section class="export-panel" aria-labelledby="export-heading">
           <div class="export-heading">
             <div>
-              <span class="section-eyebrow">Output</span>
-              <h4 id="export-heading">Badge JSON</h4>
+              <h4 id="export-heading">Export</h4>
             </div>
             <span>{{ jsonOutput.split('\n').length }} lines</span>
           </div>
           <div class="export-actions">
-            <button type="button" class="studio-button studio-button--primary" :disabled="blockingIssues.length > 0" @click="copyJson">Copy JSON</button>
-            <button type="button" class="studio-button studio-button--quiet" :disabled="blockingIssues.length > 0" @click="downloadJson">Download</button>
+            <button type="button" class="studio-button studio-button--primary" :disabled="blockingIssues.length > 0" @click="copyJson">Copy badge JSON</button>
+            <button type="button" class="studio-button studio-button--quiet" :disabled="blockingIssues.length > 0" @click="downloadJson">Download file</button>
           </div>
           <details class="raw-json">
-            <summary>Inspect formatted output</summary>
+            <summary>Show JSON preview</summary>
             <textarea :value="jsonOutput" rows="12" readonly spellcheck="false"></textarea>
           </details>
         </section>
@@ -882,9 +882,10 @@ onUnmounted(() => {
   container-type: inline-size;
   overflow: hidden;
   border: 1px solid var(--studio-line);
-  border-radius: 18px;
-  background: var(--vp-c-bg-elv);
+  border-radius: 12px;
+  background: var(--tool-surface, var(--vp-c-bg));
   color: var(--vp-c-text-1);
+  font-size: 14px;
 }
 
 button,
@@ -906,52 +907,41 @@ summary:focus-visible {
 .studio-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 22px;
-  padding: 28px 30px 22px;
+  gap: 18px;
+  padding: 24px 26px 20px;
   border-bottom: 1px solid var(--studio-line);
-  background:
-    radial-gradient(circle at 88% 0%, color-mix(in srgb, var(--vp-c-brand-1) 13%, transparent), transparent 34%),
-    var(--vp-c-bg-elv);
+  background: var(--tool-surface, var(--vp-c-bg));
 }
 
 .studio-heading {
   min-width: 0;
 }
 
-.studio-kicker,
 .section-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   color: var(--vp-c-text-3);
-  font-size: 10px;
-  font-weight: 760;
-  letter-spacing: 0.13em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
   line-height: 1;
-  text-transform: uppercase;
-}
-
-.studio-kicker-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--vp-c-brand-1);
-  box-shadow: 0 0 0 4px var(--vp-c-brand-soft);
 }
 
 .studio-heading h2 {
-  margin: 12px 0 7px !important;
+  margin: 0 0 6px !important;
   border: 0 !important;
-  font-size: clamp(21px, 2.4cqi, 29px) !important;
-  font-weight: 720;
-  letter-spacing: -0.035em;
+  font-size: clamp(21px, 2.2cqi, 27px) !important;
+  font-weight: 680;
+  letter-spacing: -0.025em;
   line-height: 1.15;
 }
 
 .studio-heading p {
   margin: 0 !important;
   color: var(--vp-c-text-2);
-  font-size: 13px;
+  max-width: 680px;
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -969,19 +959,19 @@ summary:focus-visible {
   justify-content: center;
   gap: 6px;
   min-height: 38px;
-  padding: 8px 13px;
+  padding: 8px 12px;
   border: 1px solid var(--studio-line);
-  border-radius: 9px;
+  border-radius: 6px;
   color: var(--vp-c-text-1);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 690;
   line-height: 1;
   cursor: pointer;
-  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
 }
 
 .studio-button:hover:not(:disabled) {
-  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--vp-c-text-3) 42%, var(--studio-line));
 }
 
 .studio-button:disabled {
@@ -990,7 +980,7 @@ summary:focus-visible {
 }
 
 .studio-button--quiet {
-  background: color-mix(in srgb, var(--vp-c-bg-soft) 68%, transparent);
+  background: transparent;
 }
 
 .studio-button--quiet:hover:not(:disabled) {
@@ -1015,11 +1005,10 @@ summary:focus-visible {
 .studio-metrics {
   grid-column: 1 / -1;
   display: flex;
-  gap: 20px;
-  padding-top: 18px;
-  border-top: 1px solid var(--studio-line);
+  gap: 9px;
+  padding-top: 2px;
   color: var(--vp-c-text-3);
-  font-size: 11px;
+  font-size: 12.5px;
 }
 
 .studio-metrics span {
@@ -1030,7 +1019,14 @@ summary:focus-visible {
 
 .studio-metrics strong {
   color: var(--vp-c-text-1);
-  font-size: 14px;
+  font-size: inherit;
+  font-weight: 650;
+}
+
+.studio-metrics span + span::before {
+  margin-right: 4px;
+  color: var(--studio-line);
+  content: '\00b7';
 }
 
 .studio-metrics .metric-alert strong {
@@ -1040,7 +1036,7 @@ summary:focus-visible {
 .studio-drawer {
   padding: 24px 30px;
   border-bottom: 1px solid var(--studio-line);
-  background: color-mix(in srgb, var(--vp-c-bg-soft) 45%, var(--vp-c-bg-elv));
+  background: color-mix(in srgb, var(--vp-c-bg-soft) 45%, var(--tool-surface, var(--vp-c-bg)));
 }
 
 .drawer-heading,
@@ -1058,9 +1054,16 @@ summary:focus-visible {
 .panel-heading h3,
 .validation-heading h4,
 .export-heading h4 {
-  margin: 6px 0 0 !important;
-  font-size: 16px !important;
+  margin: 0 !important;
+  font-size: 18px !important;
   line-height: 1.2;
+}
+
+.panel-description {
+  margin: 5px 0 0 !important;
+  color: var(--vp-c-text-2);
+  font-size: 11.5px;
+  line-height: 1.4;
 }
 
 .compact-field,
@@ -1076,8 +1079,18 @@ summary:focus-visible {
 .field > span,
 .sample-select > span {
   color: var(--vp-c-text-2);
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 660;
+}
+
+.field > span em,
+.section-title h4 em {
+  margin-left: 4px;
+  color: var(--vp-c-text-3);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .field input,
@@ -1090,10 +1103,10 @@ summary:focus-visible {
   width: 100%;
   min-width: 0;
   border: 1px solid var(--studio-line);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--vp-c-bg) 72%, var(--vp-c-bg-elv));
+  border-radius: 6px;
+  background: var(--tool-surface, var(--vp-c-bg));
   color: var(--vp-c-text-1);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.4;
 }
 
@@ -1103,14 +1116,25 @@ summary:focus-visible {
 .sample-select select,
 .group-filter,
 .group-row input[type='text'] {
-  min-height: 38px;
-  padding: 8px 10px;
+  min-height: 40px;
+  padding: 9px 11px;
 }
 
 .field textarea {
   resize: vertical;
-  padding: 10px;
+  padding: 11px;
   font-family: var(--vp-font-family-mono);
+}
+
+.field-help {
+  color: var(--vp-c-text-2);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.field-help code {
+  padding: 1px 4px;
+  font-size: 10.5px;
 }
 
 .field input::placeholder,
@@ -1144,7 +1168,7 @@ summary:focus-visible {
   align-items: center;
   gap: 10px;
   color: var(--vp-c-text-3);
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
 }
 
@@ -1165,7 +1189,7 @@ summary:focus-visible {
 .drawer-footer p {
   margin: 0 !important;
   color: var(--vp-c-text-3);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .drawer-footer .drawer-error {
@@ -1193,12 +1217,12 @@ summary:focus-visible {
 
 .group-row label span {
   color: var(--vp-c-text-3);
-  font-size: 10px;
+  font-size: 11.5px;
 }
 
 .group-swatch {
   width: 40px;
-  height: 38px;
+  height: 42px;
   padding: 3px;
   border: 1px solid var(--studio-line);
   border-radius: 8px;
@@ -1207,7 +1231,7 @@ summary:focus-visible {
 
 .icon-button {
   width: 34px;
-  height: 38px;
+  height: 42px;
   border: 1px solid var(--studio-line);
   border-radius: 8px;
   background: transparent;
@@ -1221,8 +1245,8 @@ summary:focus-visible {
 }
 
 .studio-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
 }
 
 .badge-queue,
@@ -1235,14 +1259,14 @@ summary:focus-visible {
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid var(--studio-line);
-  background: color-mix(in srgb, var(--vp-c-bg-soft) 32%, var(--vp-c-bg-elv));
+  background: var(--tool-surface, var(--vp-c-bg));
 }
 
 .queue-heading,
 .inspector-heading,
 .preview-heading {
-  min-height: 74px;
-  padding: 20px 22px;
+  min-height: 76px;
+  padding: 17px 22px;
   border-bottom: 1px solid var(--studio-line);
 }
 
@@ -1252,18 +1276,18 @@ summary:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 24px;
-  padding: 4px 8px;
-  border: 1px solid var(--studio-line);
-  border-radius: 999px;
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   color: var(--vp-c-text-2);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 690;
 }
 
 .queue-tools {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 112px;
+  grid-template-columns: minmax(0, 1fr) 118px;
   gap: 8px;
   padding: 14px 14px 8px;
 }
@@ -1289,43 +1313,47 @@ summary:focus-visible {
 .search-field input {
   width: 100%;
   min-width: 0;
-  height: 36px;
+  height: 40px;
   padding: 8px 8px 8px 34px;
   border: 1px solid var(--studio-line);
-  border-radius: 8px;
-  background: var(--vp-c-bg-elv);
+  border-radius: 6px;
+  background: var(--tool-surface, var(--vp-c-bg));
   color: var(--vp-c-text-1);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .group-filter {
-  min-height: 36px;
-  padding: 6px 8px;
-  font-size: 10px;
+  min-height: 40px;
+  padding: 8px;
+  font-size: 12px;
 }
 
 .queue-bulk {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-direction: column;
   justify-content: space-between;
   gap: 8px;
   padding: 4px 15px 10px;
   color: var(--vp-c-text-3);
-  font-size: 9px;
+  font-size: 11px;
+  line-height: 1.4;
 }
 
 .queue-bulk div {
   display: flex;
-  gap: 7px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .queue-bulk button,
 .inspector-actions button {
-  padding: 0;
-  border: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--studio-line);
+  border-radius: 5px;
   background: transparent;
   color: var(--vp-c-text-2);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 670;
   cursor: pointer;
 }
@@ -1338,7 +1366,7 @@ summary:focus-visible {
 .badge-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 7px;
   max-height: 650px;
   margin: 0 !important;
   padding: 4px 10px 14px !important;
@@ -1351,7 +1379,7 @@ summary:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
@@ -1359,12 +1387,12 @@ summary:focus-visible {
 }
 
 .badge-row:hover {
-  background: color-mix(in srgb, var(--vp-c-bg-elv) 76%, transparent);
+  background: color-mix(in srgb, var(--tool-surface, var(--vp-c-bg)) 76%, transparent);
 }
 
 .badge-row.is-selected {
   border-color: color-mix(in srgb, var(--vp-c-brand-1) 32%, var(--studio-line));
-  background: color-mix(in srgb, var(--vp-c-brand-soft) 70%, var(--vp-c-bg-elv));
+  background: color-mix(in srgb, var(--vp-c-brand-soft) 70%, var(--tool-surface, var(--vp-c-bg)));
 }
 
 .badge-row.is-disabled {
@@ -1373,11 +1401,11 @@ summary:focus-visible {
 
 .badge-select {
   display: grid;
-  grid-template-columns: 25px minmax(0, 1fr) 7px;
+  grid-template-columns: 29px minmax(0, 1fr) 7px;
   align-items: center;
   gap: 9px;
   min-width: 0;
-  padding: 10px 5px 10px 9px;
+  padding: 12px 5px 12px 10px;
   border: 0;
   background: transparent;
   color: inherit;
@@ -1389,13 +1417,13 @@ summary:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 25px;
-  height: 25px;
+  width: 29px;
+  height: 29px;
   border: 1px solid var(--studio-line);
   border-radius: 7px;
   color: var(--vp-c-text-3);
   font-family: var(--vp-font-family-mono);
-  font-size: 9px;
+  font-size: 10.5px;
 }
 
 .is-selected .priority-number {
@@ -1419,13 +1447,13 @@ summary:focus-visible {
 }
 
 .badge-row-copy strong {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 690;
 }
 
 .badge-row-copy small {
   color: var(--vp-c-text-3);
-  font-size: 9px;
+  font-size: 10.5px;
 }
 
 .match-dot {
@@ -1459,7 +1487,7 @@ summary:focus-visible {
   border-radius: 6px;
   background: transparent;
   color: var(--vp-c-text-3);
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -1488,8 +1516,8 @@ summary:focus-visible {
 
 .mini-switch span {
   position: relative;
-  width: 25px;
-  height: 15px;
+  width: 29px;
+  height: 17px;
   border-radius: 99px;
   background: var(--vp-c-bg-soft);
   cursor: pointer;
@@ -1499,8 +1527,8 @@ summary:focus-visible {
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 9px;
-  height: 9px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: var(--vp-c-text-3);
   content: '';
@@ -1512,7 +1540,7 @@ summary:focus-visible {
 }
 
 .mini-switch input:checked + span::after {
-  transform: translateX(10px);
+  transform: translateX(12px);
   background: var(--vp-c-brand-1);
 }
 
@@ -1542,12 +1570,19 @@ summary:focus-visible {
 .queue-empty p,
 .badge-inspector--empty p {
   margin: 8px 0 16px !important;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .badge-inspector {
   border-bottom: 1px solid var(--studio-line);
-  background: var(--vp-c-bg-elv);
+  background: var(--tool-surface, var(--vp-c-bg));
+}
+
+.badge-inspector > .inspector-section > * {
+  width: 100%;
+  max-width: 920px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .inspector-heading h3 {
@@ -1559,7 +1594,9 @@ summary:focus-visible {
 
 .inspector-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .inspector-actions .danger-text:hover {
@@ -1567,7 +1604,7 @@ summary:focus-visible {
 }
 
 .inspector-section {
-  padding: 24px 26px 28px;
+  padding: 22px 28px 25px;
   border-bottom: 1px solid var(--studio-line);
 }
 
@@ -1576,36 +1613,54 @@ summary:focus-visible {
 }
 
 .section-title {
-  display: grid;
-  grid-template-columns: 27px minmax(0, 1fr);
-  gap: 11px;
-  margin-bottom: 20px;
-}
-
-.section-title > span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 27px;
-  height: 27px;
-  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 25%, var(--studio-line));
-  border-radius: 8px;
-  background: var(--vp-c-brand-soft);
-  color: var(--vp-c-brand-1);
-  font-family: var(--vp-font-family-mono);
-  font-size: 8px;
+  display: block;
+  margin-bottom: 18px;
 }
 
 .section-title h4 {
   margin: 0 !important;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .section-title p {
   margin: 3px 0 0 !important;
   color: var(--vp-c-text-3);
-  font-size: 10px;
-  line-height: 1.45;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.advanced-section > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.advanced-section > summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-section[open] > summary {
+  margin-bottom: 22px;
+}
+
+.section-disclosure {
+  align-self: center;
+  color: var(--vp-c-brand-1);
+  font-size: 11px;
+  font-weight: 690;
+  white-space: nowrap;
+}
+
+.section-disclosure::before {
+  content: 'Show options';
+}
+
+.advanced-section[open] .section-disclosure::before {
+  content: 'Hide options';
 }
 
 .form-grid {
@@ -1616,7 +1671,7 @@ summary:focus-visible {
 
 .field-message {
   color: #dc5d5d;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.35;
 }
 
@@ -1642,12 +1697,12 @@ summary:focus-visible {
 }
 
 .full-switch strong {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .full-switch small {
   color: var(--vp-c-text-3);
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .switch-track {
@@ -1726,12 +1781,12 @@ summary:focus-visible {
 }
 
 .pattern-result strong {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .pattern-result small {
   color: var(--vp-c-text-3);
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .pattern-result.is-match {
@@ -1766,7 +1821,7 @@ summary:focus-visible {
 .artwork-preview p {
   margin: 0 !important;
   color: #8f97a3;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.45;
 }
 
@@ -1775,30 +1830,32 @@ summary:focus-visible {
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  min-width: 34px;
-  max-width: 92px;
-  height: 20px;
-  padding: 1px 4px;
+  min-width: 66px;
+  max-width: 164px;
+  height: 40px;
+  padding: 5px 10px;
   overflow: hidden;
   border: 1px solid var(--badge-stroke, rgba(255, 255, 255, 0.32));
-  border-radius: 5px;
+  border-radius: 7px;
   background: var(--badge-fill, rgba(255, 255, 255, 0.08));
-  color: white;
+  color: var(--badge-text, white);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .preview-chip img {
   display: block;
   width: auto;
-  max-width: 84px;
-  height: 16px;
-  border-radius: 2px;
+  max-width: 144px;
+  height: 28px;
+  border-radius: 3px;
   object-fit: contain;
 }
 
 .preview-chip span {
   overflow: hidden;
-  font-size: 7px;
-  font-weight: 760;
+  font-size: 13px;
+  font-weight: 780;
+  line-height: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1820,16 +1877,16 @@ summary:focus-visible {
 
 .appearance-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
 }
 
 .color-control {
   min-width: 0;
-  padding: 11px;
+  padding: 13px;
   border: 1px solid var(--studio-line);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--vp-c-bg-soft) 35%, transparent);
+  border-radius: 6px;
+  background: transparent;
 }
 
 .color-control-heading {
@@ -1841,7 +1898,7 @@ summary:focus-visible {
 }
 
 .color-control-heading span {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 690;
 }
 
@@ -1851,19 +1908,19 @@ summary:focus-visible {
   border: 0 !important;
   background: transparent !important;
   color: var(--vp-c-text-3) !important;
-  font-size: 8px;
+  font-size: 10px;
   text-overflow: ellipsis;
 }
 
 .color-input-row {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 6px;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 8px;
 }
 
 .color-input-row input[type='color'] {
-  width: 34px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   padding: 3px;
   border: 1px solid var(--studio-line);
   border-radius: 7px;
@@ -1873,14 +1930,14 @@ summary:focus-visible {
 .color-input-row input[type='text'] {
   width: 100%;
   min-width: 0;
-  height: 32px;
-  padding: 6px 7px;
+  height: 38px;
+  padding: 7px 8px;
   border: 1px solid var(--studio-line);
   border-radius: 7px;
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
   font-family: var(--vp-font-family-mono);
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .alpha-control {
@@ -1890,7 +1947,7 @@ summary:focus-visible {
   gap: 5px;
   margin-top: 9px;
   color: var(--vp-c-text-3);
-  font-size: 8px;
+  font-size: 10.5px;
 }
 
 .alpha-control input {
@@ -1909,7 +1966,14 @@ summary:focus-visible {
 
 .preview-panel {
   padding: 0 20px 22px;
-  background: color-mix(in srgb, var(--vp-c-bg-soft) 26%, var(--vp-c-bg-elv));
+  background: var(--tool-surface, var(--vp-c-bg));
+}
+
+.preview-panel > :not(.preview-heading) {
+  width: 100%;
+  max-width: 920px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .preview-heading {
@@ -1926,12 +1990,12 @@ summary:focus-visible {
   height: 5px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #41b883 15%, transparent);
+  box-shadow: none;
 }
 
 .preview-title-field textarea {
-  min-height: 82px;
-  font-size: 10px;
+  min-height: 96px;
+  font-size: 13px;
 }
 
 .sample-select {
@@ -1939,7 +2003,7 @@ summary:focus-visible {
 }
 
 .sample-select select {
-  font-size: 10px;
+  font-size: 12.5px;
 }
 
 .preview-mode {
@@ -1950,100 +2014,132 @@ summary:focus-visible {
   padding: 3px;
   border: 1px solid var(--studio-line);
   border-radius: 9px;
-  background: var(--vp-c-bg-soft);
+  background: var(--tool-surface-alt, var(--vp-c-bg-alt));
 }
 
 .preview-mode button {
-  min-height: 31px;
-  padding: 5px;
+  min-height: 36px;
+  padding: 6px;
   border: 0;
   border-radius: 6px;
   background: transparent;
   color: var(--vp-c-text-3);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 680;
   cursor: pointer;
 }
 
 .preview-mode button.active {
-  background: var(--vp-c-bg-elv);
+  background: var(--tool-surface, var(--vp-c-bg));
   color: var(--vp-c-text-1);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .stream-card {
-  display: grid;
-  grid-template-columns: 46px minmax(0, 1fr);
-  gap: 11px;
-  padding: 12px;
-  border: 1px solid #2b2f37;
-  border-radius: 12px;
-  background: #14171d;
-  color: #f6f7f9;
-  box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
+  min-height: 220px;
+  padding: 22px 24px 20px;
+  border: 1px solid #23262b;
+  border-radius: 8px;
+  background: #111214;
+  color: #f4f1ea;
+  box-shadow: none;
 }
 
-.stream-card-art {
+.stream-card-heading {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 58px;
-  border-radius: 8px;
-  background:
-    linear-gradient(145deg, rgba(192, 132, 252, 0.9), rgba(88, 15, 212, 0.65)),
-    #6b16ed;
-}
-
-.stream-card-art span {
-  color: white;
-  font-size: 20px;
-  font-weight: 820;
-  letter-spacing: -0.08em;
-}
-
-.stream-card-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .stream-card-label {
-  color: #777f8b;
-  font-size: 7px;
-  font-weight: 720;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #d8d4cb;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0;
 }
 
-.stream-card-copy > strong {
-  display: -webkit-box;
-  overflow: hidden;
-  color: #f5f7fa;
-  font-size: 9px;
-  font-weight: 620;
-  line-height: 1.35;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+.stream-card-count {
+  color: #777a80;
+  font-size: 10px;
+  font-weight: 650;
 }
 
 .preview-badges {
   display: flex;
-  gap: 3px;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
   min-width: 0;
-  overflow: hidden;
+  min-height: 76px;
+  margin-top: 22px;
 }
 
 .no-matches {
-  color: #6e7682;
-  font-size: 8px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 98px;
+  color: #777a80;
+}
+
+.no-matches strong {
+  color: #d8d4cb;
+  font-size: 15px;
+  font-weight: 680;
+}
+
+.no-matches span {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.stream-card-source {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 15px;
+  border-top: 1px solid #222429;
+}
+
+.stream-card-source-icon {
+  color: #f4f1ea;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.stream-card-source > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.stream-card-source small {
+  color: #777a80;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.stream-card-source strong {
+  overflow: hidden;
+  color: #d8d4cb;
+  font-size: 12px;
+  font-weight: 560;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .preview-explainer {
   margin: 8px 2px 0 !important;
   color: var(--vp-c-text-3);
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -2112,14 +2208,14 @@ summary:focus-visible {
   flex-direction: column;
   gap: 2px;
   min-width: 0;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.35;
 }
 
 .issue-list strong {
   overflow: hidden;
   color: var(--vp-c-text-1);
-  font-size: 9px;
+  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -2130,7 +2226,7 @@ summary:focus-visible {
   gap: 7px;
   margin: 12px 0 0 !important;
   color: #3f9f70;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .validation-empty span {
@@ -2146,14 +2242,14 @@ summary:focus-visible {
 .more-issues {
   margin: 8px 0 0 !important;
   color: var(--vp-c-text-3);
-  font-size: 8px;
+  font-size: 10px;
   text-align: center;
 }
 
 .export-heading > span {
   color: var(--vp-c-text-3);
   font-family: var(--vp-font-family-mono);
-  font-size: 9px;
+  font-size: 10.5px;
 }
 
 .export-actions {
@@ -2169,7 +2265,7 @@ summary:focus-visible {
 
 .raw-json summary {
   color: var(--vp-c-text-3);
-  font-size: 9px;
+  font-size: 11px;
   cursor: pointer;
 }
 
@@ -2183,7 +2279,7 @@ summary:focus-visible {
   background: #14171d;
   color: #c7ccd5;
   font-family: var(--vp-font-family-mono);
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.55;
 }
 
@@ -2194,9 +2290,9 @@ summary:focus-visible {
   gap: 16px;
   padding: 11px 16px;
   border-top: 1px solid var(--studio-line);
-  background: color-mix(in srgb, var(--vp-c-bg-soft) 46%, var(--vp-c-bg-elv));
+  background: var(--tool-surface, var(--vp-c-bg));
   color: var(--vp-c-text-3);
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .save-indicator {
@@ -2215,7 +2311,7 @@ summary:focus-visible {
 .empty-copy {
   margin: 0 !important;
   color: var(--vp-c-text-3);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .visually-hidden {
@@ -2230,46 +2326,24 @@ summary:focus-visible {
   border: 0 !important;
 }
 
-@container (min-width: 720px) {
-  .studio-grid {
-    grid-template-columns: 270px minmax(0, 1fr);
+@container (min-width: 860px) {
+  .queue-tools {
+    grid-template-columns: minmax(0, 1fr) 180px;
+    padding: 18px 22px 10px;
   }
 
-  .badge-queue {
-    border-right: 1px solid var(--studio-line);
-    border-bottom: 0;
+  .queue-bulk {
+    align-items: center;
+    flex-direction: row;
+    padding: 4px 23px 12px;
   }
 
-  .badge-inspector {
-    border-bottom: 0;
-  }
-
-  .preview-panel {
-    grid-column: 1 / -1;
-    border-top: 1px solid var(--studio-line);
-  }
-}
-
-@container (min-width: 1040px) {
-  .studio-grid {
-    grid-template-columns: 280px minmax(420px, 1fr) 310px;
-    align-items: start;
-  }
-
-  .badge-queue,
-  .badge-inspector {
-    min-height: 100%;
-  }
-
-  .badge-inspector {
-    border-right: 1px solid var(--studio-line);
-  }
-
-  .preview-panel {
-    position: sticky;
-    top: 16px;
-    grid-column: auto;
-    border-top: 0;
+  .badge-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-height: 560px;
+    padding: 4px 18px 20px !important;
   }
 }
 
@@ -2324,6 +2398,14 @@ summary:focus-visible {
     padding: 22px 18px 25px;
   }
 
+  .advanced-section > summary {
+    grid-template-columns: 27px minmax(0, 1fr);
+  }
+
+  .section-disclosure {
+    grid-column: 2;
+  }
+
   .preview-panel {
     padding-right: 18px;
     padding-left: 18px;
@@ -2332,6 +2414,27 @@ summary:focus-visible {
   .preview-heading {
     margin-right: -18px;
     margin-left: -18px;
+  }
+
+  .stream-card {
+    min-height: 200px;
+    padding: 19px 18px 18px;
+  }
+
+  .preview-chip {
+    min-width: 58px;
+    max-width: 138px;
+    height: 36px;
+    padding: 4px 8px;
+  }
+
+  .preview-chip img {
+    max-width: 120px;
+    height: 25px;
+  }
+
+  .stream-card-source strong {
+    white-space: normal;
   }
 
   .studio-footer {

@@ -8,7 +8,6 @@ import {
   mergeStagedRecords,
   pluginMergeKey
 } from './profileTransferMerge'
-import { withBase } from 'vitepress'
 
 type TransferMode = 'export' | 'import'
 type RestoreStrategy = 'merge' | 'replace'
@@ -1296,103 +1295,101 @@ async function runImport() {
 
 <template>
   <div class="profile-transfer">
-    <div class="tool-brand" aria-label="Nuvio Profile Transfer">
-      <img :src="withBase('/tools_icon_coloured.webp')" alt="" aria-hidden="true" />
-      <span>Nuvio Profile Transfer</span>
-    </div>
+    <div class="transfer-workspace">
+      <div class="account-rail">
+        <section class="connection-card" aria-labelledby="nuvio-connection-heading">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Step 1</span>
+              <h3 id="nuvio-connection-heading">Connect your account</h3>
+            </div>
+            <span v-if="isConnected" class="connection-badge">Connected</span>
+          </div>
 
-    <div class="privacy-note">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-        <path d="m9 12 2 2 4-4" />
-      </svg>
-      <div>
-        <strong>Your export stays private</strong>
-        <span>Your password goes directly to Nuvio and is cleared after sign-in. Your Nuvio password, session, and profile PIN are never added to an export. Add-on or plugin links and app settings can contain keys for other services, so keep the downloaded file private.</span>
-      </div>
-    </div>
+          <p class="section-description">Sign in to load your profiles. Credentials are never stored in the export.</p>
 
-    <section class="connection-card" aria-labelledby="nuvio-connection-heading">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">Step 1</span>
-          <h3 id="nuvio-connection-heading">Connect your Nuvio account</h3>
-        </div>
-        <span v-if="isConnected" class="connection-badge">Connected</span>
-      </div>
+          <form v-if="!isConnected" class="auth-form" @submit.prevent="signIn">
+            <label>
+              <span>Email</span>
+              <input
+                v-model="authForm.email"
+                type="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                :disabled="authBusy"
+              >
+            </label>
+            <label>
+              <span>Password</span>
+              <input
+                v-model="authForm.password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Nuvio password"
+                :disabled="authBusy"
+              >
+            </label>
+            <button class="primary-button auth-button" type="submit" :disabled="authBusy">
+              <span v-if="authBusy" class="spinner" aria-hidden="true"></span>
+              {{ authBusy ? 'Signing in…' : 'Sign in securely' }}
+            </button>
+          </form>
 
-      <form v-if="!isConnected" class="auth-form" @submit.prevent="signIn">
-        <label>
-          <span>Email</span>
-          <input
-            v-model="authForm.email"
-            type="email"
-            autocomplete="email"
-            placeholder="you@example.com"
-            :disabled="authBusy"
-          >
-        </label>
-        <label>
-          <span>Password</span>
-          <input
-            v-model="authForm.password"
-            type="password"
-            autocomplete="current-password"
-            placeholder="Nuvio password"
-            :disabled="authBusy"
-          >
-        </label>
-        <button class="primary-button auth-button" type="submit" :disabled="authBusy">
-          <span v-if="authBusy" class="spinner" aria-hidden="true"></span>
-          {{ authBusy ? 'Signing in…' : 'Sign in' }}
-        </button>
-      </form>
+          <div v-else class="connected-row">
+            <div class="signed-in-copy">
+              <strong>Ready to transfer</strong>
+              <span>Choose a profile in the workspace.</span>
+            </div>
+            <button class="secondary-button" type="button" :disabled="exportBusy || importBusy" @click="disconnect">
+              Disconnect
+            </button>
+          </div>
 
-      <div v-else class="connected-row">
-        <div class="signed-in-copy">
-          <strong>Signed in</strong>
-          <span>Choose the profile you want inside Export profile or Import profile.</span>
-        </div>
-        <button class="secondary-button" type="button" :disabled="exportBusy || importBusy" @click="disconnect">
-          Disconnect
-        </button>
-      </div>
+          <p v-if="authError" class="error-panel" role="alert">{{ authError }}</p>
+        </section>
 
-      <p v-if="authError" class="error-panel" role="alert">{{ authError }}</p>
-    </section>
-
-    <section class="transfer-card" aria-labelledby="transfer-heading">
-      <div class="section-heading transfer-title-row">
-        <div>
-          <span class="eyebrow">Step 2</span>
-          <h3 id="transfer-heading">Export or import a profile</h3>
+        <div class="privacy-note">
+          <div>
+            <strong>What stays out of the file</strong>
+            <span>Passwords, sessions, and profile PINs are excluded. Exports can still contain third-party keys, so store the file like a password.</span>
+          </div>
         </div>
       </div>
 
-      <div class="mode-switch" role="tablist" aria-label="Profile transfer mode">
-        <button
-          type="button"
-          role="tab"
-          :aria-selected="mode === 'export'"
-          :class="{ active: mode === 'export' }"
-          :disabled="exportBusy || importBusy"
-          @click="setMode('export')"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" /></svg>
-          Export profile
-        </button>
-        <button
-          type="button"
-          role="tab"
-          :aria-selected="mode === 'import'"
-          :class="{ active: mode === 'import' }"
-          :disabled="exportBusy || importBusy"
-          @click="setMode('import')"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0 4 4m-4-4L8 7M5 21h14" /></svg>
-          Import profile
-        </button>
-      </div>
+      <section class="transfer-card" aria-labelledby="transfer-heading">
+        <div class="transfer-card-header">
+          <div class="section-heading transfer-title-row">
+            <div>
+              <span class="eyebrow">Step 2</span>
+              <h3 id="transfer-heading">Export or import a profile</h3>
+            </div>
+          </div>
+
+          <div class="mode-switch" role="tablist" aria-label="Profile transfer mode">
+            <button
+              type="button"
+              role="tab"
+              :aria-selected="mode === 'export'"
+              :class="{ active: mode === 'export' }"
+              :disabled="exportBusy || importBusy"
+              @click="setMode('export')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" /></svg>
+              <span><strong>Export</strong><small>Create a backup file</small></span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              :aria-selected="mode === 'import'"
+              :class="{ active: mode === 'import' }"
+              :disabled="exportBusy || importBusy"
+              @click="setMode('import')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0 4 4m-4-4L8 7M5 21h14" /></svg>
+              <span><strong>Import</strong><small>Restore from a file</small></span>
+            </button>
+          </div>
+        </div>
 
       <div v-if="mode === 'export'" class="mode-panel" role="tabpanel">
         <div class="profile-choice-box">
@@ -1711,59 +1708,46 @@ async function runImport() {
           </div>
         </template>
       </div>
-    </section>
+      </section>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .profile-transfer {
+  overflow: hidden;
+  container-type: inline-size;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+}
+
+.transfer-workspace {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  color: var(--vp-c-text-1);
+  background: var(--vp-c-bg);
 }
 
-.tool-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--vp-c-text-1);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.tool-brand img {
-  width: 42px;
-  height: 24px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
-  background: var(--vp-c-bg-soft);
-  object-fit: contain;
+.account-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 26px;
+  border-bottom: 1px solid var(--vp-c-divider);
 }
 
 .privacy-note,
 .connection-card,
 .transfer-card {
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 14px;
+  min-width: 0;
 }
 
 .privacy-note {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 14px 16px;
-  background: color-mix(in srgb, var(--vp-c-brand-soft) 72%, var(--vp-c-bg));
-}
-
-.privacy-note svg {
-  width: 22px;
-  min-width: 22px;
-  fill: none;
-  stroke: var(--vp-c-brand-1);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  max-width: 620px;
+  padding-top: 16px;
+  border-top: 1px solid var(--vp-c-divider);
 }
 
 .privacy-note div {
@@ -1773,19 +1757,33 @@ async function runImport() {
 }
 
 .privacy-note strong {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .privacy-note span {
   color: var(--vp-c-text-2);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
-.connection-card,
+.connection-card {
+  max-width: 620px;
+}
+
 .transfer-card {
-  padding: 20px;
-  background: var(--vp-c-bg-soft);
+  background: var(--vp-c-bg);
+}
+
+.transfer-card-header {
+  padding: 24px 26px 18px;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.section-description {
+  margin: 14px 0 0 !important;
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .section-heading,
@@ -1807,7 +1805,8 @@ async function runImport() {
 }
 
 .section-heading h3 {
-  font-size: 17px;
+  font-size: 18px;
+  line-height: 1.25;
 }
 
 .panel-intro h4 {
@@ -1816,12 +1815,10 @@ async function runImport() {
 
 .eyebrow {
   display: block;
-  margin-bottom: 3px;
-  color: var(--vp-c-brand-1);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  margin-bottom: 4px;
+  color: var(--vp-c-text-3);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .connection-badge {
@@ -1836,10 +1833,9 @@ async function runImport() {
 
 .auth-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: end;
-  margin-top: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 11px;
+  margin-top: 18px;
 }
 
 .auth-form label,
@@ -1918,7 +1914,6 @@ button {
 
 .primary-button:hover:not(:disabled) {
   background: var(--vp-c-brand-2);
-  transform: translateY(-1px);
 }
 
 .secondary-button {
@@ -1940,12 +1935,19 @@ select:disabled {
 }
 
 .auth-button {
+  width: 100%;
+  margin-top: 2px;
   white-space: nowrap;
 }
 
 .connected-row {
-  align-items: center;
+  align-items: stretch;
+  flex-direction: column;
   margin-top: 16px;
+}
+
+.connected-row .secondary-button {
+  width: 100%;
 }
 
 .signed-in-copy {
@@ -1965,35 +1967,52 @@ select:disabled {
 
 .mode-switch {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-top: 16px;
-  padding: 5px;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  margin-top: 18px;
+  padding: 4px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
-  background: var(--vp-c-bg);
+  border-radius: 9px;
+  background: var(--vp-c-bg-alt);
 }
 
 .mode-switch button {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 42px;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 52px;
+  padding: 9px 12px;
   border: 1px solid transparent;
-  border-radius: 7px;
+  border-radius: 6px;
   background: transparent;
   color: var(--vp-c-text-2);
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 700;
+  text-align: left;
 }
 
 .mode-switch button.active {
   border-color: var(--vp-c-divider);
-  background: var(--vp-c-bg-elv);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+  background: var(--vp-c-bg);
   color: var(--vp-c-brand-1);
+}
+
+.mode-switch button > span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.mode-switch button strong {
+  color: var(--vp-c-text-1);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.mode-switch button small {
+  color: var(--vp-c-text-3);
+  font-size: 10px;
+  line-height: 1.25;
 }
 
 .mode-switch svg,
@@ -2007,9 +2026,7 @@ select:disabled {
 }
 
 .mode-panel {
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--vp-c-divider);
+  padding: 24px 26px 26px;
 }
 
 .panel-intro {
@@ -2028,16 +2045,16 @@ select:disabled {
 .destination-box,
 .backup-summary,
 .restore-review {
-  margin-top: 14px;
-  padding: 15px;
+  margin-top: 0;
+  padding: 16px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
-  background: var(--vp-c-bg);
+  border-radius: 9px;
+  background: var(--vp-c-bg-alt);
 }
 
 .profile-choice-box label,
 .destination-box label {
-  max-width: 440px;
+  max-width: none;
 }
 
 .profile-choice-box p,
@@ -2049,12 +2066,13 @@ select:disabled {
 }
 
 .choice-summary {
-  align-items: flex-start;
-  margin-top: 14px;
-  padding: 14px 15px;
+  align-items: stretch;
+  flex-direction: column;
+  margin-top: 12px;
+  padding: 16px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--vp-c-brand-soft) 25%, var(--vp-c-bg));
+  border-radius: 9px;
+  background: var(--vp-c-bg-alt);
 }
 
 .choice-summary h4,
@@ -2072,7 +2090,9 @@ select:disabled {
 }
 
 .choice-toggle {
+  align-self: flex-start;
   min-height: 36px;
+  margin-top: 4px;
   padding: 7px 10px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 7px;
@@ -2085,11 +2105,11 @@ select:disabled {
 }
 
 .choice-details {
-  margin-top: 10px;
-  padding: 12px;
+  margin-top: 12px;
+  padding: 14px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
-  background: var(--vp-c-bg-soft);
+  border-radius: 9px;
+  background: var(--vp-c-bg-alt);
 }
 
 .selection-actions {
@@ -2112,7 +2132,7 @@ select:disabled {
   display: grid;
   grid-template-columns: 1fr;
   gap: 9px;
-  margin-top: 15px;
+  margin-top: 12px;
 }
 
 .category-option {
@@ -2123,15 +2143,14 @@ select:disabled {
   min-height: 70px;
   padding: 12px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--vp-c-bg);
   cursor: pointer;
-  transition: border-color 0.18s, background 0.18s, transform 0.18s;
+  transition: border-color 0.18s, background 0.18s;
 }
 
 .category-option:hover {
   border-color: var(--vp-c-text-3);
-  transform: translateY(-1px);
 }
 
 .category-option.selected {
@@ -2231,6 +2250,8 @@ select:disabled {
 }
 
 .panel-footer {
+  align-items: stretch;
+  flex-direction: column;
   margin-top: 16px;
   padding-top: 15px;
   border-top: 1px solid var(--vp-c-divider);
@@ -2239,6 +2260,10 @@ select:disabled {
 .panel-footer > span {
   color: var(--vp-c-text-3);
   font-size: 12px;
+}
+
+.panel-footer .primary-button {
+  align-self: flex-start;
 }
 
 .progress-panel {
@@ -2271,8 +2296,8 @@ select:disabled {
 
 .recent-backup-box {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: stretch;
+  flex-direction: column;
   gap: 14px;
   margin-top: 14px;
   padding: 13px 14px;
@@ -2322,9 +2347,9 @@ select:disabled {
   min-height: 132px;
   margin-top: 14px;
   padding: 20px;
-  border: 1.5px dashed color-mix(in srgb, var(--vp-c-brand-1) 48%, var(--vp-c-divider));
-  border-radius: 11px;
-  background: color-mix(in srgb, var(--vp-c-brand-soft) 25%, var(--vp-c-bg));
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 9px;
+  background: var(--vp-c-bg-alt);
   color: var(--vp-c-text-2);
   cursor: pointer;
   text-align: center;
@@ -2333,7 +2358,7 @@ select:disabled {
 
 .file-dropzone:hover:not(:disabled) {
   border-color: var(--vp-c-brand-1);
-  background: color-mix(in srgb, var(--vp-c-brand-soft) 48%, var(--vp-c-bg));
+  background: var(--vp-c-bg-soft);
 }
 
 .file-dropzone svg {
@@ -2370,8 +2395,9 @@ select:disabled {
 
 .backup-summary {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 12px;
+  margin-top: 14px;
 }
 
 .backup-summary div {
@@ -2412,7 +2438,7 @@ select:disabled {
 
 .strategy-options {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 9px;
   margin-top: 9px;
 }
@@ -2423,15 +2449,14 @@ select:disabled {
   min-width: 0;
   padding: 13px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--vp-c-bg);
   cursor: pointer;
-  transition: border-color 0.18s, background 0.18s, transform 0.18s;
+  transition: border-color 0.18s, background 0.18s;
 }
 
 .strategy-option:hover {
   border-color: var(--vp-c-text-3);
-  transform: translateY(-1px);
 }
 
 .strategy-option.selected {
@@ -2542,8 +2567,9 @@ select:disabled {
 }
 
 .restore-review {
-  border-color: color-mix(in srgb, var(--vp-c-brand-1) 55%, var(--vp-c-divider));
-  background: color-mix(in srgb, var(--vp-c-brand-soft) 24%, var(--vp-c-bg));
+  margin-top: 16px;
+  border-color: var(--vp-c-divider);
+  background: var(--vp-c-bg-alt);
 }
 
 .restore-route {
@@ -2587,7 +2613,8 @@ select:disabled {
 
 .review-actions {
   display: flex;
-  justify-content: flex-end;
+  align-items: stretch;
+  flex-direction: column;
   gap: 8px;
   margin-top: 15px;
   padding-top: 14px;
@@ -2651,50 +2678,65 @@ select:disabled {
   background: var(--vp-c-brand-1);
 }
 
+.destination-box {
+  margin-top: 16px;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-@media (max-width: 760px) {
-  .auth-form {
-    grid-template-columns: 1fr;
-  }
-
-  .category-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .connected-row,
-  .panel-footer {
+@container (min-width: 860px) {
+  .transfer-workspace {
+    display: grid;
+    grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.65fr);
     align-items: stretch;
-    flex-direction: column;
   }
 
-  .connected-row .secondary-button,
-  .panel-footer .primary-button {
-    width: 100%;
+  .account-rail {
+    border-right: 1px solid var(--vp-c-divider);
+    border-bottom: 0;
   }
 
-  .backup-summary {
-    grid-template-columns: 1fr;
+  .connection-card,
+  .privacy-note {
+    max-width: none;
   }
 
-  .strategy-options {
-    grid-template-columns: 1fr;
+  .mode-switch {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 520px) {
-  .connection-card,
-  .transfer-card {
-    padding: 15px;
+@container (max-width: 620px) {
+  .profile-transfer {
+    border-radius: 10px;
   }
 
-  .panel-intro {
-    flex-direction: column;
+  .account-rail {
+    padding: 18px;
   }
 
+  .auth-form,
+  .category-grid,
+  .backup-summary,
+  .strategy-options {
+    grid-template-columns: 1fr;
+  }
+
+  .transfer-card-header,
+  .mode-panel {
+    padding: 20px 18px;
+  }
+
+  .mode-switch button {
+    justify-content: flex-start;
+    padding: 8px;
+  }
+
+  .panel-intro,
   .choice-summary,
+  .panel-footer,
   .review-actions,
   .recent-backup-box {
     align-items: stretch;
@@ -2702,7 +2744,9 @@ select:disabled {
   }
 
   .choice-toggle,
-  .review-actions button {
+  .panel-footer .primary-button,
+  .review-actions button,
+  .recent-backup-box .secondary-button {
     width: 100%;
   }
 
@@ -2710,8 +2754,8 @@ select:disabled {
     align-self: flex-end;
   }
 
-  .mode-switch button {
-    font-size: 11px;
+  .file-dropzone {
+    min-height: 118px;
   }
 
   .transfer-title-row {

@@ -382,1505 +382,300 @@ async function submitSetup() {
 </script>
 
 <template>
-  <div class="nuvio-quickstart-wrapper">
-    <!-- TIP Block -->
-    <div v-if="!hideTip" class="custom-block tip toggler-tip">
-      <p class="custom-block-title">TIP</p>
-      <p>
-        <span v-if="(lang || '').startsWith('nl')">
-          Voor een eenvoudigere installatie kun je de <strong>Nuvio Quickstart Tool</strong> hieronder gebruiken om Nuvio addons voor je in te stellen. Dit installeert <em>AIOStreams</em> met behulp van het sjabloon van Tam-Taro en <em>Cinemeta</em>.
-        </span>
-        <span v-else>
-          For an easier setup, use the <strong>Nuvio Quickstart Tool</strong> below to set up Nuvio addons for you. This will install <em>AIOStreams</em> using Tam-Taro's template and <em>Cinemeta</em>.
-        </span>
-      </p>
+  <div class="quickstart-shell">
+    <div v-if="!hideTip" class="quickstart-tip">
+      <strong>Nuvio Quickstart</strong>
+      <span v-if="(lang || '').startsWith('nl')">Stel Nuvio, TorBox en AIOStreams in via één begeleide flow.</span>
+      <span v-else>Set up Nuvio, TorBox, and AIOStreams in one guided flow.</span>
     </div>
 
-    <!-- The actual setup tool card -->
-    <div class="nuvio-quickstart border-base" :class="{ 'is-expanded': !isCollapsed, 'is-standalone': hideHeader }">
-      <!-- HEADER acting as accordion toggle -->
+    <section class="quickstart-card" :class="{ 'is-standalone': hideHeader }">
       <button
         v-if="!hideHeader"
-        class="qs-header clickable-header"
+        class="quickstart-toggle"
         type="button"
         :aria-expanded="!isCollapsed"
         aria-controls="nuvio-quickstart-body"
         @click="isCollapsed = !isCollapsed"
       >
-        <span class="qs-brand">
-          <img :src="withBase('/tools_icon_coloured.webp')" class="logo-mark" alt="" aria-hidden="true" />
-          <span class="qs-brand-text">Nuvio Quickstart Tool</span>
+        <span class="quickstart-toggle__identity">
+          <img :src="withBase('/tools_icon_coloured.webp')" alt="" aria-hidden="true" />
+          <span><strong>Nuvio Quickstart</strong><small>AIOStreams + TorBox</small></span>
         </span>
-        <span class="qs-meta-actions">
-          <span v-if="!isCollapsed" class="secure-note">
-            <svg viewBox="0 0 20 20" aria-hidden="true" class="icon-secure">
-              <path d="M5 8V6a5 5 0 0 1 10 0v2"></path>
-              <rect x="3" y="8" width="14" height="10" rx="3"></rect>
-            </svg>
-            <span class="secure-note-text">{{ t.keysSecureNote }}</span>
-          </span>
-          <svg viewBox="0 0 20 20" aria-hidden="true" class="summary-arrow" :class="{ rotated: !isCollapsed }">
-            <path d="m6 8 4 4 4-4"></path>
-          </svg>
-        </span>
+        <svg viewBox="0 0 20 20" aria-hidden="true" :class="{ rotated: !isCollapsed }"><path d="m6 8 4 4 4-4" /></svg>
       </button>
 
-      <!-- COLLAPSIBLE FORM BODY -->
-      <div id="nuvio-quickstart-body" v-show="!isCollapsed" class="qs-body">
-
-    <!-- ERROR PANEL -->
-    <div v-if="globalError" class="error-panel" role="alert">
-      <div class="error-icon">!</div>
-      <div class="error-content">
-        <strong class="error-title">{{ t.setupStopped }}</strong>
-        <p class="error-desc">{{ globalError }}</p>
-      </div>
-      <button class="retry-btn" type="button" @click="handleRetry">
-        {{ lastErrorField ? t.checkFieldBtn : t.retryBtn }}
-      </button>
-    </div>
-
-    <!-- FORM VIEW -->
-    <form v-if="currentView === 'form'" @submit.prevent="submitSetup" class="qs-form" novalidate>
-      <div class="form-section-title">
-        <span class="step-num">1</span>
-        <div>
-          <strong>{{ t.nuvioAccount }}</strong>
-          <small>{{ t.newAccountsAuto }}</small>
-        </div>
-      </div>
-
-      <!-- Email Field -->
-      <div class="form-field" :class="{ 'has-error': errors.email }">
-        <label for="email" class="field-label">{{ t.emailLabel }}</label>
-        <div class="input-container">
-          <svg class="field-icon" viewBox="0 0 20 20" aria-hidden="true">
-            <path d="m3 5 7 5 7-5"></path>
-            <rect x="2" y="4" width="16" height="12" rx="3"></rect>
-          </svg>
-          <input
-            id="email"
-            v-model="form.email"
-            type="email"
-            :placeholder="t.emailPlaceholder"
-            autocomplete="email"
-            required
-            :aria-invalid="Boolean(errors.email)"
-            :aria-describedby="errors.email ? 'email-error' : undefined"
-            @input="errors.email = ''"
-          />
-        </div>
-        <span v-if="errors.email" id="email-error" class="field-error">{{ errors.email }}</span>
-      </div>
-
-      <!-- Nuvio Password Field -->
-      <div class="form-field" :class="{ 'has-error': errors.nuvioPassword }">
-        <label for="nuvioPassword" class="field-label">{{ t.passwordLabel }}</label>
-        <div class="input-container">
-          <svg class="field-icon" viewBox="0 0 20 20" aria-hidden="true">
-            <rect x="3" y="8" width="14" height="10" rx="3"></rect>
-            <path d="M6 8V6a4 4 0 0 1 8 0v2"></path>
-          </svg>
-          <input
-            id="nuvioPassword"
-            v-model="form.nuvioPassword"
-            :type="showNuvioPassword ? 'text' : 'password'"
-            :placeholder="t.passwordPlaceholder"
-            autocomplete="current-password"
-            required
-            :aria-invalid="Boolean(errors.nuvioPassword)"
-            :aria-describedby="errors.nuvioPassword ? 'nuvio-password-error' : undefined"
-            @input="errors.nuvioPassword = ''"
-          />
-          <button
-            class="password-toggle"
-            type="button"
-            :aria-label="showNuvioPassword ? t.hideNuvioPassword : t.showNuvioPassword"
-            :aria-pressed="showNuvioPassword"
-            @click="showNuvioPassword = !showNuvioPassword"
-          >
-            <svg class="toggle-icon" viewBox="0 0 20 20" aria-hidden="true">
-              <path d="M2 10s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5Z"></path>
-              <circle cx="10" cy="10" r="2.5"></circle>
-            </svg>
-          </button>
-        </div>
-        <span v-if="errors.nuvioPassword" id="nuvio-password-error" class="field-error">{{ errors.nuvioPassword }}</span>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="form-section-title">
-        <span class="step-num">2</span>
-        <div>
-          <strong>{{ t.torboxTitle }}</strong>
-          <small>{{ t.torboxDesc }}</small>
-        </div>
-      </div>
-
-      <!-- TorBox Callout Box -->
-      <div class="torbox-callout">
-        <div class="callout-copy">
-          <strong>{{ t.needTorbox }}</strong>
-          <small class="ref-desc">
-            {{ t.torboxRefDesc }}
-            <svg viewBox="0 0 24 24" class="heart-icon" aria-hidden="true">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
-            </svg>
-          </small>
-        </div>
-        <a
-          href="https://torbox.app/subscription?referral=41d1ac85-ee5e-4699-9f0a-92e67cbc2fb2"
-          target="_blank"
-          rel="noreferrer"
-          class="callout-link"
-        >
-          {{ t.getTorbox }}
-          <svg viewBox="0 0 20 20" aria-hidden="true" class="external-icon">
-            <path d="M7 13 13 7M8 7h5v5"></path>
-          </svg>
-        </a>
-      </div>
-
-      <!-- TorBox API Key Field -->
-      <div class="form-field" :class="{ 'has-error': errors.torboxApiKey }">
-        <label for="torboxApiKey" class="field-label">{{ t.torboxKeyLabel }}</label>
-        <div class="input-container">
-          <svg class="field-icon" viewBox="0 0 20 20" aria-hidden="true">
-            <circle cx="7" cy="10" r="4"></circle>
-            <path d="M11 10h7M15 10v3M17 10v2"></path>
-          </svg>
-          <input
-            id="torboxApiKey"
-            v-model="form.torboxApiKey"
-            :type="showTorboxApiKey ? 'text' : 'password'"
-            :placeholder="t.torboxKeyPlaceholder"
-            autocomplete="off"
-            required
-            :aria-invalid="Boolean(errors.torboxApiKey)"
-            :aria-describedby="errors.torboxApiKey ? 'torbox-api-key-error' : undefined"
-            @input="errors.torboxApiKey = ''"
-          />
-          <button
-            class="password-toggle"
-            type="button"
-            :aria-label="showTorboxApiKey ? t.hideTorboxApiKey : t.showTorboxApiKey"
-            :aria-pressed="showTorboxApiKey"
-            @click="showTorboxApiKey = !showTorboxApiKey"
-          >
-            <svg class="toggle-icon" viewBox="0 0 20 20" aria-hidden="true">
-              <path d="M2 10s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5Z"></path>
-              <circle cx="10" cy="10" r="2.5"></circle>
-            </svg>
-          </button>
-        </div>
-        <div class="field-help">
-          {{ t.torboxHelp }}
-          <a href="https://torbox.app/settings" target="_blank" rel="noreferrer">{{ t.torboxHelpLink }}</a>.
-        </div>
-        <span v-if="errors.torboxApiKey" id="torbox-api-key-error" class="field-error">{{ errors.torboxApiKey }}</span>
-      </div>
-
-      <!-- AIOStreams Config Password Field -->
-      <div class="form-field" :class="{ 'has-error': errors.aiostreamsPassword }">
-        <label for="aiostreamsPassword" class="field-label">{{ t.aiostreamsPwdLabel }}</label>
-        <div class="input-container">
-          <svg class="field-icon" viewBox="0 0 20 20" aria-hidden="true">
-            <path d="M10 2v3M4.3 4.3l2.1 2.1M2 10h3M4.3 15.7l2.1-2.1M10 18v-3M15.7 15.7l-2.1-2.1M18 10h-3M15.7 4.3l-2.1 2.1"></path>
-          </svg>
-          <input
-            id="aiostreamsPassword"
-            v-model="form.aiostreamsPassword"
-            type="text"
-            required
-            :aria-invalid="Boolean(errors.aiostreamsPassword)"
-            :aria-describedby="errors.aiostreamsPassword ? 'aiostreams-password-error' : undefined"
-            @input="errors.aiostreamsPassword = ''"
-          />
-          <button class="text-btn-action" type="button" @click="generatePassword">
-            {{ t.regenerate }}
-          </button>
-        </div>
-        <div class="field-help">{{ t.aiostreamsPwdHelp }}</div>
-        <span v-if="errors.aiostreamsPassword" id="aiostreams-password-error" class="field-error">{{ errors.aiostreamsPassword }}</span>
-      </div>
-
-      <!-- Advanced Details -->
-      <details class="advanced-section" :open="advancedOpen" @toggle="advancedOpen = ($event.target as any).open">
-        <summary class="advanced-summary">
+      <div id="nuvio-quickstart-body" v-show="!isCollapsed" class="quickstart-body">
+        <header class="quickstart-intro">
           <div>
-            <strong>{{ t.advanced }}</strong>
-            <small>{{ t.advancedSub }}</small>
+            <span class="eyebrow">Guided setup</span>
+            <h2>Everything you need, in one pass.</h2>
+            <p>Connect your accounts and we’ll install a ready-to-use streaming setup.</p>
           </div>
-          <svg viewBox="0 0 20 20" aria-hidden="true" class="summary-arrow" :class="{ rotated: advancedOpen }">
-            <path d="m6 8 4 4 4-4"></path>
-          </svg>
-        </summary>
-        <div class="advanced-body">
-          <p class="advanced-desc-text">{{ t.advancedDesc }}</p>
-          <div class="form-field">
-            <label for="tmdbApiKey" class="field-label">{{ t.tmdbLabel }} <i class="optional-label">({{ t.optional }})</i></label>
-            <input
-              id="tmdbApiKey"
-              v-model="form.tmdbApiKey"
-              type="password"
-              class="simple-input"
-              autocomplete="off"
-            />
+          <div class="setup-summary" aria-label="Included in setup">
+            <span><i class="summary-dot summary-dot--brand"></i>AIOStreams</span>
+            <span><i class="summary-dot"></i>Cinemeta</span>
+            <span class="secure-pill">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="8" width="12" height="9" rx="2" /><path d="M7 8V6a3 3 0 0 1 6 0v2" /></svg>
+              {{ t.keysSecureNote }}
+            </span>
           </div>
-          <div class="form-field">
-            <label for="tvdbApiKey" class="field-label">{{ t.tvdbLabel }} <i class="optional-label">({{ t.optional }})</i></label>
-            <input
-              id="tvdbApiKey"
-              v-model="form.tvdbApiKey"
-              type="password"
-              class="simple-input"
-              autocomplete="off"
-            />
-          </div>
+        </header>
+
+        <div v-if="globalError" class="inline-alert" role="alert">
+          <span class="inline-alert__mark">!</span>
+          <div><strong>{{ t.setupStopped }}</strong><p>{{ globalError }}</p></div>
+          <button type="button" @click="handleRetry">{{ lastErrorField ? t.checkFieldBtn : t.retryBtn }}</button>
         </div>
-      </details>
 
-      <!-- Submit Button -->
-      <button class="btn-primary btn-large btn-submit" type="submit" :disabled="isSubmitting">
-        <span class="btn-content">
-          {{ t.submitBtn }}
-          <svg viewBox="0 0 20 20" aria-hidden="true" class="btn-arrow-icon">
-            <path d="M4 10h12M12 6l4 4-4 4"></path>
-          </svg>
-        </span>
-      </button>
+        <form v-if="currentView === 'form'" class="setup-form" novalidate @submit.prevent="submitSetup">
+          <section class="setup-panel">
+            <div class="panel-heading">
+              <div><h3>{{ t.nuvioAccount }}</h3><p>{{ t.newAccountsAuto }}</p></div>
+            </div>
 
-      <p class="privacy-text">{{ t.privacyNote }}</p>
-    </form>
+            <label class="field" :class="{ 'has-error': errors.email }">
+              <span>{{ t.emailLabel }}</span>
+              <input id="email" v-model="form.email" type="email" :placeholder="t.emailPlaceholder" autocomplete="email" required :aria-invalid="Boolean(errors.email)" :aria-describedby="errors.email ? 'email-error' : undefined" @input="errors.email = ''" />
+              <small v-if="errors.email" id="email-error">{{ errors.email }}</small>
+            </label>
 
-    <!-- PROGRESS VIEW -->
-    <div v-else-if="currentView === 'progress'" class="progress-panel" aria-live="polite">
-      <div class="progress-heading">
-        <div class="spinner"></div>
-        <div class="progress-heading-text">
-          <strong>{{ t.buildingTitle }}</strong>
-          <small>{{ progressMessage }}</small>
-        </div>
-      </div>
-      <ol class="progress-list">
-        <li :class="{ current: activeStep === 'details', done: completedSteps.includes('details') }">
-          <span></span>{{ t.validating }}
-        </li>
-        <li :class="{ current: activeStep === 'torbox', done: completedSteps.includes('torbox') }">
-          <span></span>{{ t.checkTorbox }}
-        </li>
-        <li :class="{ current: activeStep === 'nuvio', done: completedSteps.includes('nuvio') }">
-          <span></span>{{ t.connectNuvio }}
-        </li>
-        <li :class="{ current: activeStep === 'aiostreams', done: completedSteps.includes('aiostreams') }">
-          <span></span>{{ t.buildAiostreams }}
-        </li>
-        <li :class="{ current: activeStep === 'addons', done: completedSteps.includes('addons') }">
-          <span></span>{{ t.installAddons }}
-        </li>
-      </ol>
-    </div>
-
-    <!-- RESULT VIEW -->
-    <div v-else-if="currentView === 'result' && result" class="result-panel" aria-live="polite">
-      <div class="success-mark">
-        <svg viewBox="0 0 32 32" aria-hidden="true">
-          <path d="m8 16 5 5 11-11"></path>
-        </svg>
-      </div>
-      <span class="complete-label">{{ t.complete }}</span>
-      <h2 class="ready-title">{{ t.readyTitle }}</h2>
-      <p class="result-summary">
-        {{ result.email }} was {{ result.nuvioAccountCreated ? 'created' : 'connected' }}.
-        Both addons were installed on {{ result.installedProfiles }} profile{{ result.installedProfiles === 1 ? '' : 's' }}.
-      </p>
-
-      <div class="result-addons">
-        <span class="addon-tag">
-          <i class="addon-icon addon-icon-aio">
-            <svg viewBox="0 0 24 24" class="inline-logo-svg" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-              <polyline points="16 6 12 2 8 6"></polyline>
-              <line x1="12" y1="2" x2="12" y2="15"></line>
-            </svg>
-          </i>
-          {{ t.addonAio }}
-        </span>
-        <span class="addon-tag">
-          <i class="addon-icon addon-icon-cinema">
-            <svg viewBox="0 0 24 24" class="inline-logo-svg" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-              <line x1="7" y1="2" x2="7" y2="22"></line>
-              <line x1="17" y1="2" x2="17" y2="22"></line>
-              <line x1="2" y1="12" x2="22" y2="12"></line>
-              <line x1="2" y1="7" x2="7" y2="7"></line>
-              <line x1="2" y1="17" x2="7" y2="17"></line>
-              <line x1="17" y1="17" x2="22" y2="17"></line>
-              <line x1="17" y1="7" x2="22" y2="7"></line>
-            </svg>
-          </i>
-          {{ t.addonCinema }}
-        </span>
-      </div>
-
-      <div class="manifest-field">
-        <label for="manifestUrl" class="manifest-field-label">{{ t.manifestLabel }}</label>
-        <div class="manifest-copy-row">
-          <input id="manifestUrl" :value="result.aiostreamsManifest" readonly />
-          <button class="copy-btn" type="button" @click="handleCopy">
-            {{ copySuccess ? t.copied : t.copy }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Credentials block -->
-      <div class="credentials-block">
-        <div class="credentials-header">
-          <svg viewBox="0 0 20 20" aria-hidden="true" class="cred-icon">
-            <rect x="3" y="8" width="14" height="10" rx="3"></rect>
-            <path d="M6 8V6a4 4 0 0 1 8 0v2"></path>
-          </svg>
-          <strong>{{ t.yourCredentials }}</strong>
-          <span class="cred-save-note">{{ t.credentialsNote }}</span>
-        </div>
-        <div class="cred-rows">
-          <!-- Nuvio account — only shown if a new account was created -->
-          <template v-if="result.nuvioAccountCreated">
-            <div class="cred-row">
-              <span class="cred-label">
-                {{ t.nuvioEmail }}
-                <span class="cred-badge">{{ t.newAccountBadge }}</span>
+            <label class="field" :class="{ 'has-error': errors.nuvioPassword }">
+              <span>{{ t.passwordLabel }}</span>
+              <span class="input-action">
+                <input id="nuvioPassword" v-model="form.nuvioPassword" :type="showNuvioPassword ? 'text' : 'password'" :placeholder="t.passwordPlaceholder" autocomplete="current-password" required :aria-invalid="Boolean(errors.nuvioPassword)" :aria-describedby="errors.nuvioPassword ? 'nuvio-password-error' : undefined" @input="errors.nuvioPassword = ''" />
+                <button type="button" :aria-label="showNuvioPassword ? t.hideNuvioPassword : t.showNuvioPassword" :aria-pressed="showNuvioPassword" @click="showNuvioPassword = !showNuvioPassword">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 10s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5Z" /><circle cx="10" cy="10" r="2.5" /></svg>
+                </button>
               </span>
-              <span class="cred-value">{{ result.email }}</span>
+              <small v-if="errors.nuvioPassword" id="nuvio-password-error">{{ errors.nuvioPassword }}</small>
+            </label>
+          </section>
+
+          <section class="setup-panel">
+            <div class="panel-heading">
+              <div><h3>{{ t.torboxTitle }}</h3><p>{{ t.torboxDesc }}</p></div>
             </div>
-            <div class="cred-row">
-              <span class="cred-label">{{ t.nuvioPasswordLabel }}</span>
-              <span class="cred-value mono">{{ result.nuvioPassword }}</span>
+
+            <label class="field" :class="{ 'has-error': errors.torboxApiKey }">
+              <span class="field-label-row">
+                <span>{{ t.torboxKeyLabel }}</span>
+                <a href="https://torbox.app/settings" target="_blank" rel="noreferrer">{{ t.torboxHelpLink }} ↗</a>
+              </span>
+              <span class="input-action">
+                <input id="torboxApiKey" v-model="form.torboxApiKey" :type="showTorboxApiKey ? 'text' : 'password'" :placeholder="t.torboxKeyPlaceholder" autocomplete="off" required :aria-invalid="Boolean(errors.torboxApiKey)" :aria-describedby="errors.torboxApiKey ? 'torbox-api-key-error' : undefined" @input="errors.torboxApiKey = ''" />
+                <button type="button" :aria-label="showTorboxApiKey ? t.hideTorboxApiKey : t.showTorboxApiKey" :aria-pressed="showTorboxApiKey" @click="showTorboxApiKey = !showTorboxApiKey">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 10s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5Z" /><circle cx="10" cy="10" r="2.5" /></svg>
+                </button>
+              </span>
+              <small v-if="errors.torboxApiKey" id="torbox-api-key-error">{{ errors.torboxApiKey }}</small>
+            </label>
+
+            <a class="torbox-referral" href="https://torbox.app/subscription?referral=41d1ac85-ee5e-4699-9f0a-92e67cbc2fb2" target="_blank" rel="noreferrer">
+              <span><strong>{{ t.needTorbox }}</strong><small>{{ t.torboxRefDesc }}</small></span>
+              <span>{{ t.getTorbox }} ↗</span>
+            </a>
+          </section>
+
+          <details class="advanced" :open="advancedOpen" @toggle="advancedOpen = ($event.target as any).open">
+            <summary>
+              <span><strong>{{ t.advanced }}</strong><small>{{ t.advancedSub }}</small></span>
+              <svg viewBox="0 0 20 20" aria-hidden="true" :class="{ rotated: advancedOpen }"><path d="m6 8 4 4 4-4" /></svg>
+            </summary>
+            <div class="advanced-fields">
+              <label class="field advanced-password" :class="{ 'has-error': errors.aiostreamsPassword }">
+                <span>{{ t.aiostreamsPwdLabel }}</span>
+                <span class="input-action input-action--text">
+                  <input id="aiostreamsPassword" v-model="form.aiostreamsPassword" type="text" required :aria-invalid="Boolean(errors.aiostreamsPassword)" :aria-describedby="errors.aiostreamsPassword ? 'aiostreams-password-error' : undefined" @input="errors.aiostreamsPassword = ''" />
+                  <button type="button" @click="generatePassword">{{ t.regenerate }}</button>
+                </span>
+                <small v-if="errors.aiostreamsPassword" id="aiostreams-password-error">{{ errors.aiostreamsPassword }}</small>
+                <em v-else>{{ t.aiostreamsPwdHelp }}</em>
+              </label>
+              <p>{{ t.advancedDesc }}</p>
+              <label class="field"><span>{{ t.tmdbLabel }} <i>{{ t.optional }}</i></span><input id="tmdbApiKey" v-model="form.tmdbApiKey" type="password" autocomplete="off" /></label>
+              <label class="field"><span>{{ t.tvdbLabel }} <i>{{ t.optional }}</i></span><input id="tvdbApiKey" v-model="form.tvdbApiKey" type="password" autocomplete="off" /></label>
             </div>
-          </template>
-          <!-- AIOStreams password — always shown -->
-          <div class="cred-row">
-            <span class="cred-label">{{ t.aiostreamsPasswordLabel }}</span>
-            <span class="cred-value mono">{{ result.aiostreamsPassword }}</span>
+          </details>
+
+          <footer class="form-footer">
+            <p>{{ t.privacyNote }}</p>
+            <button class="primary-action" type="submit" :disabled="isSubmitting">
+              {{ t.submitBtn }}
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M12 6l4 4-4 4" /></svg>
+            </button>
+          </footer>
+        </form>
+
+        <div v-else-if="currentView === 'progress'" class="state-view" aria-live="polite">
+          <div class="state-heading"><span class="loader"></span><div><span class="eyebrow">In progress</span><h2>{{ t.buildingTitle }}</h2><p>{{ progressMessage }}</p></div></div>
+          <ol class="step-track">
+            <li v-for="step in [
+              { id: 'details', label: t.validating },
+              { id: 'torbox', label: t.checkTorbox },
+              { id: 'nuvio', label: t.connectNuvio },
+              { id: 'aiostreams', label: t.buildAiostreams },
+              { id: 'addons', label: t.installAddons }
+            ]" :key="step.id" :class="{ active: activeStep === step.id, done: completedSteps.includes(step.id) }">
+              <i></i><span>{{ step.label }}</span>
+            </li>
+          </ol>
+        </div>
+
+        <div v-else-if="currentView === 'result' && result" class="state-view result-view" aria-live="polite">
+          <div class="success-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg></div>
+          <span class="eyebrow">{{ t.complete }}</span>
+          <h2>{{ t.readyTitle }}</h2>
+          <p>{{ result.email }} was {{ result.nuvioAccountCreated ? 'created' : 'connected' }}. AIOStreams and Cinemeta were installed on {{ result.installedProfiles }} profile{{ result.installedProfiles === 1 ? '' : 's' }}.</p>
+
+          <div class="result-grid">
+            <section>
+              <span class="result-label">{{ t.manifestLabel }}</span>
+              <div class="copy-row"><input :value="result.aiostreamsManifest" readonly /><button type="button" @click="handleCopy">{{ copySuccess ? t.copied : t.copy }}</button></div>
+            </section>
+            <section class="credentials">
+              <span class="result-label">{{ t.yourCredentials }}</span>
+              <p>{{ t.credentialsNote }}</p>
+              <dl>
+                <template v-if="result.nuvioAccountCreated"><dt>{{ t.nuvioEmail }}</dt><dd>{{ result.email }}</dd><dt>{{ t.nuvioPasswordLabel }}</dt><dd><code>{{ result.nuvioPassword }}</code></dd></template>
+                <dt>{{ t.aiostreamsPasswordLabel }}</dt><dd><code>{{ result.aiostreamsPassword }}</code></dd>
+              </dl>
+            </section>
+          </div>
+
+          <div class="result-actions">
+            <a :href="result.aiostreamsConfigureUrl" target="_blank" rel="noreferrer">{{ t.openAioSettings }} ↗</a>
+            <button type="button" @click="startOver">{{ t.startOver }}</button>
           </div>
         </div>
       </div>
-
-      <div class="result-actions">
-        <a :href="result.aiostreamsConfigureUrl" class="btn-primary btn-aio-settings" target="_blank" rel="noreferrer">
-          {{ t.openAioSettings }}
-        </a>
-        <button class="btn-secondary" type="button" @click="startOver">
-          {{ t.startOver }}
-        </button>
-      </div>
-
-      <p class="result-note">
-        {{
-          result.metadataMatchingEnabled
-            ? `Tam-Taro Complete SEL v${result.tamTemplateVersion} was applied with metadata matching enabled.`
-            : `Tam-Taro Complete SEL v${result.tamTemplateVersion} was applied. Metadata-dependent matching is disabled because no TMDB key was supplied.`
-        }}
-      </p>
-    </div>
-    </div>
-    </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
-.nuvio-quickstart-wrapper {
-  margin: 28px 0;
-}
-
-.toggler-tip {
-  margin-bottom: 16px !important;
-}
-
-.nuvio-quickstart {
-  --qs-success: color-mix(in srgb, #10b981 66%, var(--vp-c-text-1));
-  --qs-warning: color-mix(in srgb, #f59e0b 55%, var(--vp-c-text-1));
-  --qs-danger: color-mix(in srgb, #ef4444 74%, var(--vp-c-text-1));
-  border: 1px solid var(--vp-c-border);
-  border-radius: 14px;
-  background: var(--vp-c-bg-elv);
-  padding: 16px 20px;
-  margin: 16px 0 28px 0;
-  color: var(--vp-c-text-1);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--vp-c-text-1) 8%, transparent);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, padding 0.2s ease;
-}
-
-.nuvio-quickstart.is-expanded {
-  border-color: color-mix(in srgb, var(--vp-c-brand-1) 24%, var(--vp-c-border));
-  padding: 20px 24px 24px;
-}
-
-.nuvio-quickstart.is-standalone {
-  border: none;
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  box-shadow: none;
-}
-
-.qs-header {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  border: 0;
-  border-bottom: 1px solid transparent;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  appearance: none;
-  padding: 0;
-  margin-bottom: 0;
-  cursor: pointer;
-  user-select: none;
-  transition: border-color 0.2s, padding-bottom 0.2s, margin-bottom 0.2s;
-}
-
-.qs-header:focus-visible {
-  outline: 2px solid var(--vp-c-brand-1);
-  outline-offset: 3px;
-  border-radius: 6px;
-}
-
-.nuvio-quickstart.is-expanded .qs-header {
-  border-bottom-color: var(--vp-c-divider);
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-}
-
-.qs-meta-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--vp-c-text-2);
-}
-
-.qs-brand {
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
-  color: var(--vp-c-text-1);
-}
-
-.logo-mark {
-  width: 30px;
-  height: 30px;
-  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 32%, var(--vp-c-border));
-  border-radius: 8px;
-  background: var(--vp-c-brand-soft);
-  object-fit: contain;
-  fill: none;
-  stroke: var(--vp-c-brand-1);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.qs-brand-text {
-  font-family: var(--vp-font-family-base);
-  font-size: 14px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-}
-
-.secure-note {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-  color: var(--vp-c-text-2);
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.icon-secure {
-  width: 14px;
-  height: 14px;
-  fill: none;
-  stroke: var(--qs-success);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2;
-}
-
-.form-section-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.step-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 30%, var(--vp-c-border));
-  border-radius: 7px;
-  background: var(--vp-c-brand-soft);
-  color: var(--vp-c-brand-1);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.form-section-title strong {
-  display: block;
-  font-size: 15px;
-  font-weight: 650;
-  color: var(--vp-c-text-1);
-}
-
-.form-section-title small {
-  display: block;
-  font-size: 12px;
-  color: var(--vp-c-text-2);
-  line-height: 1.2;
-}
-
-.form-field {
-  margin-bottom: 18px;
-}
-
-.qs-form,
-.progress-panel,
-.result-panel {
-  max-width: 640px;
-  margin-right: auto;
-  margin-left: auto;
-}
-
-.field-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: var(--vp-c-text-1);
-}
-
-.input-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-.field-icon {
-  position: absolute;
-  left: 12px;
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: var(--vp-c-text-3);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
-  pointer-events: none;
-}
-
-.input-container input {
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 12px 10px 40px;
-  border: 1px solid var(--vp-c-border);
-  border-radius: 8px;
-  background: var(--vp-c-bg-alt);
-  color: var(--vp-c-text-1);
-  font-size: 14px;
-  line-height: 1.4;
-  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
-  outline: none;
-}
-
-.input-container input:hover,
-.simple-input:hover {
-  border-color: color-mix(in srgb, var(--vp-c-brand-1) 22%, var(--vp-c-border));
-}
-
-.input-container input:focus {
-  border-color: var(--vp-c-brand-1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vp-c-brand-1) 15%, transparent);
-}
-
-.password-toggle {
-  position: absolute;
-  right: 4px;
-  min-width: 36px;
-  min-height: 36px;
-  border: none;
-  border-radius: 6px;
-  background: none;
-  color: var(--vp-c-text-2);
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.password-toggle:hover {
-  color: var(--vp-c-text-1);
-}
-
-.toggle-icon {
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.text-btn-action {
-  position: absolute;
-  right: 4px;
-  min-height: 36px;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 8px;
-  background: none;
-  border: none;
-  border-radius: 6px;
-  color: var(--vp-c-brand-1);
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.text-btn-action:hover {
-  text-decoration: underline;
-}
-
-.field-help {
-  font-size: 11px;
-  color: var(--vp-c-text-3);
-  margin-top: 4px;
-  line-height: 1.45;
-}
-
-.field-help a {
-  color: var(--vp-c-brand-1);
-  text-decoration: underline;
-}
-
-.field-error {
-  display: block;
-  font-size: 11px;
-  color: var(--qs-danger);
-  margin-top: 4px;
-}
-
-.form-field.has-error input {
-  border-color: var(--qs-danger);
-}
-
-.form-field.has-error input:focus {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--qs-danger) 16%, transparent);
-}
-
-.divider {
-  height: 1px;
-  background: var(--vp-c-divider);
-  margin: 24px 0;
-}
-
-.torbox-callout {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: color-mix(in srgb, var(--vp-c-brand-1) 6%, var(--vp-c-bg-alt));
-  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 24%, var(--vp-c-border));
-  border-radius: 10px;
-  padding: 13px 14px;
-  margin-bottom: 18px;
-  gap: 12px;
-}
-
-.callout-copy {
-  display: flex;
-  flex-direction: column;
-}
-
-.callout-copy strong {
-  font-size: 13px;
-  color: var(--vp-c-text-1);
-}
-
-.callout-copy small {
-  font-size: 11px;
-  color: var(--vp-c-text-2);
-}
-
-.ref-desc {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.heart-icon {
-  width: 12px;
-  height: 12px;
-  fill: #f43f5e;
-  stroke: none;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.callout-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--vp-c-bg-elv);
-  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 35%, var(--vp-c-border));
-  color: var(--vp-c-brand-1) !important;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 8px 10px;
-  border-radius: 6px;
-  text-decoration: none !important;
-  transition: background-color 0.15s, border-color 0.15s;
-  white-space: nowrap;
-}
-
-.callout-link:hover {
-  background: var(--vp-c-brand-soft);
-  border-color: var(--vp-c-brand-1);
-}
-
-.external-icon {
-  width: 12px;
-  height: 12px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.2;
-}
-
-.advanced-section {
-  border: 1px solid var(--vp-c-border);
-  border-radius: 10px;
-  background: var(--vp-c-bg-soft);
-  padding: 12px 16px;
-  margin-bottom: 24px;
-}
-
-.advanced-summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-}
-
-.advanced-summary::-webkit-details-marker {
-  display: none;
-}
-
-.advanced-summary div {
-  display: flex;
-  flex-direction: column;
-}
-
-.advanced-summary strong {
-  font-size: 13px;
-  color: var(--vp-c-text-1);
-}
-
-.advanced-summary small {
-  font-size: 11px;
-  color: var(--vp-c-text-2);
-}
-
-.summary-arrow {
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: var(--vp-c-text-3);
-  stroke-width: 2;
-  transition: transform 0.2s;
-}
-
-.summary-arrow.rotated {
-  transform: rotate(180deg);
-}
-
-.advanced-body {
-  margin-top: 14px;
-  border-top: 1px solid var(--vp-c-divider);
-  padding-top: 14px;
-}
-
-.advanced-desc-text {
-  font-size: 12px;
-  color: var(--vp-c-text-2);
-  margin-bottom: 14px;
-  line-height: 1.5;
-}
-
-.simple-input {
-  width: 100%;
-  min-height: 42px;
-  padding: 8px 12px;
-  border: 1px solid var(--vp-c-border);
-  border-radius: 8px;
-  background: var(--vp-c-bg-alt);
-  color: var(--vp-c-text-1);
-  font-size: 13px;
-  outline: none;
-}
-
-.simple-input:focus {
-  border-color: var(--vp-c-brand-1);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vp-c-brand-1) 15%, transparent);
-}
-
-.optional-label {
-  font-weight: normal;
-  font-size: 11px;
-  color: var(--vp-c-text-3);
-}
-
-.btn-primary {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
-  background: var(--vp-c-brand-1);
-  color: #ffffff;
-  border: 1px solid var(--vp-c-brand-1);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--vp-c-brand-1) 24%, transparent);
-  transition: background-color 0.15s, box-shadow 0.15s, transform 0.1s;
-}
-
-.btn-primary:hover {
-  background: var(--vp-c-brand-2);
-  box-shadow: 0 4px 10px color-mix(in srgb, var(--vp-c-brand-1) 20%, transparent);
-}
-
-.btn-primary:active {
-  transform: scale(0.98);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.btn-large {
-  width: 100%;
-  padding: 12px 18px;
-}
-
-.btn-content {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-arrow-icon {
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2;
-}
-
-.privacy-text {
-  font-size: 11px;
-  color: var(--vp-c-text-3);
-  text-align: center;
-  margin-top: 14px;
-  line-height: 1.4;
-}
-
-/* PROGRESS STYLES */
-.progress-panel {
-  padding: 24px 8px;
-}
-
-.progress-heading {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 2px solid var(--vp-c-divider);
-  border-top-color: var(--vp-c-brand-1);
-  border-radius: 50%;
-  animation: spin 850ms linear infinite;
-  flex-shrink: 0;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.progress-heading-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.progress-heading-text strong {
-  font-size: 16px;
-  color: var(--vp-c-text-1);
-}
-
-.progress-heading-text small {
-  font-size: 12px;
-  color: var(--vp-c-text-2);
-  margin-top: 2px;
-}
-
-.progress-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.progress-list li {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding-bottom: 24px;
-  color: var(--vp-c-text-2);
-  font-size: 13px;
-  transition: color 0.3s;
-}
-
-.progress-list li:last-child {
-  padding-bottom: 0;
-}
-
-.progress-list li:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  left: 6px;
-  top: 16px;
-  bottom: 0;
-  width: 1px;
-  background: var(--vp-c-divider);
-}
-
-.progress-list li > span {
-  position: relative;
-  z-index: 2;
-  width: 13px;
-  height: 13px;
-  border: 2px solid var(--vp-c-divider);
-  border-radius: 50%;
-  background: var(--vp-c-bg-alt);
-  margin-top: 3px;
-  flex-shrink: 0;
-  transition: border-color 0.3s, background-color 0.3s;
-}
-
-.progress-list li.current {
-  color: var(--vp-c-text-1);
-  font-weight: 600;
-}
-
-.progress-list li.current > span {
-  border-color: var(--vp-c-brand-1);
-  background: color-mix(in srgb, var(--vp-c-brand-1) 20%, var(--vp-c-bg-alt));
-}
-
-.progress-list li.done {
-  color: var(--vp-c-text-1);
-}
-
-.progress-list li.done > span {
-  border-color: var(--qs-success);
-  background: var(--qs-success);
-}
-
-/* ERROR PANEL */
-.error-panel {
-  display: flex;
-  align-items: center;
-  max-width: 640px;
-  background: color-mix(in srgb, var(--qs-danger) 8%, var(--vp-c-bg-soft));
-  border: 1px solid color-mix(in srgb, var(--qs-danger) 58%, var(--vp-c-border));
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin: 0 auto 24px;
-  gap: 14px;
-}
-
-.error-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--qs-danger);
-  color: #ffffff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.error-content {
-  flex-grow: 1;
-}
-
-.error-title {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--vp-c-text-1);
-}
-
-.error-desc {
-  font-size: 11px;
-  color: var(--qs-danger);
-  margin: 2px 0 0 0;
-  line-height: 1.4;
-}
-
-.retry-btn {
-  background: transparent;
-  border: 1px solid var(--qs-danger);
-  color: var(--qs-danger);
-  font-size: 11px;
-  font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.retry-btn:hover {
-  background: var(--qs-danger);
-  color: #ffffff;
-}
-
-/* RESULT PANEL */
-.result-panel {
-  text-align: center;
-  padding: 16px 0;
-}
-
-.success-mark {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--qs-success) 12%, var(--vp-c-bg-soft));
-  border: 1px solid color-mix(in srgb, var(--qs-success) 58%, var(--vp-c-border));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-  color: var(--qs-success);
-}
-
-.success-mark svg {
-  width: 26px;
-  height: 26px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.complete-label {
-  display: block;
-  font-family: var(--vp-font-family-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--qs-success);
-  margin-bottom: 6px;
-}
-
-.ready-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin-top: 0;
-  margin-bottom: 8px;
-  color: var(--vp-c-text-1);
-}
-
-.result-summary {
-  font-size: 13px;
-  color: var(--vp-c-text-2);
-  margin-bottom: 24px;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.result-addons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 24px;
-}
-
-.addon-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--vp-c-bg-alt);
-  border: 1px solid var(--vp-c-border);
-  border-radius: 8px;
-  padding: 6px 12px 6px 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--vp-c-text-1);
-}
-
-.addon-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-}
-
-.addon-icon-aio {
-  background: var(--vp-c-brand-1);
-}
-
-.addon-icon-cinema {
-  background: #4b5563;
-}
-
-.inline-logo-svg {
-  width: 14px;
-  height: 14px;
-}
-
-.manifest-field {
-  text-align: left;
-  max-width: 480px;
-  margin: 0 auto 24px;
-}
-
-.manifest-field-label {
-  display: block;
-  font-family: var(--vp-font-family-mono);
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--vp-c-text-2);
-  margin-bottom: 6px;
-}
-
-.manifest-copy-row {
-  display: flex;
-  border: 1px solid var(--vp-c-border);
-  border-radius: 8px;
-  background: var(--vp-c-bg-alt);
-  overflow: hidden;
-}
-
-.manifest-copy-row input {
-  flex-grow: 1;
-  border: none;
-  background: transparent;
-  padding: 10px 12px;
-  font-size: 11px;
-  font-family: var(--vp-font-family-mono);
-  color: var(--vp-c-text-1);
-  outline: none;
-}
-
-.copy-btn {
-  background: var(--vp-c-brand-1);
-  color: #ffffff;
-  border: none;
-  padding: 0 16px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.copy-btn:hover {
-  background: var(--vp-c-brand-2);
-}
-
-.result-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 24px;
-}
-
-.btn-aio-settings {
-  text-decoration: none !important;
-  font-size: 13px;
-  padding: 10px 20px;
-}
-
-.btn-secondary {
-  background: transparent;
-  min-height: 44px;
-  border: 1px solid var(--vp-c-border);
-  color: var(--vp-c-text-1);
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.btn-secondary:hover {
-  background: var(--vp-c-bg-soft);
-}
-
-.result-note {
-  font-size: 11px;
-  color: var(--vp-c-text-2);
-  background: var(--vp-c-bg-alt);
-  border: 1px solid var(--vp-c-border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  display: inline-block;
-  max-width: 500px;
-  text-align: left;
-  line-height: 1.4;
-}
-
-/* CREDENTIALS BLOCK */
-.credentials-block {
-  text-align: left;
-  max-width: 480px;
-  margin: 0 auto 24px;
-  border: 1px solid color-mix(in srgb, var(--qs-warning) 48%, var(--vp-c-border));
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--qs-warning) 7%, var(--vp-c-bg-alt));
-  overflow: hidden;
-}
-
-.credentials-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-bottom: 1px solid color-mix(in srgb, var(--qs-warning) 36%, var(--vp-c-border));
-  flex-wrap: wrap;
-}
-
-.credentials-header strong {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--qs-warning);
-}
-
-.cred-save-note {
-  font-size: 11px;
-  color: var(--qs-warning);
-  margin-left: auto;
-}
-
-.cred-icon {
-  width: 14px;
-  height: 14px;
-  fill: none;
-  stroke: var(--qs-warning);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
-  flex-shrink: 0;
-}
-
-.cred-rows {
-  padding: 0;
-}
-
-.cred-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 9px 14px;
-  border-bottom: 1px solid var(--vp-c-divider);
-}
-
-.cred-row:last-child {
-  border-bottom: none;
-}
-
-.cred-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--vp-c-text-2);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.cred-badge {
-  display: inline-block;
-  background: color-mix(in srgb, var(--qs-success) 15%, transparent);
-  color: var(--qs-success);
-  border: 1px solid var(--qs-success);
-  border-radius: 4px;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 1px 5px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.cred-value {
-  font-size: 12px;
-  color: var(--vp-c-text-1);
-  text-align: right;
-  word-break: break-all;
-}
-
-.cred-value.mono {
-  font-family: var(--vp-font-family-mono);
-  font-size: 11px;
-  color: var(--qs-warning);
-}
-
-.password-toggle:focus-visible,
-.text-btn-action:focus-visible,
-.field-help a:focus-visible,
-.callout-link:focus-visible,
-.advanced-summary:focus-visible,
-.btn-primary:focus-visible,
-.btn-secondary:focus-visible,
-.copy-btn:focus-visible,
-.retry-btn:focus-visible {
-  outline: 2px solid var(--vp-c-brand-1);
-  outline-offset: 2px;
-}
-
-/* Prevent text overlapping with absolute buttons/toggles */
-.input-container input:has(+ .password-toggle) {
-  padding-right: 48px;
-}
-
-.input-container input:has(+ .text-btn-action) {
-  padding-right: 96px;
-}
-
-@media (max-width: 600px) {
-  .error-panel {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .error-content {
-    min-width: 0;
-  }
-
-  .retry-btn {
-    margin-left: 42px;
-  }
-}
-
-/* Mobile responsive styles */
-@media (max-width: 480px) {
-  .nuvio-quickstart {
-    padding: 16px 14px;
-    margin: 12px 0 20px 0;
-  }
-  
-  .nuvio-quickstart.is-expanded {
-    padding: 18px 14px;
-  }
-
-  .nuvio-quickstart.is-standalone,
-  .nuvio-quickstart.is-standalone.is-expanded {
-    padding: 0;
-    margin: 0;
-  }
-
-  .qs-header {
-    gap: 8px;
-  }
-
-  .qs-brand-text {
-    font-size: 13px;
-  }
-
-  .input-container input,
-  .simple-input {
-    font-size: 16px;
-  }
-
-  .secure-note-text {
-    display: none;
-  }
-
-  .secure-note {
-    gap: 0;
-  }
-
-  .torbox-callout {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    text-align: center;
-    padding: 14px;
-  }
-
-  .callout-link {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .result-actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .result-actions .btn-primary,
-  .result-actions .btn-secondary {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .cred-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    padding: 10px 12px;
-  }
-
-  .cred-value {
-    text-align: left;
-    width: 100%;
-  }
-
-  .copy-btn {
-    padding: 0 12px;
-    font-size: 11px;
-  }
+.quickstart-shell { --qs-radius: 14px; color: var(--vp-c-text-1); }
+.quickstart-tip { display: flex; gap: 10px; margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--vp-c-divider); border-radius: 10px; background: var(--vp-c-bg-soft); font-size: 13px; }
+.quickstart-tip span { color: var(--vp-c-text-2); }
+.quickstart-card { overflow: hidden; border: 1px solid var(--vp-c-divider); border-radius: var(--qs-radius); background: var(--vp-c-bg); }
+.quickstart-card.is-standalone { border: 0; border-radius: 0; background: transparent; }
+.quickstart-toggle { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 15px 18px; border: 0; background: transparent; color: inherit; cursor: pointer; }
+.quickstart-toggle__identity { display: flex; align-items: center; gap: 11px; text-align: left; }
+.quickstart-toggle__identity img { width: 32px; height: 32px; }
+.quickstart-toggle__identity span { display: grid; }
+.quickstart-toggle__identity strong { font-size: 14px; }
+.quickstart-toggle__identity small { color: var(--vp-c-text-3); }
+.quickstart-toggle > svg, .advanced summary svg { width: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; transition: transform .2s ease; }
+.rotated { transform: rotate(180deg); }
+.quickstart-body { padding: 22px; }
+.quickstart-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--vp-c-divider); }
+.eyebrow { display: block; margin-bottom: 5px; color: var(--vp-c-brand-1); font: 700 10px/1.2 var(--vp-font-family-mono); letter-spacing: .1em; text-transform: uppercase; }
+.quickstart-intro h2, .state-view h2 { margin: 0 !important; border: 0 !important; font-size: 21px !important; line-height: 1.25; }
+.quickstart-intro p, .state-view > p { margin: 6px 0 0; max-width: 550px; color: var(--vp-c-text-2); font-size: 13px; line-height: 1.55; }
+.setup-summary { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px 14px; min-width: 300px; color: var(--vp-c-text-2); font-size: 11px; }
+.setup-summary > span { display: inline-flex; align-items: center; gap: 6px; }
+.summary-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--vp-c-text-3); }
+.summary-dot--brand { background: var(--vp-c-brand-1); }
+.secure-pill { width: 100%; justify-content: flex-end; color: var(--vp-c-text-3); }
+.secure-pill svg { width: 13px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.inline-alert { display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 12px; border: 1px solid var(--vp-c-danger-2); border-radius: 10px; background: color-mix(in srgb, var(--vp-c-danger-1) 7%, transparent); }
+.inline-alert__mark { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: var(--vp-c-danger-1); color: white; font-weight: 800; }
+.inline-alert div { flex: 1; }
+.inline-alert strong { font-size: 12px; }
+.inline-alert p { margin: 1px 0 0; color: var(--vp-c-danger-1); font-size: 11px; }
+.inline-alert button { border: 0; background: transparent; color: var(--vp-c-danger-1); font-weight: 700; cursor: pointer; }
+.setup-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-top: 18px; }
+.setup-panel { display: flex; flex-direction: column; gap: 14px; padding: 17px; border: 1px solid var(--vp-c-divider); border-radius: 12px; background: var(--tool-surface-alt, var(--vp-c-bg-alt)); }
+.panel-heading { margin-bottom: 1px; }
+.panel-heading h3 { margin: 0 !important; font-size: 14px !important; }
+.panel-heading p { margin: 2px 0 0; color: var(--vp-c-text-3); font-size: 11px; }
+.field { display: grid; gap: 6px; margin: 0; }
+.field > span:first-child, .field-label-row { color: var(--vp-c-text-2); font-size: 11px; font-weight: 650; }
+.field input { box-sizing: border-box; width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid var(--vp-c-divider); border-radius: 8px; outline: none; background: var(--vp-c-bg); color: var(--vp-c-text-1); font: 13px var(--vp-font-family-base); transition: border-color .15s, box-shadow .15s; }
+.field input:focus { border-color: var(--vp-c-brand-1); box-shadow: 0 0 0 3px var(--vp-c-brand-soft); }
+.field input::placeholder { color: var(--vp-c-text-3); }
+.field.has-error input { border-color: var(--vp-c-danger-1); }
+.field small { color: var(--vp-c-danger-1); font-size: 10px; }
+.field em { color: var(--vp-c-text-3); font-size: 10px; font-style: normal; }
+.field i { color: var(--vp-c-text-3); font-weight: 400; font-style: normal; }
+.field-label-row { display: flex; justify-content: space-between; gap: 10px; }
+.field-label-row a { color: var(--vp-c-brand-1); font-weight: 500; text-decoration: none; }
+.input-action { position: relative; display: block; }
+.input-action input { padding-right: 44px; }
+.input-action button { position: absolute; top: 5px; right: 5px; height: 32px; padding: 0 8px; border: 0; border-radius: 6px; background: transparent; color: var(--vp-c-text-3); font-size: 10px; font-weight: 700; cursor: pointer; }
+.input-action button:hover { background: var(--vp-c-bg-alt); color: var(--vp-c-text-1); }
+.input-action svg { width: 17px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.input-action--text input { padding-right: 88px; font-family: var(--vp-font-family-mono); font-size: 11px; }
+.torbox-referral { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: auto; padding-top: 11px; border-top: 1px solid var(--vp-c-divider); color: inherit; text-decoration: none !important; }
+.torbox-referral > span:first-child { display: grid; }
+.torbox-referral strong { font-size: 11px; }
+.torbox-referral small { color: var(--vp-c-text-3); font-size: 9px; }
+.torbox-referral > span:last-child { color: var(--vp-c-brand-1); font-size: 10px; font-weight: 700; white-space: nowrap; }
+.advanced { grid-column: 1 / -1; border: 1px solid var(--vp-c-divider); border-radius: 10px; }
+.advanced summary { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; list-style: none; }
+.advanced summary::-webkit-details-marker { display: none; }
+.advanced summary > span { display: grid; }
+.advanced summary strong { font-size: 11px; }
+.advanced summary small { color: var(--vp-c-text-3); font-size: 10px; }
+.advanced-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0 14px 14px; }
+.advanced-password { grid-column: 1 / -1; }
+.advanced-fields > p { grid-column: 1 / -1; margin: 0; color: var(--vp-c-text-2); font-size: 11px; }
+.form-footer { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 25px; padding-top: 2px; }
+.form-footer p { margin: 0; max-width: 620px; color: var(--vp-c-text-3); font-size: 10px; line-height: 1.4; }
+.primary-action { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 42px; padding: 0 17px; border: 0; border-radius: 8px; background: var(--vp-c-brand-1); color: white; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.primary-action:hover { background: var(--vp-c-brand-2); }
+.primary-action:disabled { opacity: .6; cursor: wait; }
+.primary-action svg { width: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+.state-view { max-width: 760px; margin: 0 auto; padding: 54px 20px; }
+.state-heading { display: flex; align-items: center; gap: 17px; }
+.state-heading p { margin: 4px 0 0; color: var(--vp-c-text-2); font-size: 12px; }
+.loader { width: 38px; height: 38px; border: 2px solid var(--vp-c-divider); border-top-color: var(--vp-c-brand-1); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.step-track { display: grid; grid-template-columns: repeat(5, 1fr); padding: 0; margin: 38px 0 0; list-style: none; }
+.step-track li { position: relative; display: grid; justify-items: center; gap: 9px; color: var(--vp-c-text-3); font-size: 10px; text-align: center; }
+.step-track li:not(:last-child)::after { content: ''; position: absolute; top: 5px; left: calc(50% + 8px); width: calc(100% - 16px); height: 1px; background: var(--vp-c-divider); }
+.step-track i { z-index: 1; width: 11px; height: 11px; border: 2px solid var(--vp-c-divider); border-radius: 50%; background: var(--vp-c-bg); }
+.step-track li.active { color: var(--vp-c-text-1); font-weight: 700; }
+.step-track li.active i { border-color: var(--vp-c-brand-1); }
+.step-track li.done i { border-color: var(--vp-c-brand-1); background: var(--vp-c-brand-1); }
+.result-view { text-align: center; }
+.success-icon { display: grid; place-items: center; width: 42px; height: 42px; margin: 0 auto 13px; border-radius: 50%; background: var(--vp-c-brand-soft); color: var(--vp-c-brand-1); }
+.success-icon svg { width: 22px; fill: none; stroke: currentColor; stroke-width: 2.3; }
+.result-view > p { margin: 7px auto 25px; }
+.result-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; text-align: left; }
+.result-grid section { padding: 14px; border: 1px solid var(--vp-c-divider); border-radius: 10px; background: var(--tool-surface-alt, var(--vp-c-bg-alt)); }
+.result-label { display: block; margin-bottom: 8px; color: var(--vp-c-text-2); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.copy-row { display: flex; overflow: hidden; border: 1px solid var(--vp-c-divider); border-radius: 7px; background: var(--vp-c-bg); }
+.copy-row input { flex: 1; min-width: 0; padding: 9px; border: 0; outline: 0; background: transparent; color: var(--vp-c-text-2); font: 10px var(--vp-font-family-mono); }
+.copy-row button { border: 0; background: var(--vp-c-brand-1); color: white; padding: 0 12px; font-size: 10px; font-weight: 700; cursor: pointer; }
+.credentials > p { margin: -4px 0 8px; color: var(--vp-c-text-3); font-size: 9px; }
+.credentials dl { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; margin: 0; font-size: 10px; }
+.credentials dt { color: var(--vp-c-text-3); }
+.credentials dd { min-width: 0; margin: 0; overflow-wrap: anywhere; text-align: right; }
+.credentials code { color: var(--vp-c-text-1); font-size: 9px; }
+.result-actions { display: flex; justify-content: center; gap: 9px; margin-top: 16px; }
+.result-actions a, .result-actions button { min-height: 38px; padding: 0 14px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.result-actions a { display: inline-flex; align-items: center; border: 1px solid var(--vp-c-brand-1); background: var(--vp-c-brand-1); color: white; text-decoration: none; }
+.result-actions button { border: 1px solid var(--vp-c-divider); background: transparent; color: var(--vp-c-text-1); }
+button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px solid var(--vp-c-brand-1); outline-offset: 2px; }
+@media (max-width: 760px) {
+  .quickstart-body { padding: 17px; }
+  .quickstart-intro { align-items: flex-start; }
+  .setup-summary { min-width: 0; }
+  .setup-form, .result-grid { grid-template-columns: 1fr; }
+  .advanced-fields { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .quickstart-intro { display: block; }
+  .setup-summary { justify-content: flex-start; margin-top: 13px; }
+  .secure-pill { width: auto; justify-content: flex-start; }
+  .form-footer { align-items: stretch; flex-direction: column-reverse; gap: 10px; }
+  .primary-action { width: 100%; }
+  .step-track { grid-template-columns: 1fr; gap: 13px; margin-top: 28px; }
+  .step-track li { grid-template-columns: 13px 1fr; justify-items: start; text-align: left; }
+  .step-track li:not(:last-child)::after { top: 12px; bottom: -14px; left: 5px; width: 1px; height: auto; }
+  .result-actions { flex-direction: column; }
+  .result-actions a { justify-content: center; }
+  .quickstart-tip { flex-direction: column; gap: 2px; }
 }
 </style>
