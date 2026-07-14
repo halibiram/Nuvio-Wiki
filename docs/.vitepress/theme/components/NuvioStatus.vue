@@ -102,6 +102,8 @@ const communityServices = computed(() =>
   statusData.value?.services.filter((service) => service.kind === 'community') || []
 )
 
+const showsUptimeMetrics = computed(() => statusData.value?.provider === 'ibbylabs')
+
 const groupOptions = computed(() => {
   const groups = new Map<string, { order: number; count: number }>()
   for (const service of communityServices.value) {
@@ -465,7 +467,10 @@ onUnmounted(() => {
 
               <div class="service-list">
                 <article v-for="service in group.services" :key="service.id" class="service-row">
-                  <div class="service-row__summary">
+                  <div
+                    class="service-row__summary"
+                    :class="{ 'has-uptime': showsUptimeMetrics }"
+                  >
                     <div class="service-identity">
                       <span class="service-dot" :class="`is-${service.status}`" aria-hidden="true"></span>
                       <div>
@@ -496,7 +501,7 @@ onUnmounted(() => {
                       ></span>
                     </div>
 
-                    <div class="service-uptime">
+                    <div v-if="showsUptimeMetrics" class="service-uptime">
                       <span>24h uptime</span>
                       <strong>{{ formatPercent(service.uptimeWindows?.h24) }}</strong>
                     </div>
@@ -789,15 +794,16 @@ onUnmounted(() => {
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
-  gap: 3px;
-  min-width: 37px;
+  gap: 2px;
+  min-width: 70px;
   height: 22px;
 }
 
 .activity-bar {
   display: block;
-  width: 5px;
-  border-radius: 3px;
+  flex: 0 0 4px;
+  width: 4px;
+  border-radius: 999px;
   background: var(--status-muted);
 }
 
@@ -1080,11 +1086,15 @@ onUnmounted(() => {
 
 .service-row__summary {
   display: grid;
-  grid-template-columns: minmax(190px, 1fr) 42px 74px 64px 84px 28px;
+  grid-template-columns: minmax(190px, 1fr) 70px 64px 84px 28px;
   align-items: center;
   gap: 20px;
   min-height: 68px;
   padding: 11px 18px;
+}
+
+.service-row__summary:where(.has-uptime) {
+  grid-template-columns: minmax(190px, 1fr) 70px 74px 64px 84px 28px;
 }
 
 .service-row:last-child { border-bottom: 0; }
@@ -1280,7 +1290,7 @@ onUnmounted(() => {
 
 @media (max-width: 860px) {
   .service-row__summary {
-    grid-template-columns: minmax(160px, 1fr) 42px 64px 84px 28px;
+    grid-template-columns: minmax(160px, 1fr) 70px 64px 84px 28px;
     gap: 14px;
   }
 
