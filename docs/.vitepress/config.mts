@@ -211,6 +211,9 @@ export default defineConfig({
   titleTemplate: ':title | Nuvio Wiki',
   description: 'Community-maintained guides for installing, configuring, and using Nuvio.',
   base,
+  sitemap: {
+    hostname: 'https://nuvio.wiki'
+  },
   cleanUrls: true,
   lastUpdated: true,
   locales,
