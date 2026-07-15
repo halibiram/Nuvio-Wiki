@@ -222,7 +222,6 @@ export default defineConfig({
   },
   head: [
     ['link', { rel: 'icon', type: 'image/png', href: `${base}logo.png` }],
-    ['script', { type: 'module', src: `${base}sidebar-scroll.js?v=20260617e` }],
     ['meta', { name: 'theme-color', content: '#0877f9' }],
     ['meta', { property: 'og:title', content: 'Nuvio Wiki' }],
     ['meta', { property: 'og:description', content: 'Community-maintained guides for installing, configuring, and using Nuvio.' }],

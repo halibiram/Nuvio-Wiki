@@ -315,4 +315,29 @@ const selectTab = (id: ToolId) => {
     display: none;
   }
 }
+
+@media (max-width: 680px) {
+  .tools-container {
+    gap: 16px;
+    margin: 20px calc(var(--nuvio-mobile-gutter) * -1) 0;
+  }
+
+  .tools-tabs {
+    border-inline: 0;
+    border-radius: 0;
+  }
+
+  .tools-content {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .tool-info-header {
+    margin: 0 var(--nuvio-mobile-gutter) 14px;
+    padding-bottom: 14px;
+  }
+}
 </style>

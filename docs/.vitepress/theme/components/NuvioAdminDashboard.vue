@@ -141,6 +141,28 @@ interface SetupDoctorFeedback {
   recent?: FeedbackRecord[] | null
 }
 
+interface PageFeedbackBreakdown {
+  page?: string | null
+  title?: string | null
+  total?: number | null
+  helpful?: number | null
+  notHelpful?: number | null
+  helpRate?: number | null
+  latestAt?: string | null
+}
+
+interface PageFeedbackOverview {
+  summary?: {
+    total?: number | null
+    helpful?: number | null
+    notHelpful?: number | null
+    helpRate?: number | null
+    retainedEntries?: number | null
+    retentionLimit?: number | null
+  } | null
+  byPage?: PageFeedbackBreakdown[] | null
+}
+
 interface ServerLogEntry {
   id?: number | null
   at?: string | null
@@ -162,6 +184,7 @@ interface AdminOverview {
   knowledge?: KnowledgeOverview | null
   integrations?: Record<string, boolean | null> | null
   security?: SecurityOverview | null
+  pageFeedback?: PageFeedbackOverview | null
   setupDoctorFeedback?: SetupDoctorFeedback | null
   serverLogs?: ServerLogsOverview | null
 }
@@ -191,7 +214,7 @@ const emit = defineEmits<{
 const tabs: Array<{ id: AdminTab; label: string; description: string }> = [
   { id: 'overview', label: 'Overview', description: 'Live operating picture' },
   { id: 'traffic', label: 'Traffic', description: 'Requests and latency' },
-  { id: 'feedback', label: 'Doctor feedback', description: 'Guide outcomes and gaps' },
+  { id: 'feedback', label: 'Feedback', description: 'Page and guide outcomes' },
   { id: 'logs', label: 'Server logs', description: 'Live process output' },
   { id: 'services', label: 'Services', description: 'Integrations and knowledge' },
   { id: 'system', label: 'System', description: 'Runtime and security' }
@@ -221,6 +244,9 @@ const traffic = computed(() => overview.value?.traffic || {})
 const runtime = computed(() => overview.value?.runtime || {})
 const knowledge = computed(() => overview.value?.knowledge || {})
 const security = computed(() => overview.value?.security || {})
+const pageFeedback = computed(() => overview.value?.pageFeedback || {})
+const pageFeedbackSummary = computed(() => pageFeedback.value.summary || {})
+const pageFeedbackRows = computed(() => normalizeArray<PageFeedbackBreakdown>(pageFeedback.value.byPage))
 const feedback = computed(() => overview.value?.setupDoctorFeedback || {})
 const feedbackSummary = computed(() => feedback.value.summary || {})
 const feedbackBySymptom = computed(() => normalizeArray<FeedbackBreakdown>(feedback.value.bySymptom))
@@ -939,7 +965,7 @@ onBeforeUnmount(() => {
                   <article class="metric-card metric-card--brand">
                     <span class="metric-card__label">Total requests</span>
                     <strong>{{ formatNumber(traffic.totalRequests, 1) }}</strong>
-                    <small>Since process start</small>
+                    <small>Saved server history</small>
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V9M10 18V5M16 18v-7M22 18V3" /></svg>
                   </article>
                   <article class="metric-card">
@@ -1167,11 +1193,64 @@ onBeforeUnmount(() => {
                 role="tabpanel"
                 aria-labelledby="admin-tab-feedback"
               >
+                <div class="feedback-section-heading">
+                  <div><span>Documentation</span><h3>Page feedback</h3></div>
+                  <p>Anonymous votes from the prompt at the bottom of each wiki page.</p>
+                </div>
+
                 <div class="metric-grid feedback-metric-grid">
                   <article class="metric-card metric-card--brand">
-                    <span class="metric-card__label">Responses</span>
+                    <span class="metric-card__label">Page votes</span>
+                    <strong>{{ formatExactNumber(pageFeedbackSummary.total) }}</strong>
+                    <small>Saved on the server</small>
+                  </article>
+                  <article class="metric-card">
+                    <span class="metric-card__label">Helpful</span>
+                    <strong>{{ formatExactNumber(pageFeedbackSummary.helpful) }}</strong>
+                    <small>Yes responses</small>
+                  </article>
+                  <article class="metric-card" :class="{ 'is-warning': (finiteNumber(pageFeedbackSummary.notHelpful) ?? 0) > 0 }">
+                    <span class="metric-card__label">Needs work</span>
+                    <strong>{{ formatExactNumber(pageFeedbackSummary.notHelpful) }}</strong>
+                    <small>No responses</small>
+                  </article>
+                  <article class="metric-card">
+                    <span class="metric-card__label">Help rate</span>
+                    <strong>{{ formatPercent(pageFeedbackSummary.helpRate) }}</strong>
+                    <small>{{ formatExactNumber(pageFeedbackSummary.retainedEntries) }} of {{ formatExactNumber(pageFeedbackSummary.retentionLimit) }} votes retained</small>
+                  </article>
+                </div>
+
+                <article class="dashboard-card table-card page-feedback-card">
+                  <header class="card-heading"><div><span>Documentation quality</span><h3>Results by page</h3></div><span class="record-count">{{ pageFeedbackRows.length }} pages</span></header>
+                  <div v-if="pageFeedbackRows.length" class="data-table-wrap">
+                    <table class="data-table page-feedback-table">
+                      <thead><tr><th>Page</th><th>Responses</th><th>Helpful</th><th>Needs work</th><th>Help rate</th><th>Latest</th></tr></thead>
+                      <tbody>
+                        <tr v-for="item in pageFeedbackRows" :key="item.page || item.title || ''">
+                          <td><strong>{{ item.title || item.page || 'Unknown page' }}</strong><code>{{ item.page || '—' }}</code></td>
+                          <td>{{ formatExactNumber(item.total) }}</td>
+                          <td>{{ formatExactNumber(item.helpful) }}</td>
+                          <td>{{ formatExactNumber(item.notHelpful) }}</td>
+                          <td>{{ formatPercent(item.helpRate) }}</td>
+                          <td>{{ formatDate(item.latestAt, true) }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div v-else class="inline-empty inline-empty--large">Page feedback will appear here after readers respond.</div>
+                </article>
+
+                <div class="feedback-section-heading feedback-section-heading--spaced">
+                  <div><span>Setup Doctor</span><h3>Guide feedback</h3></div>
+                  <p>Outcomes and diagnostic context from the interactive troubleshooting guide.</p>
+                </div>
+
+                <div class="metric-grid feedback-metric-grid">
+                  <article class="metric-card metric-card--brand">
+                    <span class="metric-card__label">Doctor responses</span>
                     <strong>{{ formatExactNumber(feedbackSummary.total) }}</strong>
-                    <small>Since process start</small>
+                    <small>Saved on the server</small>
                   </article>
                   <article class="metric-card">
                     <span class="metric-card__label">Helpful</span>
@@ -2615,6 +2694,37 @@ onBeforeUnmount(() => {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.feedback-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.feedback-section-heading--spaced { margin-top: 24px; }
+.feedback-section-heading span {
+  color: var(--vp-c-brand-1);
+  font-size: 8px;
+  font-weight: 750;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.feedback-section-heading h3 { margin: 3px 0 0; font-size: 15px; }
+.feedback-section-heading p { max-width: 460px; margin: 0; color: var(--vp-c-text-3); font-size: 9px; text-align: right; }
+
+.page-feedback-card { margin-bottom: 14px; }
+.page-feedback-table { min-width: 760px; }
+.page-feedback-table td:first-child { display: flex; flex-direction: column; gap: 2px; }
+.page-feedback-table td:first-child strong {
+  max-width: 360px;
+  overflow: hidden;
+  color: var(--vp-c-text-1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.page-feedback-table td:first-child code { color: var(--vp-c-text-3); font-size: 8px; }
+
 .feedback-breakdown-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(260px, .5fr);
@@ -3297,6 +3407,12 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 680px) {
+  .feedback-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .feedback-section-heading p { text-align: left; }
   .admin-topbar {
     min-height: 62px;
     gap: 10px;

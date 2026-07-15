@@ -6,6 +6,7 @@ import {
   ADMIN_SECRET_PREFIX,
   createAdminSecurity,
   createDashboardSnapshot,
+  createPageFeedbackStore,
   createRequestMetrics,
   createServerLogStore,
   createSetupDoctorFeedbackStore,
@@ -58,6 +59,38 @@ test('stores bounded anonymous Setup Doctor feedback and builds useful breakdown
   assert.equal(snapshot.bySymptom.length, 2);
   assert.equal(snapshot.recent[0].symptom.id, 'other');
   assert.equal(JSON.stringify(snapshot).includes('203.0.113'), false);
+});
+
+test('stores bounded anonymous page feedback and aggregates it by page', () => {
+  let now = Date.parse('2026-07-15T10:00:00.000Z');
+  const feedback = createPageFeedbackStore({ now: () => now, maxEntries: 3 });
+
+  assert.deepEqual(feedback.record({
+    helpful: true,
+    page: '/installation/windows.html?source=nav',
+    title: 'Install Nuvio on Windows',
+    userAgent: 'must not be retained'
+  }), { ok: true });
+  now += 1_000;
+  assert.deepEqual(feedback.record({
+    helpful: false,
+    page: '/installation/windows.html',
+    title: 'Install Nuvio on Windows'
+  }), { ok: true });
+  now += 1_000;
+  assert.deepEqual(feedback.record({ helpful: true, page: '/faq', title: 'FAQ' }), { ok: true });
+  assert.deepEqual(feedback.record({ helpful: 'yes', page: '/faq' }), { ok: false });
+  assert.deepEqual(feedback.record({ helpful: true, page: 'https://example.com' }), { ok: false });
+
+  const snapshot = feedback.snapshot();
+  assert.deepEqual(snapshot.summary, {
+    total: 3, helpful: 2, notHelpful: 1, helpRate: 0.6667, retainedEntries: 3, retentionLimit: 3
+  });
+  assert.equal(snapshot.byPage[0].page, '/installation/windows.html');
+  assert.equal(snapshot.byPage[0].total, 2);
+  assert.equal(snapshot.byPage[0].helpRate, 0.5);
+  assert.equal(snapshot.recent[0].page, '/faq');
+  assert.equal(JSON.stringify(snapshot).includes('must not be retained'), false);
 });
 
 const STRONG_SECRET =

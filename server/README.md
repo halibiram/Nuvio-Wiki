@@ -16,12 +16,13 @@ The server also checks lazily on the first request after 48 hours. It hashes the
 English wiki and only re-indexes when content changed. New stores are fully
 indexed before the server switches to them; the replaced store is then deleted.
 
-When the service runs as a non-root account, keep mutable metadata outside the
+When the service runs as a non-root account, keep mutable server data outside the
 repository in a directory owned by that account:
 
 ```env
 FILE_SEARCH_DATA_FILE=/var/lib/nuvio-ai/file-search.json
 CACHE_DATA_FILE=/var/lib/nuvio-ai/cache.json
+ADMIN_DATA_DB_FILE=/var/lib/nuvio-ai/admin-data.sqlite
 METADATA_CACHE_DB_FILE=/var/lib/nuvio-ai/metadata-cache.sqlite
 ```
 
@@ -73,13 +74,19 @@ only by the Express server; it is never embedded in the VitePress bundle,
 stored in browser storage, added to a URL, or sent to the AI assistant.
 
 Successful unlocks receive a short-lived HttpOnly, SameSite session cookie.
-Sessions and traffic history are held in memory, so restarting the service logs
-out every administrator and resets dashboard history. In production, keep the
-secret in a root-readable environment file outside this repository, serve the
-site over HTTPS, and include the admin proxy location described below.
+Admin sessions remain in memory, so restarting the service safely logs out every
+administrator. Anonymous request metrics, page votes, and Setup Doctor feedback
+are stored in the WAL-mode SQLite database at `ADMIN_DATA_DB_FILE` and survive a
+restart. Traffic storage is bounded to the newest 500,000 requests by default;
+set `ADMIN_TRAFFIC_MAX_ENTRIES` to tune that limit. Keep the database in a
+writable, backed-up server data directory. Traffic records contain route
+templates and a keyed anonymous digest, never raw IP addresses, user agents, or
+query strings. In production, keep the secret in a root-readable environment
+file outside this repository, serve the site over HTTPS, and include the admin
+proxy location described below.
 
 ## Production Deployment (Nginx Reverse Proxy)
 
-When running the wiki website and AI server in production behind Nginx, you must route requests starting with `/api/ai`, `/api/trakt`, and `/api/admin`, plus `/api/status` and `/api/setup-doctor/feedback`, to the Express backend (default port `3001`).
+When running the wiki website and AI server in production behind Nginx, you must route requests starting with `/api/ai`, `/api/trakt`, and `/api/admin`, plus `/api/status`, `/api/setup-doctor/feedback`, and `/api/page-feedback`, to the Express backend (default port `3001`).
 
-An example Nginx location block configuration is provided in [wiki-api.location.conf](../deploy/nginx/wiki-api.location.conf). Include these configuration blocks inside your site's HTTPS server block to enable the AI assistant, Trakt bridge, live status page, and Setup Doctor feedback.
+An example Nginx location block configuration is provided in [wiki-api.location.conf](../deploy/nginx/wiki-api.location.conf). Include these configuration blocks inside your site's HTTPS server block to enable the AI assistant, Trakt bridge, live status page, and anonymous feedback.

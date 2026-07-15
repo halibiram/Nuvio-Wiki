@@ -3,6 +3,7 @@ import { defineAsyncComponent, h } from 'vue'
 import WelcomePage from './components/WelcomePage.vue'
 import NuvioSidebar from './components/NuvioSidebar.vue'
 import MobileNavigation from './components/MobileNavigation.vue'
+import PageFeedback from './components/PageFeedback.vue'
 import './custom.css'
 import './nuvio-shell.css'
 import './mobile-shell.css'
@@ -10,7 +11,8 @@ import './mobile-shell.css'
 export default {
   extends: DefaultTheme,
   Layout: () => h(DefaultTheme.Layout, null, {
-    'layout-top': () => [h(NuvioSidebar), h(MobileNavigation)]
+    'layout-top': () => [h(NuvioSidebar), h(MobileNavigation)],
+    'doc-after': () => h(PageFeedback)
   }),
   enhanceApp({ app }) {
     app.component('P2PGenerator', defineAsyncComponent(() => import('./components/P2PGenerator.vue')))

@@ -75,6 +75,12 @@ function isoDate(timestamp) {
   return new Date(timestamp).toISOString();
 }
 
+function timestampFromIso(value) {
+  if (typeof value !== 'string') return null;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
 function sha256(value) {
   return createHash('sha256').update(value, 'utf8').digest();
 }
@@ -151,14 +157,15 @@ export function createServerLogStore({
 }
 
 /**
- * Keep anonymous Setup Doctor outcomes in a bounded in-memory store. Records
- * intentionally exclude IP addresses, user agents, free text and credentials.
+ * Keep anonymous Setup Doctor outcomes in a bounded store. Records intentionally
+ * exclude IP addresses, user agents, free text and credentials.
  */
 export function createSetupDoctorFeedbackStore({
   now = Date.now,
   maxEntries = 100,
   maxAnswers = 20,
-  maxResults = 5
+  maxResults = 5,
+  persistence = null
 } = {}) {
   const entries = [];
   const limit = clampInteger(maxEntries, 100, 1, 1_000);
@@ -179,9 +186,9 @@ export function createSetupDoctorFeedbackStore({
     })).filter((item) => item.id && item.label && item.value);
   }
 
-  function record(payload) {
+  function normalize(payload, timestamp = nowValue(now)) {
     const source = payload && typeof payload === 'object' ? payload : {};
-    if (typeof source.helpful !== 'boolean') return { ok: false };
+    if (typeof source.helpful !== 'boolean') return null;
 
     const area = cleanLabel(source.area, 80);
     const platform = cleanLabel(source.platform, 80);
@@ -190,11 +197,11 @@ export function createSetupDoctorFeedbackStore({
     const platformId = cleanLabel(source.platformId, 80);
     const symptomId = cleanLabel(source.symptomId, 80);
     if (!area || !platform || !symptom || !areaId || !platformId || !symptomId) {
-      return { ok: false };
+      return null;
     }
 
-    const timestamp = nowValue(now);
-    entries.push({
+    const page = cleanLabel(source.page, 180);
+    return {
       at: isoDate(timestamp),
       helpful: source.helpful,
       area: { id: areaId, label: area },
@@ -204,10 +211,42 @@ export function createSetupDoctorFeedbackStore({
       results: (Array.isArray(source.results) ? source.results : []).slice(0, resultLimit)
         .map((item) => ({ id: cleanLabel(item?.id, 80), label: cleanLabel(item?.label, 180) }))
         .filter((item) => item.id && item.label),
-      page: cleanLabel(source.page, 180)?.startsWith('/') ? cleanLabel(source.page, 180) : null
-    });
+      page: page?.startsWith('/') ? page : null
+    };
+  }
+
+  function append(entry, persist = true) {
+    if (persist) persistence?.recordSetupDoctorFeedback?.(entry, limit);
+    entries.push(entry);
     if (entries.length > limit) entries.splice(0, entries.length - limit);
+  }
+
+  function record(payload) {
+    const entry = normalize(payload);
+    if (!entry) return { ok: false };
+    append(entry);
     return { ok: true };
+  }
+
+  const restoredEntries = persistence?.loadSetupDoctorFeedback?.(limit);
+  if (Array.isArray(restoredEntries)) {
+    for (const source of restoredEntries) {
+      const timestamp = timestampFromIso(source?.at);
+      if (timestamp === null) continue;
+      const entry = normalize({
+        helpful: source.helpful,
+        areaId: source.area?.id,
+        area: source.area?.label,
+        platformId: source.platform?.id,
+        platform: source.platform?.label,
+        symptomId: source.symptom?.id,
+        symptom: source.symptom?.label,
+        answers: source.answers,
+        results: source.results,
+        page: source.page
+      }, timestamp);
+      if (entry) append(entry, false);
+    }
   }
 
   function breakdown(key) {
@@ -243,6 +282,105 @@ export function createSetupDoctorFeedbackStore({
         answers: entry.answers.map((answer) => ({ ...answer })),
         results: entry.results.map((result) => ({ ...result }))
       }))
+    };
+  }
+
+  return Object.freeze({ record, snapshot });
+}
+
+/**
+ * Keep anonymous documentation-page votes in a bounded store. Only the page
+ * path, page title and boolean outcome are retained.
+ */
+export function createPageFeedbackStore({
+  now = Date.now,
+  maxEntries = 500,
+  persistence = null
+} = {}) {
+  const entries = [];
+  const limit = clampInteger(maxEntries, 500, 1, 5_000);
+
+  function cleanPage(value) {
+    const clean = safeString(value, 180)?.trim();
+    if (!clean?.startsWith('/')) return null;
+    return clean.split(/[?#]/, 1)[0] || '/';
+  }
+
+  function normalize(payload, timestamp = nowValue(now)) {
+    const source = payload && typeof payload === 'object' ? payload : {};
+    if (typeof source.helpful !== 'boolean') return null;
+
+    const page = cleanPage(source.page);
+    if (!page) return null;
+
+    const title = safeString(source.title, 160)?.trim() || null;
+    return {
+      at: isoDate(timestamp),
+      helpful: source.helpful,
+      page,
+      title
+    };
+  }
+
+  function append(entry, persist = true) {
+    if (persist) persistence?.recordPageFeedback?.(entry, limit);
+    entries.push(entry);
+    if (entries.length > limit) entries.splice(0, entries.length - limit);
+  }
+
+  function record(payload) {
+    const entry = normalize(payload);
+    if (!entry) return { ok: false };
+    append(entry);
+    return { ok: true };
+  }
+
+  const restoredEntries = persistence?.loadPageFeedback?.(limit);
+  if (Array.isArray(restoredEntries)) {
+    for (const source of restoredEntries) {
+      const timestamp = timestampFromIso(source?.at);
+      if (timestamp === null) continue;
+      const entry = normalize(source, timestamp);
+      if (entry) append(entry, false);
+    }
+  }
+
+  function snapshot() {
+    const helpful = entries.filter((entry) => entry.helpful).length;
+    const pages = new Map();
+
+    for (const entry of entries) {
+      const current = pages.get(entry.page) || {
+        page: entry.page,
+        title: entry.title,
+        total: 0,
+        helpful: 0,
+        latestAt: entry.at
+      };
+      current.total += 1;
+      if (entry.helpful) current.helpful += 1;
+      if (entry.title) current.title = entry.title;
+      current.latestAt = entry.at;
+      pages.set(entry.page, current);
+    }
+
+    return {
+      summary: {
+        total: entries.length,
+        helpful,
+        notHelpful: entries.length - helpful,
+        helpRate: entries.length ? round(helpful / entries.length, 4) : 0,
+        retainedEntries: entries.length,
+        retentionLimit: limit
+      },
+      byPage: [...pages.values()]
+        .map((item) => ({
+          ...item,
+          notHelpful: item.total - item.helpful,
+          helpRate: round(item.helpful / item.total, 4)
+        }))
+        .sort((left, right) => right.total - left.total || left.page.localeCompare(right.page)),
+      recent: entries.slice().reverse().map((entry) => ({ ...entry }))
     };
   }
 
@@ -628,7 +766,8 @@ function formatAggregate(aggregate, startAt = aggregate?.startAt ?? null) {
  */
 export function createRequestMetrics({
   now = Date.now,
-  anonymizationKey = randomBytes(32),
+  persistence = null,
+  anonymizationKey = persistence?.anonymizationKey || randomBytes(32),
   minuteRetention = 120,
   hourRetention = 48,
   maxRecentRequests = 200,
@@ -725,7 +864,7 @@ export function createRequestMetrics({
     durationMs,
     timestamp,
     clientId
-  }) {
+  }, { persist = true, countTotals = true } = {}) {
     if (isAdminApiPath(path) || isAdminApiPath(route)) return false;
 
     const normalizedMethod = normalizeMethod(method);
@@ -742,10 +881,12 @@ export function createRequestMetrics({
       clientId
     };
 
-    totals.requests += 1;
-    totals[statusClass(normalizedStatus)] += 1;
-    totals.totalDurationMs += normalizedDuration;
-    totals.maxDurationMs = Math.max(totals.maxDurationMs, normalizedDuration);
+    if (countTotals) {
+      totals.requests += 1;
+      totals[statusClass(normalizedStatus)] += 1;
+      totals.totalDurationMs += normalizedDuration;
+      totals.maxDurationMs = Math.max(totals.maxDurationMs, normalizedDuration);
+    }
     pushBounded(durations, normalizedDuration, latencySampleLimit);
 
     updateAggregate(
@@ -777,6 +918,7 @@ export function createRequestMetrics({
     if (recentRequests.length > recentLimit) {
       recentRequests.splice(0, recentRequests.length - recentLimit);
     }
+    if (persist) persistence?.recordRequestMetric?.(record);
     return true;
   }
 
@@ -921,6 +1063,26 @@ export function createRequestMetrics({
         .sort((left, right) => right.requests - left.requests || left.route.localeCompare(right.route)),
       recentRequests: recentRequests.map((request) => ({ ...request }))
     };
+  }
+
+  const restoredRecords = persistence?.loadRequestMetrics?.();
+  const restoredTotals = persistence?.loadRequestMetricTotals?.();
+  const hasRestoredTotals = restoredTotals && Number.isFinite(Number(restoredTotals.requests));
+  if (hasRestoredTotals) {
+    totals.requests = nonNegativeNumber(restoredTotals.requests);
+    totals.successful = nonNegativeNumber(restoredTotals.successful);
+    totals.clientErrors = nonNegativeNumber(restoredTotals.clientErrors);
+    totals.serverErrors = nonNegativeNumber(restoredTotals.serverErrors);
+    totals.totalDurationMs = nonNegativeNumber(restoredTotals.totalDurationMs);
+    totals.maxDurationMs = nonNegativeNumber(restoredTotals.maxDurationMs);
+  }
+  if (Array.isArray(restoredRecords)) {
+    for (const record of restoredRecords) {
+      recordSanitized({
+        ...record,
+        path: record.route
+      }, { persist: false, countTotals: !hasRestoredTotals });
+    }
   }
 
   return Object.freeze({ middleware, recordRequest, snapshot });

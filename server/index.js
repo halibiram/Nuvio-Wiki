@@ -16,6 +16,10 @@ import { runSetup, SetupError } from './quickstart/services.js';
 import { getStatusOverview } from './status.js';
 import { createTraktOAuthStateStore } from './trakt-oauth.js';
 import {
+  createAdminDataStore,
+  DEFAULT_ADMIN_TRAFFIC_MAX_ENTRIES
+} from './admin-data.js';
+import {
   createMetadataCache,
   DEFAULT_METADATA_CACHE_MAX_ENTRIES
 } from './metadata-cache.js';
@@ -28,6 +32,7 @@ import {
   ADMIN_COOKIE_NAME,
   createAdminSecurity,
   createDashboardSnapshot,
+  createPageFeedbackStore,
   createRequestMetrics,
   createServerLogStore,
   createSetupDoctorFeedbackStore,
@@ -49,6 +54,13 @@ const CACHE_FILE = process.env.CACHE_DATA_FILE
 const METADATA_CACHE_DB_FILE = process.env.METADATA_CACHE_DB_FILE
   ? resolve(process.env.METADATA_CACHE_DB_FILE)
   : join(__dirname, 'metadata-cache.sqlite');
+const ADMIN_DATA_DB_FILE = process.env.ADMIN_DATA_DB_FILE
+  ? resolve(process.env.ADMIN_DATA_DB_FILE)
+  : join(__dirname, 'admin-data.sqlite');
+const ADMIN_TRAFFIC_MAX_ENTRIES = positiveInteger(
+  process.env.ADMIN_TRAFFIC_MAX_ENTRIES,
+  DEFAULT_ADMIN_TRAFFIC_MAX_ENTRIES
+);
 const LEGACY_METADATA_CACHE_FILE = join(__dirname, 'metadata-cache.json');
 const METADATA_CACHE_MAX_ENTRIES = positiveInteger(
   process.env.METADATA_CACHE_MAX_ENTRIES,
@@ -87,9 +99,14 @@ if (!process.env.GEMINI_API_KEY) {
 }
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const adminData = createAdminDataStore({
+  file: ADMIN_DATA_DB_FILE,
+  maxTrafficEntries: ADMIN_TRAFFIC_MAX_ENTRIES
+});
 const adminSecurity = createAdminSecurity();
-const requestMetrics = createRequestMetrics();
-const setupDoctorFeedback = createSetupDoctorFeedbackStore();
+const requestMetrics = createRequestMetrics({ persistence: adminData });
+const pageFeedback = createPageFeedbackStore({ persistence: adminData });
+const setupDoctorFeedback = createSetupDoctorFeedbackStore({ persistence: adminData });
 const serverLogs = createServerLogStore();
 const traktOAuthStates = createTraktOAuthStateStore({ allowedOrigins: ALLOWED_ORIGIN });
 
@@ -485,6 +502,7 @@ function buildAdminOverview(session) {
       ...integrations,
       adminDashboard: adminSecurity.isConfigured()
     },
+    pageFeedback: pageFeedback.snapshot(),
     setupDoctorFeedback: setupDoctorFeedback.snapshot(),
     serverLogs: serverLogs.snapshot(),
     security: {
@@ -594,7 +612,7 @@ const setupLimiter = rateLimit({
   keyGenerator: (req) => req.ip
 });
 
-const setupFeedbackLimiter = rateLimit({
+const feedbackLimiter = rateLimit({
   windowMs: 10 * 60_000,
   max: 20,
   standardHeaders: true,
@@ -661,8 +679,14 @@ app.get('/api/admin/overview', requireAdminSession, (req, res) => {
   res.json(buildAdminOverview(req.adminSession));
 });
 
-app.post('/api/setup-doctor/feedback', setupFeedbackLimiter, (req, res) => {
+app.post('/api/setup-doctor/feedback', feedbackLimiter, (req, res) => {
   const result = setupDoctorFeedback.record(req.body);
+  if (!result.ok) return res.status(400).json({ error: 'Invalid feedback payload.' });
+  res.status(201).json({ ok: true });
+});
+
+app.post('/api/page-feedback', feedbackLimiter, (req, res) => {
+  const result = pageFeedback.record(req.body);
   if (!result.ok) return res.status(400).json({ error: 'Invalid feedback payload.' });
   res.status(201).json({ ok: true });
 });

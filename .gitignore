@@ -14,6 +14,9 @@ server/metadata-cache.json
 server/metadata-cache.sqlite
 server/metadata-cache.sqlite-shm
 server/metadata-cache.sqlite-wal
+server/admin-data.sqlite
+server/admin-data.sqlite-shm
+server/admin-data.sqlite-wal
 server/node_modules/
 
 # Scratch files
