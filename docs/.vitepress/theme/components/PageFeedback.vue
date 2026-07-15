@@ -69,20 +69,20 @@ onMounted(restoreVote)
 <template>
   <aside class="page-feedback" aria-labelledby="page-feedback-title">
     <div class="page-feedback__copy">
-      <span class="page-feedback__eyebrow">{{ isDutch ? 'Snelle feedback' : 'Quick feedback' }}</span>
+      <span class="page-feedback__eyebrow">{{ isDutch ? 'Snelle feedback' : 'A quick question' }}</span>
       <strong id="page-feedback-title">
         {{ isDutch ? 'Was deze pagina nuttig?' : 'Was this page helpful?' }}
       </strong>
       <p v-if="choice !== null" role="status" aria-live="polite">
         <template v-if="choice">
-          {{ isDutch ? 'Fijn om te horen. Je kunt het project steunen via Ko-fi.' : 'Glad to hear it. You can support the project on Ko-fi.' }}
+          {{ isDutch ? 'Fijn om te horen. Je kunt het project steunen via Ko-fi.' : 'Glad to hear it. Please consider supporting the project on Ko-fi ❤️' }}
         </template>
         <template v-else>
-          {{ isDutch ? 'Bedankt — je antwoord helpt ons deze pagina te verbeteren.' : 'Thanks — your answer helps us improve this page.' }}
+          {{ isDutch ? 'Bedankt — je antwoord helpt ons deze pagina te verbeteren.' : 'Thanks for the honest feedback. This helps me improve this page' }}
         </template>
       </p>
       <p v-else>
-        {{ isDutch ? 'Je antwoord wordt anoniem gedeeld met de wiki-beheerders.' : 'Your answer is shared anonymously with the wiki admins.' }}
+        {{ isDutch ? 'Je antwoord wordt anoniem gedeeld met de wiki-beheerders.' : 'Your answer will help me to improve the docs.' }}
       </p>
     </div>
 
@@ -129,53 +129,41 @@ onMounted(restoreVote)
 
 <style scoped>
 .page-feedback {
-  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 20px;
-  margin-top: 48px;
-  padding: 22px 24px;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 22%, var(--vp-c-divider));
-  border-radius: 16px;
-  background:
-    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--vp-c-brand-1) 12%, transparent), transparent 42%),
-    var(--vp-c-bg-soft);
-}
-
-.page-feedback::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
-  background: var(--vp-c-brand-1);
-  content: '';
+  gap: 16px;
+  margin-top: 40px;
+  padding: 14px 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  background: var(--vp-c-bg-soft);
 }
 
 .page-feedback__copy { min-width: 0; }
 
 .page-feedback__eyebrow {
   display: block;
-  margin-bottom: 4px;
-  color: var(--vp-c-brand-1);
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: .08em;
+  margin-bottom: 2px;
+  color: var(--vp-c-text-3);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .06em;
   text-transform: uppercase;
 }
 
 .page-feedback strong {
   display: block;
   color: var(--vp-c-text-1);
-  font-size: 17px;
+  font-size: 15px;
   line-height: 1.35;
 }
 
 .page-feedback p {
-  margin: 5px 0 0;
+  margin: 3px 0 0;
   color: var(--vp-c-text-2);
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .page-feedback__actions,
@@ -183,7 +171,8 @@ onMounted(restoreVote)
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 9px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .page-feedback__choice,
@@ -192,49 +181,55 @@ onMounted(restoreVote)
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  min-height: 38px;
-  border-radius: 9px;
+  gap: 6px;
+  min-height: 32px;
+  border-radius: 7px;
   font: inherit;
-  font-size: 13px;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  transition: border-color .18s ease, background-color .18s ease, color .18s ease, transform .18s ease;
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease;
 }
 
 .page-feedback__choice {
-  min-width: 76px;
+  min-width: 62px;
   border: 1px solid var(--vp-c-divider);
-  background: var(--vp-c-bg-elv);
+  background: transparent;
   color: var(--vp-c-text-2);
 }
 
 .page-feedback__choice:hover {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-brand-1);
-  transform: translateY(-1px);
+  border-color: var(--vp-c-text-3);
+  background: var(--vp-c-bg-mute);
+  color: var(--vp-c-text-1);
 }
 
 .page-feedback__choice svg,
 .page-feedback__donate svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   fill: currentColor;
 }
 
 .page-feedback__donate {
-  padding: 0 15px;
-  border: 1px solid #ff5e5b;
-  background: #ff5e5b;
-  color: #fff;
+  padding: 0 11px;
+  border: 1px solid color-mix(in srgb, #ff5e5b 55%, var(--vp-c-divider));
+  background: transparent;
+  color: #e94e4b;
   text-decoration: none;
 }
 
 .page-feedback__donate:hover {
   border-color: #e94e4b;
-  background: #e94e4b;
-  color: #fff;
-  transform: translateY(-1px);
+  background: color-mix(in srgb, #ff5e5b 8%, transparent);
+  color: #e94e4b;
+}
+
+.page-feedback__choice:focus-visible,
+.page-feedback__retry:focus-visible,
+.page-feedback__donate:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
 }
 
 .page-feedback__retry {
@@ -259,16 +254,14 @@ onMounted(restoreVote)
 @media (max-width: 639px) {
   .page-feedback {
     grid-template-columns: 1fr;
-    gap: 16px;
-    margin-top: 36px;
-    padding: 20px;
+    gap: 12px;
+    margin-top: 32px;
+    padding: 14px;
   }
 
   .page-feedback__actions,
   .page-feedback__response-actions { justify-content: flex-start; }
 
-  .page-feedback__choice { flex: 1; }
-
-  .page-feedback__error { margin-top: -8px; }
+  .page-feedback__error { margin-top: -6px; }
 }
 </style>
