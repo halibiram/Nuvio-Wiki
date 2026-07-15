@@ -24,9 +24,7 @@
 ## Community Resources
 - **Viren070:** - [Guide](https://guides.viren070.me/)
 - **Duckstreams:** - [Guide and Quickstart Tool](https://duckkota.gitlab.io/guides/nuvio/)
-- **Nuvio Quickstart Tool:** - [Set up Nuvio addons automatically](https://nuvio-quickstart.duckdns.org/)
 - **Addons:** - [List of Available Addons](https://stremio-addons.net/)
-- **Nuvio Trakt Bridge:** - [Import tool for Trakt history](https://trakt-nuvio.duckdns.org/)
 - **Anime Skip:** - [Generate Client ID for automatic skipping](https://anime-skip.com)
 - **Intro DB:** - [Generate API key for community intros/outros](https://introdb.app)
 - **SegmentScraper** - [Extract inro, outro and recap segements from popular streaming services](https://github.com/mronion212/SegmentScraper)
